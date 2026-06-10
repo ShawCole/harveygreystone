@@ -3,4 +3,9 @@ node_modules/
 .env
 .env.*
 *.local
-sa-key.json
+.secrets.env
+# service-account keys — NEVER commit
+.sa-key.json
+*sa-key*.json
+*-sa.json
+*.serviceaccount.json

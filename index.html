@@ -864,7 +864,6 @@
     }
   </script>
 <script>
-  const PASSWORD = 'HGCARK2027!';
   const STORAGE_KEY = 'hgc_data';
   
   let deals = [
@@ -959,16 +958,24 @@
   }
   
   async function login() {
-    if (document.getElementById('passwordInput').value === PASSWORD) {
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('mainApp').style.display = 'grid';
-      await loadData();
-      updateMetrics();
-      renderDashboard();
-      renderDeals();
-    } else {
-      alert('❌ Incorrect password');
+    const pw = document.getElementById('passwordInput').value;
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw })
+      });
+      if (!res.ok) { alert('❌ Incorrect password'); return; }
+    } catch (err) {
+      alert('⚠️ Could not reach the server. Check your connection and try again.');
+      return;
     }
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'grid';
+    await loadData();
+    updateMetrics();
+    renderDashboard();
+    renderDeals();
   }
   
   async function refreshFromDB() {
