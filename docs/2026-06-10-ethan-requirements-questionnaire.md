@@ -200,6 +200,28 @@ This questionnaire is informed by what professional virtual data rooms (Datasite
 
 ---
 
+## P. Client portals, NCNDA e-signature & certificates
+
+*A per-deal, client-facing link where the company raising capital can sign your NCNDA and upload their documents — without giving them access to the rest of your platform. (We're building a first version of this now: the portal enforces signing before upload; internal access stays soft-gated for now and can become a hard requirement later.)*
+
+1. **NCNDA flow:** confirm the order — your internal team signs first (so it arrives "already signed by us"), then the client countersigns before they can upload anything. Is that right?
+2. Who on your side counts as **"internal team" that must sign** — specific people, or any HGC partner? Should *all* of them be required, or is one authorized signer enough?
+3. Is it a **single standing NCNDA** (same document every deal) or does the agreement text change per deal/client?
+4. Do you want the signed certificate to be **legally robust** (counsel-reviewed text, audit trail, possibly a real e-sign provider like DocuSign), or is a clean in-house signature + tamper-evident certificate enough for now?
+5. Capabilities:
+   - 🔶 **Per-deal client upload link** (unique, client-facing, no full-platform access) — **M / N / L / X**
+   - 🔶 **NCNDA gate** — client must sign before uploading/viewing anything — **M / N / L / X**
+   - 🔶 **Multi-party signing** — internal team signs, then client signs, then it's finalized — **M / N / L / X**
+   - 🔶 **Verifiable certificate** generated when all parties have signed (tamper-evident, with a verification link) — **M / N / L / X**
+   - ⬜ **Hard gate** — eventually block *internal* platform/data access too if the NCNDA isn't signed — **M / N / L / X**
+   - ⬜ **Real e-signature provider** (DocuSign/Dropbox Sign) for legal-grade signatures — **M / N / L / X**
+   - ⬜ **Countersigned PDF** — produce a final signed PDF of the NCNDA itself (not just a certificate) — **M / N / L / X**
+   - ⬜ **Per-document NDA** (different documents require different/additional agreements) — **M / N / L / X**
+   - ⬜ **Client sees a checklist** of what to upload (your required-doc list) on their portal — **M / N / L / X**
+   - ⬜ **Notify the team** when a client signs or uploads — **M / N / L / X**
+
+---
+
 ## O. Anything else
 What does this platform need to do that isn't captured above? What does a "perfect" version look like to you a year from now?
 

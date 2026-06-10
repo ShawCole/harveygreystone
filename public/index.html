@@ -1701,6 +1701,8 @@ ${docText}`;
               <div class="documents-title">Data Room</div>
               <div id="dr-summary-${d.id}">${window.HGCDataRoom ? HGCDataRoom.cardSummary(d) : '<div style="color:#64748b;font-size:12px;">Loading…</div>'}</div>
               <button class="add-doc-btn" onclick="HGCDataRoom.open(${d.id})">📁 Open Data Room</button>
+              <div style="margin-top:6px;">${window.HGCNcnda ? HGCNcnda.cardStatus(d) : ''}</div>
+              <button class="add-doc-btn" onclick="HGCNcnda.open(${d.id})">🔏 Client Portal &amp; NCNDA</button>
             </div>
           </div>
         </div>
@@ -2046,7 +2048,22 @@ ${docText}`;
   </div>
 </div>
 
+<!-- CLIENT PORTAL & NCNDA MODAL -->
+<div class="modal-overlay" id="ncndaModal">
+  <div class="modal" style="max-width: 760px;">
+    <div class="modal-header" style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem;">
+      <div>
+        <h2 id="ncDealName">Client Portal &amp; NCNDA</h2>
+        <p>Share a signing + upload link with the client. They sign your NCNDA before they can upload.</p>
+      </div>
+      <button class="btn btn-secondary btn-small" onclick="HGCNcnda.close()">Close</button>
+    </div>
+    <div class="modal-body" id="ncBody" style="max-height:65vh; overflow-y:auto;"></div>
+  </div>
+</div>
+
 <script src="/dataroom.js"></script>
+<script src="/ncnda.js"></script>
 </body>
 </html>
 

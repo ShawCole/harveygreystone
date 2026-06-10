@@ -98,4 +98,43 @@ async function writeAll({ deals, tasks, contacts }) {
   }
 }
 
-module.exports = { getPool, ensureSchema, readAll, writeAll };
+// --- single-deal helpers (used by the NCNDA / client-portal endpoints) ---
+
+async function getDeal(id) {
+  const pool = await getPool();
+  const { rows } = await pool.query('SELECT payload FROM deals WHERE id = $1', [id]);
+  return rows[0] ? rows[0].payload : null;
+}
+
+async function saveDeal(id, payload) {
+  const pool = await getPool();
+  await pool.query(
+    `INSERT INTO deals (id, payload, updated_at) VALUES ($1, $2, now())
+     ON CONFLICT (id) DO UPDATE SET payload = EXCLUDED.payload, updated_at = now()`,
+    [id, payload]
+  );
+}
+
+// Look up a deal by its client-portal token (stored at payload.ncnda.token).
+async function findDealByToken(token) {
+  if (!token) return null;
+  const pool = await getPool();
+  const { rows } = await pool.query(
+    `SELECT id, payload FROM deals WHERE payload->'ncnda'->>'token' = $1 LIMIT 1`,
+    [token]
+  );
+  return rows[0] ? { id: Number(rows[0].id), payload: rows[0].payload } : null;
+}
+
+// Look up a deal by a finalized NCNDA certificate id (for public verification).
+async function findDealByCertificate(certId) {
+  if (!certId) return null;
+  const pool = await getPool();
+  const { rows } = await pool.query(
+    `SELECT id, payload FROM deals WHERE payload->'ncnda'->>'certificateId' = $1 LIMIT 1`,
+    [certId]
+  );
+  return rows[0] ? { id: Number(rows[0].id), payload: rows[0].payload } : null;
+}
+
+module.exports = { getPool, ensureSchema, readAll, writeAll, getDeal, saveDeal, findDealByToken, findDealByCertificate };

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Document Upload — HGC & ARK Capital Consulting</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    :root { --primary:#0f172a; --secondary:#64748b; --accent:#0ea5e9; --success:#10b981; --danger:#ef4444; --border:#e2e8f0; --light:#f8fafc; --lighter:#f1f5f9; }
+    body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif; background:linear-gradient(135deg,#0f172a,#1e293b); color:var(--primary); min-height:100vh; padding:2rem 1rem; line-height:1.6; }
+    .wrap { max-width:760px; margin:0 auto; }
+    .card { background:#fff; border-radius:18px; box-shadow:0 20px 40px rgba(0,0,0,.25); overflow:hidden; margin-bottom:1.5rem; }
+    .hdr { background:linear-gradient(135deg,#0ea5e9,#0284c7); color:#fff; padding:2rem; }
+    .hdr h1 { font-size:24px; font-weight:800; }
+    .hdr p { opacity:.9; font-size:14px; margin-top:.25rem; }
+    .body { padding:2rem; }
+    .step { font-size:11px; font-weight:800; color:var(--accent); text-transform:uppercase; letter-spacing:.6px; margin-bottom:.5rem; }
+    h2 { font-size:19px; font-weight:700; margin-bottom:1rem; }
+    .ncnda { max-height:320px; overflow-y:auto; border:1px solid var(--border); border-radius:12px; padding:1.25rem; background:var(--lighter); font-size:13px; white-space:pre-wrap; margin-bottom:1rem; }
+    .signed-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,.12); color:#065f46; border:1px solid rgba(16,185,129,.3); padding:6px 12px; border-radius:8px; font-size:12px; font-weight:700; margin-bottom:1rem; }
+    label { display:block; font-weight:600; font-size:13px; margin-bottom:.4rem; }
+    input { width:100%; padding:11px 14px; border:1px solid var(--border); border-radius:10px; font-size:14px; font-family:inherit; margin-bottom:1rem; }
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    .chk { display:flex; gap:10px; align-items:flex-start; margin-bottom:1.25rem; }
+    .chk input { width:18px; height:18px; margin-top:2px; }
+    .chk label { font-weight:400; color:var(--secondary); }
+    .btn { padding:13px 24px; border:none; border-radius:10px; font-weight:700; cursor:pointer; font-size:14px; width:100%; }
+    .btn-primary { background:var(--primary); color:#fff; } .btn-primary:disabled { opacity:.5; cursor:not-allowed; }
+    .btn-accent { background:var(--accent); color:#fff; }
+    .drop { border:2px dashed #cbd5e1; border-radius:14px; padding:2.5rem; text-align:center; background:var(--lighter); cursor:pointer; }
+    .drop .ico { font-size:40px; } .drop .t { font-weight:700; margin:.5rem 0 .25rem; } .drop .s { font-size:13px; color:var(--secondary); }
+    .file { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--lighter); border-radius:8px; font-size:13px; margin-top:8px; }
+    .muted { color:var(--secondary); font-size:12px; }
+    .hide { display:none; }
+    .err { color:var(--danger); font-size:13px; margin-top:.5rem; }
+    .cert { background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.3); border-radius:12px; padding:1rem; font-size:12px; margin-top:1rem; }
+    .foot { text-align:center; color:rgba(255,255,255,.6); font-size:12px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="hdr">
+      <h1 id="title">HGC &amp; ARK Capital Consulting</h1>
+      <p id="subtitle">Secure document portal</p>
+    </div>
+    <div class="body" id="content"><p class="muted">Loading…</p></div>
+  </div>
+  <div class="foot">🔒 Confidential. Access is governed by the NCNDA. Powered by HGC &amp; ARK Capital Consulting.</div>
+</div>
+
+<script>
+  const token = new URLSearchParams(location.search).get('t');
+  const C = document.getElementById('content');
+  let state = null;
+
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+  async function load(){
+    if(!token){ C.innerHTML='<p class="err">Missing access link. Please use the link provided to you.</p>'; return; }
+    try{
+      const r = await fetch('/api/portal?token='+encodeURIComponent(token));
+      if(!r.ok){ const e=await r.json().catch(()=>({})); C.innerHTML='<p class="err">'+esc(e.error||'This link is invalid or has expired.')+'</p>'; return; }
+      state = await r.json();
+      document.getElementById('title').textContent = state.company ? `${state.company}` : 'HGC & ARK Capital Consulting';
+      document.getElementById('subtitle').textContent = 'Secure document portal · ' + (state.dealName||'');
+      render();
+    }catch(e){ C.innerHTML='<p class="err">Could not load the portal. Please try again.</p>'; }
+  }
+
+  function render(){
+    if(state.clientSigned) return renderUpload();
+    renderSign();
+  }
+
+  function renderSign(){
+    const internal = (state.internalSigners||[]);
+    const internalLine = internal.length
+      ? `<div class="signed-badge">✓ Signed by HGC &amp; ARK: ${internal.map(s=>esc(s.name)).join(', ')}</div>`
+      : `<div class="muted" style="margin-bottom:1rem;">Awaiting countersignature — sign below to proceed.</div>`;
+    C.innerHTML = `
+      <div class="step">Step 1 of 2 · Sign the agreement</div>
+      <h2>${esc(state.agreementTitle)}</h2>
+      ${internalLine}
+      <div class="ncnda">${esc(state.agreementText)}</div>
+      <div class="row">
+        <div><label>Full name *</label><input id="sg-name" placeholder="Your full name"></div>
+        <div><label>Title</label><input id="sg-title" placeholder="e.g. CEO"></div>
+      </div>
+      <label>Email *</label><input id="sg-email" type="email" placeholder="you@company.com">
+      <label>Type your name to sign *</label><input id="sg-sign" placeholder="Type your full legal name">
+      <div class="chk"><input type="checkbox" id="sg-agree"><label for="sg-agree">I have read and agree to be bound by this Non-Circumvention &amp; Non-Disclosure Agreement, and I am authorized to sign on behalf of my organization.</label></div>
+      <button class="btn btn-primary" id="sg-btn" onclick="sign()">Sign &amp; Continue</button>
+      <div class="err hide" id="sg-err"></div>`;
+  }
+
+  async function sign(){
+    const name=document.getElementById('sg-name').value.trim();
+    const title=document.getElementById('sg-title').value.trim();
+    const email=document.getElementById('sg-email').value.trim();
+    const typed=document.getElementById('sg-sign').value.trim();
+    const agree=document.getElementById('sg-agree').checked;
+    const err=document.getElementById('sg-err');
+    err.classList.add('hide');
+    if(!name||!email||!typed||!agree){ err.textContent='Please complete all required fields and accept the agreement.'; err.classList.remove('hide'); return; }
+    if(typed.toLowerCase()!==name.toLowerCase()){ err.textContent='Your typed signature must match your full name.'; err.classList.remove('hide'); return; }
+    const btn=document.getElementById('sg-btn'); btn.disabled=true; btn.textContent='Signing…';
+    try{
+      const r=await fetch('/api/portal-sign',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,name,title,email,agree:true})});
+      const d=await r.json();
+      if(!r.ok) throw new Error(d.error||'Could not record signature');
+      await load();
+    }catch(e){ err.textContent=e.message; err.classList.remove('hide'); btn.disabled=false; btn.textContent='Sign & Continue'; }
+  }
+
+  function renderUpload(){
+    const cs = state.clientSigner;
+    const certLine = state.certificateId
+      ? `<div class="cert">✓ Agreement finalized. Verifiable certificate: <strong>${esc(state.certificateId)}</strong> · <a href="/api/certificate?cert=${encodeURIComponent(state.certificateId)}" target="_blank">verify</a></div>`
+      : '';
+    const uploads = (state.uploads||[]).map(u=>`<div class="file"><span>📄 ${esc(u.filename)}</span><span class="muted">${new Date(u.uploadedAt).toLocaleString()}</span></div>`).join('') || '<p class="muted">No documents uploaded yet.</p>';
+    C.innerHTML = `
+      <div class="step">Step 2 of 2 · Upload documents</div>
+      <div class="signed-badge">✓ NCNDA signed${cs?` by ${esc(cs.name)}`:''} on ${cs?new Date(cs.signedAt).toLocaleDateString():''}</div>
+      <h2>Upload your documents</h2>
+      <p class="muted" style="margin-bottom:1rem;">Drop files below or click to browse. Your uploads are encrypted and visible only to the HGC &amp; ARK team.</p>
+      <div class="drop" id="drop"><div class="ico">📥</div><div class="t">Drop files here to upload</div><div class="s">PDF, Excel, Word, images — any deal document</div>
+        <input type="file" id="fileInput" multiple class="hide"></div>
+      <div id="uploadList" style="margin-top:1rem;">${uploads}</div>
+      ${certLine}
+      <div class="err hide" id="up-err"></div>`;
+    const drop=document.getElementById('drop'), fi=document.getElementById('fileInput');
+    drop.onclick=()=>fi.click();
+    drop.ondragover=e=>{e.preventDefault(); drop.style.borderColor='#0ea5e9';};
+    drop.ondragleave=e=>{e.preventDefault(); drop.style.borderColor='#cbd5e1';};
+    drop.ondrop=e=>{e.preventDefault(); drop.style.borderColor='#cbd5e1'; handle(e.dataTransfer.files);};
+    fi.onchange=()=>handle(fi.files);
+  }
+
+  async function handle(files){
+    const err=document.getElementById('up-err'); err.classList.add('hide');
+    for(const f of files){
+      try{
+        const r=await fetch('/api/portal-upload-url',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,filename:f.name,contentType:f.type||'application/octet-stream'})});
+        const d=await r.json();
+        if(!r.ok) throw new Error(d.error||'Upload not permitted');
+        const put=await fetch(d.url,{method:'PUT',headers:{'Content-Type':f.type||'application/octet-stream'},body:f});
+        if(!put.ok) throw new Error('Upload failed');
+        await fetch('/api/portal-record',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,path:d.path,filename:f.name,size:f.size})});
+      }catch(e){ err.textContent='“'+f.name+'”: '+e.message; err.classList.remove('hide'); }
+    }
+    await load();
+  }
+
+  load();
+</script>
+</body>
+</html>
