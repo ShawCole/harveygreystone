@@ -1698,16 +1698,9 @@ ${docText}`;
             </div>
             
             <div class="documents-section">
-              <div class="documents-title">Docs (${d.files.length})</div>
-              <div class="document-list">
-                ${d.files.length > 0 ? d.files.map(f => `
-                  <div class="document-item">
-                    <div class="document-name"><div class="document-icon">📄</div>${f.name}</div>
-                    <button class="doc-btn" style="color: #ef4444;" onclick="deleteDocument(${d.id}, ${f.id})">×</button>
-                  </div>
-                `).join('') : '<div style="color: #64748b; font-size: 12px;">None</div>'}
-              </div>
-              <button class="add-doc-btn" onclick="addDocument(${d.id})">+ Document</button>
+              <div class="documents-title">Data Room</div>
+              <div id="dr-summary-${d.id}">${window.HGCDataRoom ? HGCDataRoom.cardSummary(d) : '<div style="color:#64748b;font-size:12px;">Loading…</div>'}</div>
+              <button class="add-doc-btn" onclick="HGCDataRoom.open(${d.id})">📁 Open Data Room</button>
             </div>
           </div>
         </div>
@@ -2038,6 +2031,22 @@ ${docText}`;
   }
 </script>
 
+<!-- DATA ROOM MODAL -->
+<div class="modal-overlay" id="dataRoomModal">
+  <div class="modal" style="max-width: 900px;">
+    <div class="modal-header" style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem;">
+      <div>
+        <h2 id="drDealName">Data Room</h2>
+        <p id="drDealMeta">Capital raise document checklist &amp; intake tracker</p>
+      </div>
+      <button class="btn btn-secondary btn-small" onclick="HGCDataRoom.close()">Close</button>
+    </div>
+    <div id="drControls" style="display:flex; gap:1.5rem; align-items:center; flex-wrap:wrap; padding:1rem; background:var(--lighter); border-radius:12px; margin-bottom:1rem;"></div>
+    <div class="modal-body" id="drBody" style="max-height:60vh; overflow-y:auto;"></div>
+  </div>
+</div>
+
+<script src="/dataroom.js"></script>
 </body>
 </html>
 
