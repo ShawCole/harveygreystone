@@ -90,6 +90,7 @@
     if (!deal.dataRoom) deal.dataRoom = {};
     currentDealId = dealId;
     document.getElementById('drDealName').textContent = `Data Room — ${deal.name}`;
+    ensureDelegation();
     render();
     document.getElementById('dataRoomModal').classList.add('show');
   }
@@ -137,21 +138,47 @@
     document.getElementById('drBody').innerHTML = html;
   }
 
+  // Rows carry their docId/path in data-* attributes and are wired via one
+  // delegated listener (see ensureDelegation) — no inline handlers built from
+  // strings, so neither a filename/path nor a docId can break out into markup.
   function docRow(deal, id, doc, req, st) {
     const file = st.file;
     const sel = STATUSES.map((s) => `<option value="${s}" ${st.status === s ? 'selected' : ''}>${STATUS_LABEL[s]}</option>`).join('');
-    const safePath = file ? file.path.replace(/'/g, "\\'") : '';
     const badge = req
       ? '<span style="font-size:10px;color:#991b1b;background:#fecaca;padding:1px 6px;border-radius:4px;font-weight:700;">REQ</span>'
       : '<span style="font-size:10px;color:#64748b;background:#e2e8f0;padding:1px 6px;border-radius:4px;font-weight:700;">OPT</span>';
+    const fileLine = file
+      ? `<div style="font-size:11px;color:var(--accent);margin-top:3px;">📄 <a href="#" data-act="download" data-path="${esc(file.path)}">${esc(file.filename)}</a> · <a href="#" style="color:#ef4444;" data-act="remove" data-id="${esc(id)}">remove</a></div>`
+      : '';
     return `<div style="display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:8px 10px;border-radius:8px;background:var(--lighter);margin-bottom:6px;">
       <div style="min-width:0;">
-        <div style="font-size:13px;font-weight:600;">${doc.name} ${badge}</div>
-        ${file ? `<div style="font-size:11px;color:var(--accent);margin-top:3px;">📄 <a href="#" onclick="HGCDataRoom.download('${safePath}');return false;">${esc(file.filename)}</a> · <a href="#" style="color:#ef4444;" onclick="HGCDataRoom.removeFile('${id}');return false;">remove</a></div>` : ''}
+        <div style="font-size:13px;font-weight:600;">${esc(doc.name)} ${badge}</div>
+        ${fileLine}
       </div>
-      <select onchange="HGCDataRoom.setStatus('${id}', this.value)" style="padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-weight:600;border-left:3px solid ${STATUS_COLOR[st.status] || '#94a3b8'};">${sel}</select>
-      <button class="doc-btn" onclick="HGCDataRoom.upload('${id}')" style="white-space:nowrap;">⬆ Upload</button>
+      <select data-act="status" data-id="${esc(id)}" style="padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-weight:600;border-left:3px solid ${STATUS_COLOR[st.status] || '#94a3b8'};">${sel}</select>
+      <button class="doc-btn" data-act="upload" data-id="${esc(id)}" style="white-space:nowrap;">⬆ Upload</button>
     </div>`;
+  }
+
+  let delegated = false;
+  function ensureDelegation() {
+    if (delegated) return;
+    const body = document.getElementById('drBody');
+    if (!body) return;
+    body.addEventListener('click', (e) => {
+      const el = e.target.closest('[data-act]');
+      if (!el || !body.contains(el)) return;
+      const act = el.dataset.act;
+      if (act === 'download') { e.preventDefault(); download(el.dataset.path); }
+      else if (act === 'remove') { e.preventDefault(); removeFile(el.dataset.id); }
+      else if (act === 'upload') { e.preventDefault(); upload(el.dataset.id); }
+    });
+    body.addEventListener('change', (e) => {
+      const el = e.target.closest('select[data-act="status"]');
+      if (!el || !body.contains(el)) return;
+      setStatus(el.dataset.id, el.value);
+    });
+    delegated = true;
   }
 
   function setStatus(id, val) {
