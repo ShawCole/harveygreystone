@@ -1,5 +1,7 @@
 [build]
-  publish = "."
+  # ONLY this folder is served as the public site. Secrets (.secrets.env),
+  # source, and the functions dir live OUTSIDE it and are never published.
+  publish = "public"
   functions = "netlify/functions"
 
 # Serve every /api/* path from the matching function file.
