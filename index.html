@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HGC & ARK Capital Consulting — Deal Platform</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --primary: #0f172a;
+      --secondary: #64748b;
+      --accent: #0ea5e9;
+      --accent-dark: #0284c7;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --light: #f8fafc;
+      --lighter: #f1f5f9;
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 20px 40px rgba(0,0,0,0.12);
+    }
+    
+    body {
+      font-family: 'Segoe UI', '-apple-system', BlinkMacSystemFont, sans-serif;
+      background: var(--light);
+      color: var(--primary);
+      line-height: 1.6;
+    }
+    
+    .auth-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 1rem; }
+    .auth-container { background: white; border-radius: 20px; box-shadow: var(--shadow-lg); max-width: 1000px; width: 100%; overflow: hidden; display: grid; grid-template-columns: 1fr 1fr; }
+    .auth-content { padding: 3.5rem; display: flex; flex-direction: column; justify-content: center; }
+    .auth-graphic { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); padding: 3rem; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; }
+    .auth-graphic h2 { font-size: 32px; margin-bottom: 1rem; }
+    .auth-header h1 { font-size: 36px; margin-bottom: 0.5rem; font-weight: 700; }
+    .auth-header p { color: var(--secondary); margin-bottom: 2rem; font-size: 15px; }
+    .nda-scroll { max-height: 450px; overflow-y: auto; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; background: var(--lighter); margin-bottom: 1.5rem; font-size: 13px; line-height: 1.9; }
+    .nda-scroll h3 { font-size: 14px; font-weight: 700; margin: 1.5rem 0 0.5rem 0; color: var(--primary); }
+    .nda-scroll p { color: var(--secondary); margin-bottom: 0.75rem; }
+    
+    .form-group { margin-bottom: 1.5rem; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 14px; color: var(--primary); }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; font-family: inherit; transition: all 0.3s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
+    
+    .checkbox-group { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 1.5rem; }
+    .checkbox-group input { width: 18px; height: 18px; margin-top: 2px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0; }
+    .checkbox-group label { margin: 0; cursor: pointer; font-weight: 400; font-size: 14px; color: var(--secondary); }
+    
+    .btn { padding: 11px 24px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 14px; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover:not(:disabled) { background: #1e293b; transform: translateY(-1px); box-shadow: var(--shadow); }
+    .btn-secondary { background: var(--lighter); color: var(--primary); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover { background: #059669; }
+    .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
+    .btn-small { padding: 8px 14px; font-size: 12px; }
+    
+    .app-container { display: grid; grid-template-rows: auto auto auto 1fr; min-height: 100vh; background: var(--light); }
+    .app-header { background: white; border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm); }
+    .header-left h1 { font-size: 26px; margin-bottom: 0.25rem; font-weight: 700; }
+    .header-left p { font-size: 12px; color: var(--secondary); }
+    .header-right { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .security-badge { background: rgba(14, 165, 233, 0.1); color: var(--accent); padding: 8px 16px; border-radius: 10px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .confidential-banner { background: linear-gradient(90deg, #fecaca 0%, #fca5a5 100%); color: #7f1d1d; padding: 12px 2rem; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #f87171; }
+    
+    .toolbar { padding: 1.5rem 2rem; background: white; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .toolbar-left { display: flex; gap: 1rem; align-items: center; }
+    .toolbar-right { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .search-box { padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; width: 280px; max-width: 100%; }
+    .filter-group { display: flex; gap: 6px; }
+    .filter-btn { padding: 8px 16px; border: 1px solid var(--border); background: white; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
+    .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    
+    .nav-tabs { background: white; border-bottom: 1px solid var(--border); display: flex; padding: 0 2rem; gap: 1.5rem; overflow-x: auto; }
+    .nav-tab { padding: 16px 0; background: none; border: none; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--secondary); border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; }
+    .nav-tab:hover { color: var(--primary); }
+    .nav-tab.active { color: var(--primary); border-bottom-color: var(--accent); }
+    
+    .content { padding: 2rem; overflow-y: auto; max-width: 2000px; margin: 0 auto; width: 100%; }
+    .content-section { display: none; }
+    .content-section.active { display: block; animation: fadeIn 0.2s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    
+    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+    .metric-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: var(--shadow-sm); border-left: 4px solid var(--accent); transition: all 0.3s; }
+    .metric-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .metric-label { font-size: 12px; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 0.5rem; font-weight: 700; }
+    .metric-value { font-size: 36px; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem; }
+    .metric-change { font-size: 12px; color: var(--secondary); }
+    
+    .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .chart-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: var(--shadow-sm); }
+    .chart-title { font-size: 16px; font-weight: 700; margin-bottom: 1rem; color: var(--primary); }
+    
+    .deals-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 1.5rem; }
+    .deal-card { background: white; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); overflow: hidden; transition: all 0.3s; cursor: grab; }
+    .deal-card:active { cursor: grabbing; }
+    .deal-card:hover { box-shadow: var(--shadow); border-color: var(--accent); transform: translateY(-2px); }
+    
+    .deal-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 1.5rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+    .deal-header-content { flex: 1; }
+    .deal-rank { font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 0.5rem; font-weight: 700; }
+    .deal-name { font-size: 18px; font-weight: 700; margin-bottom: 0.5rem; }
+    .deal-amount { font-size: 28px; font-weight: 800; margin: 0.75rem 0; }
+    .deal-meta { font-size: 12px; opacity: 0.85; }
+    .deal-delete { background: rgba(239, 68, 68, 0.2); color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; }
+    
+    .deal-body { padding: 1.5rem; }
+    .deal-field { margin-bottom: 1.25rem; }
+    .deal-field-label { font-size: 11px; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 0.4rem; font-weight: 700; display: block; }
+    .deal-field-input { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; }
+    .deal-field-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.1); }
+    
+    .deal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    .deal-row-full { grid-column: 1 / -1; }
+    
+    .status-badges { display: flex; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
+    .status-badge { padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+    .status-lead { background: #dbeafe; color: #0369a1; }
+    .status-proposal { background: #fef3c7; color: #92400e; }
+    .status-negotiation { background: #fecaca; color: #991b1b; }
+    .status-closed { background: #d1fae5; color: #065f46; }
+    
+    .urgency-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+    .urgency-btn { padding: 8px; border: 1px solid var(--border); background: white; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; transition: all 0.2s; }
+    .urgency-btn.urgent { background: #fee2e2; border-color: #dc2626; color: #991b1b; }
+    .urgency-btn.high { background: #fef3c7; border-color: #f59e0b; color: #92400e; }
+    .urgency-btn.medium { background: #dbeafe; border-color: #0284c7; color: #0369a1; }
+    
+    .deal-metrics { background: #f1f5f9; border-radius: 8px; padding: 1rem; margin-top: 1rem; font-size: 12px; }
+    .metric-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+    .metric-row:last-child { margin-bottom: 0; }
+    .metric-label { color: var(--secondary); font-weight: 600; }
+    .metric-value-small { color: var(--primary); font-weight: 700; }
+    
+    .documents-section { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+    .documents-title { font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 1rem; }
+    .document-list { display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; }
+    .document-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: var(--lighter); border-radius: 8px; font-size: 12px; }
+    .document-name { display: flex; align-items: center; gap: 8px; flex: 1; color: var(--primary); font-weight: 500; }
+    .document-icon { width: 24px; height: 24px; background: rgba(14, 165, 233, 0.15); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+    .document-actions { display: flex; gap: 4px; }
+    .doc-btn { padding: 4px 8px; background: white; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 11px; color: var(--accent); font-weight: 600; }
+    .add-doc-btn { width: 100%; padding: 10px; border: 1px dashed var(--border); background: var(--lighter); border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--secondary); margin-top: 0.75rem; }
+    
+    .pipeline-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; }
+    .pipeline-title { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 1rem; }
+    .pipeline-item { padding: 12px; background: var(--lighter); border-radius: 8px; margin-bottom: 8px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
+    
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: white; border-radius: 16px; padding: 2rem; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); }
+    .modal-header { margin-bottom: 1.5rem; }
+    .modal-header h2 { font-size: 24px; margin-bottom: 0.5rem; font-weight: 700; }
+    .modal-header p { color: var(--secondary); font-size: 14px; }
+    .modal-body { margin-bottom: 2rem; }
+    .modal-footer { display: flex; gap: 12px; justify-content: flex-end; }
+    
+    .export-menu { display: none; position: absolute; top: 100%; right: 0; background: white; border-radius: 10px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); z-index: 100; min-width: 200px; }
+    .export-menu.show { display: block; }
+    .export-item { padding: 12px 16px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 13px; font-weight: 600; color: var(--primary); transition: all 0.2s; }
+    .export-item:hover { background: var(--lighter); }
+    .export-item:last-child { border-bottom: none; }
+    
+    .stats-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    .stats-table th, .stats-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .stats-table th { background: var(--lighter); font-weight: 700; color: var(--primary); }
+    .stats-table tr:hover { background: var(--lighter); }
+    
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--secondary); }
+    .empty-icon { font-size: 48px; margin-bottom: 1rem; }
+    
+    .timeline-item { padding: 1rem; border-left: 3px solid var(--accent); background: white; margin-bottom: 1rem; border-radius: 8px; }
+    .timeline-date { font-size: 11px; color: var(--secondary); font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .timeline-text { font-size: 13px; color: var(--primary); }
+    
+    @media (max-width: 1024px) {
+      .deals-container { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+      .auth-container { grid-template-columns: 1fr; }
+      .auth-graphic { display: none; }
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+    
+    @media (max-width: 768px) {
+      .app-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .toolbar-right { flex-direction: column; }
+      .search-box { width: 100%; }
+      .deals-container { grid-template-columns: 1fr; }
+      .deal-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NDA SCREEN -->
+<div id="ndaScreen" class="auth-screen">
+  <div class="auth-container">
+    <div class="auth-content">
+      <div class="auth-header">
+        <h1>HGC & ARK Capital Consulting</h1>
+        <p>Professional deal tracking and management system</p>
+      </div>
+      
+      <div class="nda-scroll">
+        <h3>Confidentiality & Non-Disclosure Agreement</h3>
+        <p><strong>By accessing this platform, you acknowledge and agree to be bound by the following terms:</strong></p>
+        
+        <h3>1. Confidentiality & Data Protection</h3>
+        <p>All documents, financial information, deal structures, projections, contact information, and materials contained herein are strictly confidential and proprietary. You agree not to disclose, share, or transfer any information to unauthorized third parties without express written consent.</p>
+        
+        <h3>2. Permitted Use</h3>
+        <p>This platform and all contents are provided solely for evaluating potential business opportunities and managing capital-raising activities. Unauthorized use, including competitive analysis, reverse engineering, or public disclosure, is strictly prohibited.</p>
+        
+        <h3>3. Security Obligations</h3>
+        <p>You shall not: (a) copy, reproduce, or distribute materials; (b) attempt to derive competitive advantage; (c) discuss with unauthorized parties; (d) use for unauthorized purposes; (e) modify or create derivative works.</p>
+        
+        <h3>4. Term & Duration</h3>
+        <p>Confidentiality obligations survive termination of access and continue for five (5) years or as required by law. Upon termination, you agree to return or permanently destroy all copies of confidential materials.</p>
+      </div>
+      
+      <div class="checkbox-group">
+        <input type="checkbox" id="ndaCheckbox" onchange="updateNDAButton()">
+        <label for="ndaCheckbox">I acknowledge and agree to all terms of this Non-Disclosure Agreement</label>
+      </div>
+      
+      <button class="btn btn-primary" id="ndaBtn" onclick="acceptNDA()" disabled style="width: 100%; padding: 13px;">
+        Accept & Continue
+      </button>
+    </div>
+    
+    <div class="auth-graphic">
+      <h2>🚀</h2>
+      <h2 style="font-size: 28px; margin: 1rem 0;">Professional Platform</h2>
+      <p style="font-size: 15px;">Advanced deal management with pipeline tracking, financial analytics, and comprehensive reporting.</p>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="auth-screen" style="display: none;">
+  <div class="auth-container">
+    <div class="auth-content">
+      <div class="auth-header">
+        <h1>Secure Login</h1>
+        <p>Access your confidential platform</p>
+      </div>
+      
+      <div class="form-group">
+        <label>Master Password</label>
+        <input type="password" id="passwordInput" placeholder="Enter password" onkeypress="if(event.key==='Enter') login()">
+      </div>
+      
+      <div style="display: flex; gap: 12px;">
+        <button class="btn btn-secondary" style="flex: 1;" onclick="backToNDA()">Back</button>
+        <button class="btn btn-primary" style="flex: 1;" onclick="login()">Login</button>
+      </div>
+    </div>
+    
+    <div class="auth-graphic">
+      <h2>🔐</h2>
+      <h2 style="font-size: 28px; margin: 1rem 0;">Secure Access</h2>
+      <p style="font-size: 15px;">Enterprise-grade security with password protection and session management.</p>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APPLICATION -->
+<div id="mainApp" class="app-container" style="display: none;">
+  <div class="app-header">
+    <div class="header-left">
+      <h1>HGC & ARK Capital Consulting</h1>
+      <p>Deal tracking • Financial analytics • Pipeline management</p>
+    </div>
+    <div class="header-right">
+      <div id="saveIndicator" style="font-size:12px; color:var(--success); font-weight:600; opacity:0; transition:opacity 0.3s;"></div>
+      <button class="btn btn-secondary btn-small" onclick="refreshFromDB()">🔄 Sync</button>
+      <div class="security-badge">🔒 Secure Session</div>
+      <div style="position: relative;">
+        <button class="btn btn-primary btn-small" onclick="toggleExportMenu()">💾 Export</button>
+        <div class="export-menu" id="exportMenu">
+          <div class="export-item" onclick="exportToJSON()">📄 JSON</div>
+          <div class="export-item" onclick="exportToCSV()">📊 CSV</div>
+          <div class="export-item" onclick="exportToPDF()">📋 PDF</div>
+          <div class="export-item" onclick="exportBackup()">💾 Backup</div>
+        </div>
+      </div>
+      <button class="btn btn-danger btn-small" onclick="logout()">Logout</button>
+    </div>
+  </div>
+  
+  <div class="confidential-banner">
+    <span>🔐</span>
+    <span><strong>CONFIDENTIAL:</strong> All information is strictly protected under NDA. Unauthorized access or disclosure is prohibited.</span>
+  </div>
+  
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+    <button class="nav-tab" onclick="switchTab('underwriting')">🔍 Underwriting</button>
+    <button class="nav-tab" onclick="switchTab('pipeline')">📈 Pipeline</button>
+    <button class="nav-tab" onclick="switchTab('deals')">💰 Deals</button>
+    <button class="nav-tab" onclick="switchTab('analytics')">📉 Analytics</button>
+    <button class="nav-tab" onclick="switchTab('contacts')">👥 Contacts</button>
+    <button class="nav-tab" onclick="switchTab('tasks')">✓ Tasks</button>
+  </div>
+  
+  <div class="content">
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="content-section active">
+      <h2 style="margin-bottom: 1.5rem; font-size: 24px; font-weight: 700;">Executive Dashboard</h2>
+      
+      <div class="dashboard-grid">
+        <div class="metric-card">
+          <div class="metric-label">Total Pipeline</div>
+          <div class="metric-value" id="metricCapital">$0</div>
+          <div class="metric-change">All deals</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Active Deals</div>
+          <div class="metric-value" id="metricDeals">0</div>
+          <div class="metric-change">In progress</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Est. Revenue</div>
+          <div class="metric-value" id="metricFees">$0</div>
+          <div class="metric-change">Commission value</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Win Rate</div>
+          <div class="metric-value" id="metricWinRate">0%</div>
+          <div class="metric-change">Closed deals</div>
+        </div>
+      </div>
+      
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-title">Deal Status Distribution</div>
+          <canvas id="statusChart" style="max-width: 100%;"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Pipeline by Urgency</div>
+          <canvas id="urgencyChart" style="max-width: 100%;"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card" style="margin-top:1.5rem;">
+        <div class="chart-title">Deal Ratings — Underwriter Scores</div>
+        <div id="dashboardRatings"></div>
+      </div>
+    </div>
+    
+    <!-- UNDERWRITING -->
+    <div id="underwriting" class="content-section">
+      <h2 style="margin-bottom: 0.5rem; font-size: 24px; font-weight: 700;">Underwriting Station</h2>
+      <p style="color: var(--secondary); margin-bottom: 1.5rem; font-size: 14px;">Drop any deal's documents to get an instant underwriter read — risk, ratings, flags, valuation — <strong>before</strong> committing it to your pipeline. First-pass screening only; a licensed broker reviews before any decision.</p>
+
+      <div id="uwDropZone" style="border: 2px dashed #cbd5e1; border-radius: 14px; padding: 2.5rem; text-align: center; background: var(--lighter); cursor: pointer; transition: all 0.2s; margin-bottom: 1rem;">
+        <div style="font-size: 36px; margin-bottom: 0.5rem;">📥</div>
+        <div style="font-weight: 700; color: var(--primary); margin-bottom: 0.25rem; font-size: 16px;">Drop documents to audit</div>
+        <div style="font-size: 13px; color: var(--secondary);">PDFs scanned instantly · any language · reads like an underwriter</div>
+        <input type="file" id="uwFileInput" accept=".pdf" multiple style="display:none" onchange="handleUwFiles(event.target.files)">
+      </div>
+      <div class="document-list" id="uwFileList" style="margin-bottom: 1rem;"></div>
+      <textarea id="uwDocText" rows="3" class="deal-field-input" placeholder="Extracted text appears here — or paste document content directly to audit" style="margin-bottom:1rem;"></textarea>
+      <div style="display:flex; gap:12px; margin-bottom:1.5rem;">
+        <button class="btn btn-secondary" onclick="clearUw()">Clear</button>
+        <button class="btn btn-primary" id="uwAnalyzeBtn" onclick="runUwAnalysis()" style="flex:1;">🔍 Run Underwriting Analysis</button>
+      </div>
+
+      <div id="uwResultPanel" style="display:none;"></div>
+
+      <div id="uwActions" style="display:none; gap:12px; margin:1.5rem 0;">
+        <button class="btn btn-success" onclick="pushUwToDeal()" style="width:100%;">✓ Add This to My Deals Pipeline</button>
+      </div>
+
+      <div class="pipeline-card" style="margin-top:2rem;">
+        <div class="pipeline-title">Audit Log — Everything You've Screened</div>
+        <div id="uwAuditLog"></div>
+      </div>
+    </div>
+
+    <!-- PIPELINE -->
+    <div id="pipeline" class="content-section">
+      <h2 style="margin-bottom: 1.5rem; font-size: 24px; font-weight: 700;">Sales Pipeline</h2>
+      
+      <div id="pipelineContainer"></div>
+    </div>
+    
+    <!-- DEALS -->
+    <div id="deals" class="content-section">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <h2 style="margin: 0; font-weight: 700;">All Deals</h2>
+          <input type="text" class="search-box" id="dealSearch" placeholder="Search deals..." onkeyup="renderDeals()">
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-primary" onclick="openAddDealModal()">+ New Deal</button>
+        </div>
+      </div>
+      
+      <div class="filter-group" style="padding: 1rem 2rem 0 2rem;">
+        <button class="filter-btn active" onclick="filterDeals('all')">All</button>
+        <button class="filter-btn" onclick="filterDeals('lead')">Lead</button>
+        <button class="filter-btn" onclick="filterDeals('proposal')">Proposal</button>
+        <button class="filter-btn" onclick="filterDeals('negotiation')">Negotiation</button>
+        <button class="filter-btn" onclick="filterDeals('closed')">Closed</button>
+      </div>
+      
+      <div id="dealsContainer" class="deals-container" style="padding: 1.5rem 2rem;"></div>
+    </div>
+    
+    <!-- ANALYTICS -->
+    <div id="analytics" class="content-section">
+      <h2 style="margin-bottom: 2rem; font-size: 24px; font-weight: 700;">Financial Analytics</h2>
+      
+      <div class="pipeline-card">
+        <div class="pipeline-title">Key Metrics</div>
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Value</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody id="metricsTable"></tbody>
+        </table>
+      </div>
+      
+      <div class="pipeline-card">
+        <div class="pipeline-title">Deal Performance</div>
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th>Deal</th>
+              <th>Capital</th>
+              <th>Fee %</th>
+              <th>Est. Revenue</th>
+              <th>Status</th>
+              <th>Probability</th>
+            </tr>
+          </thead>
+          <tbody id="performanceTable"></tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- SCREENING -->
+    <div id="screening" class="content-section">
+      <h2 style="margin-bottom: 0.5rem; font-size: 24px; font-weight: 700;">Deal Screening &amp; Pre-Underwriting</h2>
+      <p style="color: var(--secondary); margin-bottom: 1.5rem; font-size: 14px;">First-pass analysis only. A licensed broker must complete formal underwriting before any decision.</p>
+
+      <div class="confidential-banner" style="border-radius: 10px; margin-bottom: 1.5rem; background: linear-gradient(90deg, #fed7aa 0%, #fdba74 100%); color: #7c2d12; border-color: #fb923c;">
+        <span>⚠️</span>
+        <span><strong>SCREENING AID — NOT VERIFIED UNDERWRITING.</strong> This tool extracts and checks what the documents claim. It does not verify that figures are real or that the business exists as described. Treat every output as a list of things to confirm, not facts.</span>
+      </div>
+
+      <div class="pipeline-card">
+        <div class="pipeline-title">Intake Form</div>
+        <p style="font-size: 13px; color: var(--secondary); margin-bottom: 1.5rem;">Have the prospect complete this. Fields adapt to any deal type — leave non-applicable fields blank.</p>
+
+        <div class="deal-row">
+          <div class="deal-field">
+            <label class="deal-field-label">Attach to Deal</label>
+            <select id="scrDealLink" class="deal-field-input"><option value="">— New / Unlinked —</option></select>
+          </div>
+          <div class="deal-field">
+            <label class="deal-field-label">Deal Type</label>
+            <select id="scrType" class="deal-field-input">
+              <option value="operating">Operating Business</option>
+              <option value="realestate">Real Estate / Project Finance</option>
+              <option value="earlystage">Early-Stage / Pre-Revenue</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.6px; margin: 1.5rem 0 1rem 0;">The Ask</div>
+        <div class="deal-row">
+          <div class="deal-field"><label class="deal-field-label">Amount Sought</label><input id="scrAmount" class="deal-field-input" placeholder="$50M"></div>
+          <div class="deal-field"><label class="deal-field-label">Instrument</label><input id="scrInstrument" class="deal-field-input" placeholder="Equity / Debt / SAFE / Convertible"></div>
+        </div>
+        <div class="deal-row">
+          <div class="deal-field"><label class="deal-field-label">Pre-Money Valuation</label><input id="scrValuation" class="deal-field-input" placeholder="$200M"></div>
+          <div class="deal-field"><label class="deal-field-label">Use of Funds</label><input id="scrUseFunds" class="deal-field-input" placeholder="e.g. expansion, debt refi"></div>
+        </div>
+
+        <div style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.6px; margin: 1.5rem 0 1rem 0;">Financials</div>
+        <div class="deal-row">
+          <div class="deal-field"><label class="deal-field-label">Revenue (TTM)</label><input id="scrRevenue" class="deal-field-input" placeholder="$30M"></div>
+          <div class="deal-field"><label class="deal-field-label">Revenue (Prior Year)</label><input id="scrRevenuePrior" class="deal-field-input" placeholder="$22M"></div>
+        </div>
+        <div class="deal-row">
+          <div class="deal-field"><label class="deal-field-label">EBITDA / Net Income</label><input id="scrEbitda" class="deal-field-input" placeholder="$6M"></div>
+          <div class="deal-field"><label class="deal-field-label">Gross Margin %</label><input id="scrMargin" class="deal-field-input" placeholder="45%"></div>
+        </div>
+        <div class="deal-row">
+          <div class="deal-field"><label class="deal-field-label">Existing Debt</label><input id="scrDebt" class="deal-field-input" placeholder="$10M"></div>
+          <div class="deal-field"><label class="deal-field-label">Monthly Burn (if pre-profit)</label><input id="scrBurn" class="deal-field-input" placeholder="$400k"></div>
+        </div>
+        <div class="deal-row">
+          <div class="deal-field"><label class="deal-field-label">Financials Quality</label>
+            <select id="scrFinQuality" class="deal-field-input">
+              <option value="">— Select —</option>
+              <option>Audited</option>
+              <option>Reviewed</option>
+              <option>Management-prepared</option>
+              <option>None provided</option>
+            </select>
+          </div>
+          <div class="deal-field"><label class="deal-field-label">Projections Provided?</label>
+            <select id="scrProjections" class="deal-field-input"><option value="">— Select —</option><option>Yes</option><option>No</option></select>
+          </div>
+        </div>
+
+        <div style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.6px; margin: 1.5rem 0 1rem 0;">The Business</div>
+        <div class="deal-row">
+          <div class="deal-field"><label class="deal-field-label">Years in Business</label><input id="scrYears" class="deal-field-input" placeholder="7"></div>
+          <div class="deal-field"><label class="deal-field-label">Employees</label><input id="scrEmployees" class="deal-field-input" placeholder="45"></div>
+        </div>
+        <div class="deal-field deal-row-full" style="margin-bottom: 1rem;"><label class="deal-field-label">What does the business do?</label><textarea id="scrDescription" class="deal-field-input" rows="2" placeholder="Plain-language description of the business, customers, and how it makes money"></textarea></div>
+        <div class="deal-field deal-row-full" style="margin-bottom: 1rem;"><label class="deal-field-label">Revenue Model / Key Customers</label><textarea id="scrModel" class="deal-field-input" rows="2" placeholder="Recurring? Concentration? Top customers as % of revenue?"></textarea></div>
+
+        <div style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.6px; margin: 1.5rem 0 1rem 0;">Real Estate / Project (if applicable)</div>
+        <div class="deal-row">
+          <div class="deal-field"><label class="deal-field-label">Asset / Project Value</label><input id="scrAssetValue" class="deal-field-input" placeholder="$80M"></div>
+          <div class="deal-field"><label class="deal-field-label">LTV / Loan-to-Cost</label><input id="scrLTV" class="deal-field-input" placeholder="65%"></div>
+        </div>
+        <div class="deal-row">
+          <div class="deal-field"><label class="deal-field-label">NOI / Cap Rate</label><input id="scrNOI" class="deal-field-input" placeholder="$5M / 6%"></div>
+          <div class="deal-field"><label class="deal-field-label">Collateral</label><input id="scrCollateral" class="deal-field-input" placeholder="First-lien on property"></div>
+        </div>
+
+        <div class="deal-field deal-row-full" style="margin: 1rem 0;"><label class="deal-field-label">Document Text (auto-filled from PDFs, or paste manually)</label><textarea id="scrDocs" class="deal-field-input" rows="6" placeholder="Drop a PDF below and its text appears here automatically — or paste any document content directly."></textarea></div>
+
+        <div id="scrDropZone" style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 2rem; text-align: center; background: var(--lighter); cursor: pointer; transition: all 0.2s;">
+          <div style="font-size: 32px; margin-bottom: 0.5rem;">📥</div>
+          <div style="font-weight: 600; color: var(--primary); margin-bottom: 0.25rem;">Drop PDFs here to scan</div>
+          <div style="font-size: 12px; color: var(--secondary);">or click to browse — text is extracted and added automatically</div>
+          <input type="file" id="scrFileInput" accept=".pdf" multiple style="display:none" onchange="handleScrFiles(event.target.files)">
+        </div>
+        <div class="document-list" id="scrFileList" style="margin-top: 1rem;"></div>
+
+        <div style="display: flex; gap: 12px; margin-top: 1.5rem;">
+          <button class="btn btn-secondary" onclick="clearScreening()">Clear Form</button>
+          <button class="btn btn-primary" id="scrAnalyzeBtn" onclick="runScreening()" style="flex: 1;">🔍 Run Screening Analysis</button>
+        </div>
+      </div>
+
+      <div class="pipeline-card" id="scrResultCard" style="display: none;">
+        <div class="pipeline-title">Screening Memo</div>
+        <div id="scrResult" style="font-size: 14px; line-height: 1.7;"></div>
+        <div style="display: flex; gap: 12px; margin-top: 1.5rem;">
+          <button class="btn btn-secondary" onclick="copyMemo()">📋 Copy Memo</button>
+          <button class="btn btn-success" onclick="attachMemoToDeal()">📎 Attach to Deal</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACTS -->
+    <div id="contacts" class="content-section">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <h2 style="margin: 0; font-weight: 700;">Contacts</h2>
+          <input type="text" class="search-box" id="contactSearch" placeholder="Search..." onkeyup="renderContacts()">
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-primary" onclick="openAddContactModal()">+ New</button>
+        </div>
+      </div>
+      
+      <div id="contactsContainer" class="deals-container" style="padding: 1.5rem 2rem;"></div>
+    </div>
+    
+    <!-- TASKS -->
+    <div id="tasks" class="content-section">
+      <div class="toolbar">
+        <h2 style="margin: 0; font-weight: 700;">Tasks</h2>
+        <button class="btn btn-primary" onclick="openAddTaskModal()">+ New Task</button>
+      </div>
+      
+      <div id="tasksContainer" class="deals-container" style="padding: 1.5rem 2rem;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="addDealModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>New Deal</h2>
+      <p>Drop documents to auto-fill and underwrite, or enter manually.</p>
+    </div>
+    <div class="modal-body">
+
+      <div id="dealDropZone" style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 1.75rem; text-align: center; background: var(--lighter); cursor: pointer; transition: all 0.2s; margin-bottom: 1rem;">
+        <div style="font-size: 28px; margin-bottom: 0.4rem;">📥</div>
+        <div style="font-weight: 600; color: var(--primary); margin-bottom: 0.2rem;">Drop deal documents here</div>
+        <div style="font-size: 12px; color: var(--secondary);">PDFs are scanned, fields auto-fill, and an underwriting memo is generated</div>
+        <input type="file" id="dealFileInput" accept=".pdf" multiple style="display:none" onchange="handleDealFiles(event.target.files)">
+      </div>
+      <div class="document-list" id="dealFileList" style="margin-bottom: 1rem;"></div>
+      <button class="btn btn-primary" id="underwriteBtn" onclick="underwriteDocs()" style="width:100%; margin-bottom: 1.5rem; display:none;">🔍 Underwrite Documentation</button>
+
+      <div style="font-size: 11px; font-weight: 700; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 1rem;">Deal Details</div>
+      <div class="form-group">
+        <label>Deal Name *</label>
+        <input type="text" id="dealName" placeholder="e.g., Series A">
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group"><label>Company</label><input type="text" id="dealCompany" placeholder="Company name"></div>
+        <div class="form-group"><label>Contact Name</label><input type="text" id="dealContact" placeholder="Primary contact"></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group"><label>Email</label><input type="email" id="dealEmail" placeholder="contact@company.com"></div>
+        <div class="form-group"><label>Phone</label><input type="tel" id="dealPhone" placeholder="+1..."></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label>Capital Sought *</label>
+          <input type="text" id="dealCapital" placeholder="$50M">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="dealStatus">
+            <option value="lead">Lead</option>
+            <option value="proposal">Proposal</option>
+            <option value="negotiation">Negotiation</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group"><label>Revenue (TTM)</label><input type="text" id="dealRevenue" placeholder="$30M"></div>
+        <div class="form-group"><label>Years in Business</label><input type="text" id="dealYears" placeholder="7"></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label>Fee %</label>
+          <input type="number" id="dealFee" step="0.1" value="5" min="0">
+        </div>
+        <div class="form-group">
+          <label>Equity %</label>
+          <input type="number" id="dealEquity" step="0.5" value="0" min="0">
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label>Win Probability %</label>
+          <input type="number" id="dealProbability" step="5" value="50" min="0" max="100">
+        </div>
+        <div class="form-group">
+          <label>Deal Score (1-100)</label>
+          <input type="number" id="dealScore" min="1" max="100" placeholder="auto-scored">
+        </div>
+      </div>
+      <div id="scoreBar" style="display:none; margin-bottom:1.5rem;">
+        <div style="height:10px; background:var(--lighter); border-radius:6px; overflow:hidden;">
+          <div id="scoreFill" style="height:100%; width:0%; transition:width 0.5s; border-radius:6px;"></div>
+        </div>
+        <div id="scoreLabel" style="font-size:12px; color:var(--secondary); margin-top:4px; font-weight:600;"></div>
+      </div>
+      <div id="aiAnalysisPanel" style="display:none; background:linear-gradient(135deg,#0f172a,#1e293b); border-radius:14px; padding:1.5rem; margin-bottom:1.5rem; color:white;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <div style="font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; opacity:0.7;">AI Underwriter Read</div>
+          <div id="aiDealType" style="font-size:11px; font-weight:700; padding:5px 12px; border-radius:20px; background:rgba(255,255,255,0.15);"></div>
+        </div>
+        <div id="aiLangNote" style="font-size:11px; opacity:0.6; margin-bottom:1rem; display:none;"></div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.25rem;">
+          <div>
+            <div style="font-size:11px; opacity:0.7; margin-bottom:4px;">Banker Fit (Debt)</div>
+            <div style="height:8px; background:rgba(255,255,255,0.15); border-radius:5px; overflow:hidden;"><div id="bankerBar" style="height:100%; width:0%; background:#0ea5e9; transition:width 0.6s;"></div></div>
+            <div id="bankerVal" style="font-size:18px; font-weight:800; margin-top:4px;"></div>
+          </div>
+          <div>
+            <div style="font-size:11px; opacity:0.7; margin-bottom:4px;">Investor Fit (Equity)</div>
+            <div style="height:8px; background:rgba(255,255,255,0.15); border-radius:5px; overflow:hidden;"><div id="investorBar" style="height:100%; width:0%; background:#10b981; transition:width 0.6s;"></div></div>
+            <div id="investorVal" style="font-size:18px; font-weight:800; margin-top:4px;"></div>
+          </div>
+          <div>
+            <div style="font-size:11px; opacity:0.7; margin-bottom:4px;">Risk Level</div>
+            <div style="height:8px; background:rgba(255,255,255,0.15); border-radius:5px; overflow:hidden;"><div id="riskBar" style="height:100%; width:0%; background:#ef4444; transition:width 0.6s;"></div></div>
+            <div id="riskVal" style="font-size:18px; font-weight:800; margin-top:4px;"></div>
+          </div>
+          <div>
+            <div style="font-size:11px; opacity:0.7; margin-bottom:4px;">Profitability</div>
+            <div style="height:8px; background:rgba(255,255,255,0.15); border-radius:5px; overflow:hidden;"><div id="profitBar" style="height:100%; width:0%; background:#f59e0b; transition:width 0.6s;"></div></div>
+            <div id="profitVal" style="font-size:18px; font-weight:800; margin-top:4px;"></div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.75rem; margin-bottom:1.25rem;">
+          <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:0.75rem;">
+            <div style="font-size:10px; opacity:0.7; text-transform:uppercase;">Est. Valuation</div>
+            <div id="aiValuation" style="font-size:13px; font-weight:700; margin-top:4px; line-height:1.3;"></div>
+          </div>
+          <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:0.75rem;">
+            <div style="font-size:10px; opacity:0.7; text-transform:uppercase;">ROI / Return</div>
+            <div id="aiRoi" style="font-size:13px; font-weight:700; margin-top:4px; line-height:1.3;"></div>
+          </div>
+          <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:0.75rem;">
+            <div style="font-size:10px; opacity:0.7; text-transform:uppercase;">LOI / Terms</div>
+            <div id="aiLoi" style="font-size:13px; font-weight:700; margin-top:4px; line-height:1.3;"></div>
+          </div>
+          <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:0.75rem;">
+            <div style="font-size:10px; opacity:0.7; text-transform:uppercase;">DSCR</div>
+            <div id="aiDscr" style="font-size:13px; font-weight:700; margin-top:4px; line-height:1.3;"></div>
+          </div>
+          <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:0.75rem;">
+            <div style="font-size:10px; opacity:0.7; text-transform:uppercase;">Leverage</div>
+            <div id="aiLeverage" style="font-size:13px; font-weight:700; margin-top:4px; line-height:1.3;"></div>
+          </div>
+          <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:0.75rem;">
+            <div style="font-size:10px; opacity:0.7; text-transform:uppercase;">Margins</div>
+            <div id="aiMargins" style="font-size:13px; font-weight:700; margin-top:4px; line-height:1.3;"></div>
+          </div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:0.85rem; margin-bottom:1.25rem;">
+          <div style="font-size:10px; opacity:0.7; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Plausibility Read</div>
+          <div id="aiConsistency" style="font-size:12px; line-height:1.4;"></div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.25rem;">
+          <div style="background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); border-radius:10px; padding:0.85rem;">
+            <div style="font-size:11px; font-weight:700; color:#6ee7b7; margin-bottom:6px;">🟢 Green Flags</div>
+            <ul id="aiGreenFlags" style="font-size:12px; line-height:1.6; padding-left:1rem; margin:0;"></ul>
+          </div>
+          <div style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); border-radius:10px; padding:0.85rem;">
+            <div style="font-size:11px; font-weight:700; color:#fca5a5; margin-bottom:6px;">🔴 Red Flags</div>
+            <ul id="aiRedFlags" style="font-size:12px; line-height:1.6; padding-left:1rem; margin:0;"></ul>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:0.85rem;">
+            <div style="font-size:10px; opacity:0.7; text-transform:uppercase; letter-spacing:0.5px;">Short-Term Capacity</div>
+            <div id="aiShortTerm" style="font-size:12px; font-weight:600; margin-top:4px; line-height:1.4;"></div>
+          </div>
+          <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:0.85rem;">
+            <div style="font-size:10px; opacity:0.7; text-transform:uppercase; letter-spacing:0.5px;">Long-Term Capacity</div>
+            <div id="aiLongTerm" style="font-size:12px; font-weight:600; margin-top:4px; line-height:1.4;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Executive Summary</label>
+        <div id="dealExecSummary" style="background:var(--lighter); border:1px solid var(--border); border-radius:10px; padding:1rem; font-size:13px; line-height:1.6; min-height:40px; color:var(--secondary);">Auto-generated when you scan documents.</div>
+      </div>
+      <div class="form-group">
+        <label>Business Description</label>
+        <textarea id="dealDescription" placeholder="What the business does, model, customers..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Extracted Document Text</label>
+        <textarea id="dealDocText" rows="4" placeholder="Auto-filled from scanned PDFs, or paste manually" style="font-size:12px;"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Underwriting Memo</label>
+        <div id="dealMemo" style="background:var(--lighter); border:1px solid var(--border); border-radius:10px; padding:1rem; font-size:13px; line-height:1.7; min-height:60px; color:var(--secondary);">Drop documents and click "Underwrite Documentation" to generate.</div>
+        <p style="font-size:11px; color:var(--secondary); margin-top:0.5rem; font-style:italic;">First-pass screening only. Not verified underwriting. A licensed broker must complete formal review before any decision.</p>
+      </div>
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea id="dealNotes" placeholder="Any relevant details..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeAddDealModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addDeal()">Save Deal</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addContactModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Add Contact</h2>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Name *</label>
+        <input type="text" id="contactName" placeholder="Full name">
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label>Company</label>
+          <input type="text" id="contactCompany">
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <input type="text" id="contactRole" placeholder="e.g., CFO">
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="contactEmail">
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="contactPhone">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeAddContactModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addContact()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addTaskModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Add Task</h2>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Task *</label>
+        <input type="text" id="taskTitle" placeholder="e.g., Follow up">
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label>Due Date</label>
+          <input type="date" id="taskDue">
+        </div>
+        <div class="form-group">
+          <label>Priority</label>
+          <select id="taskPriority">
+            <option value="high">High</option>
+            <option value="medium" selected>Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Related Deal</label>
+        <input type="text" id="taskDeal">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeAddTaskModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="addTask()">Save</button>
+    </div>
+  </div>
+</div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+  </script>
+<script>
+  const PASSWORD = 'HGCARK2027!';
+  const STORAGE_KEY = 'hgc_data';
+  
+  let deals = [
+    {id: 1, name: "Voozaa", capital: 5000000, status: "lead", reference: "", client: "", fee: 5, equity: 0, rank: 1, files: [], notes: "", probability: 60, createdDate: new Date().toISOString()},
+    {id: 2, name: "Walmart Deal", capital: 15000000, status: "lead", reference: "", client: "Walmart", fee: 4, equity: 0, rank: 2, files: [], notes: "", probability: 75, createdDate: new Date().toISOString()},
+    {id: 3, name: "BKFC", capital: 50000000, status: "lead", reference: "Steve", client: "", fee: 5, equity: 2, rank: 3, files: [], notes: "", probability: 50, createdDate: new Date().toISOString()},
+    {id: 4, name: "Colton Elliot - Tampa Real Estate", capital: 60000000, status: "lead", reference: "", client: "Colton Elliot", fee: 5, equity: 2, rank: 4, files: [], notes: "", probability: 70, createdDate: new Date().toISOString()},
+    {id: 5, name: "Meat Factory", capital: 25000000, status: "lead", reference: "", client: "", fee: 5, equity: 2, rank: 5, files: [], notes: "", probability: 40, createdDate: new Date().toISOString()},
+    {id: 6, name: "Lake Havasu Energy", capital: 900000, status: "lead", reference: "Corey", client: "", fee: 4, equity: 0, rank: 6, files: [], notes: "", probability: 55, createdDate: new Date().toISOString()},
+    {id: 7, name: "Kelly Walker - Political Campaign", capital: 70000, status: "lead", reference: "Corey", client: "Kelly Walker", fee: 15, equity: 0, rank: 7, files: [], notes: "", probability: 100, createdDate: new Date().toISOString()},
+    {id: 8, name: "James SAFE Deal", capital: 2000000, status: "lead", reference: "Corey", client: "James", fee: 3, equity: 0, rank: 8, files: [], notes: "", probability: 65, createdDate: new Date().toISOString()},
+    {id: 9, name: "Satellite Company", capital: 50000000, status: "lead", reference: "Corey", client: "", fee: 5, equity: 1, rank: 9, files: [], notes: "", probability: 35, createdDate: new Date().toISOString()},
+    {id: 10, name: "Pyrolysis Systems", capital: 50000000, status: "lead", reference: "Corey", client: "", fee: 5, equity: 2, rank: 10, files: [], notes: "", probability: 80, createdDate: new Date().toISOString()},
+    {id: 11, name: "Trade Desk Fund", capital: 75000000, status: "lead", reference: "Corey", client: "", fee: 4, equity: 0, rank: 11, files: [], notes: "", probability: 45, createdDate: new Date().toISOString()},
+    {id: 12, name: "David", capital: 40000000, status: "lead", reference: "", client: "David", fee: 5, equity: 0, rank: 12, files: [], notes: "Wants $40M raised.", probability: 50, createdDate: new Date().toISOString()},
+    {id: 14, name: "International Bridge Loan", capital: 200000, status: "lead", reference: "Corey", client: "", fee: 7, equity: 0, rank: 14, files: [], notes: "", probability: 50, createdDate: new Date().toISOString()},
+    {id: 15, name: "Gold Deals (Multiple)", capital: 0, status: "lead", reference: "Corey", client: "", fee: 5, equity: 0, rank: 15, files: [], notes: "", probability: 20, createdDate: new Date().toISOString()},
+    {id: 16, name: "Oil Deals (Multiple)", capital: 0, status: "lead", reference: "Corey", client: "", fee: 4, equity: 0, rank: 16, files: [], notes: "", probability: 25, createdDate: new Date().toISOString()}
+  ];
+  
+  let tasks = [];
+  let contacts = [];
+  let nextDealId = 17;
+  let nextTaskId = 1;
+  let nextContactId = 1;
+  let currentFilter = 'all';
+  
+  let saveTimer = null;
+  let dbReady = false;
+
+  async function loadData() {
+    try {
+      const res = await fetch('/api/deals');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.deals && data.deals.length) deals = data.deals;
+        tasks = data.tasks || tasks;
+        contacts = data.contacts || contacts;
+        dbReady = true;
+        // recompute next IDs so we don't collide
+        nextDealId = (deals.reduce((m, d) => Math.max(m, d.id), 0) || 16) + 1;
+        nextTaskId = (tasks.reduce((m, t) => Math.max(m, t.id), 0) || 0) + 1;
+        nextContactId = (contacts.reduce((m, c) => Math.max(m, c.id), 0) || 0) + 1;
+      }
+    } catch (err) {
+      // fall back to local cache if server unreachable
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const data = JSON.parse(saved);
+        deals = data.deals || deals;
+        tasks = data.tasks || tasks;
+        contacts = data.contacts || contacts;
+      }
+    }
+  }
+
+  async function saveData() {
+    // keep a local cache as backup
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ deals, tasks, contacts }));
+    // debounce server writes so rapid edits don't spam
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async () => {
+      try {
+        await fetch('/api/deals', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ deals, tasks, contacts })
+        });
+        const ind = document.getElementById('saveIndicator');
+        if (ind) { ind.textContent = '✓ Saved to shared database'; ind.style.opacity = '1'; setTimeout(() => ind.style.opacity = '0', 2000); }
+      } catch (err) {
+        const ind = document.getElementById('saveIndicator');
+        if (ind) { ind.textContent = '⚠️ Saved locally only — sync failed'; ind.style.opacity = '1'; }
+      }
+    }, 600);
+  }
+  
+  // AUTH
+  function updateNDAButton() {
+    document.getElementById('ndaBtn').disabled = !document.getElementById('ndaCheckbox').checked;
+  }
+  
+  function acceptNDA() {
+    document.getElementById('ndaScreen').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+  }
+  
+  function backToNDA() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('ndaScreen').style.display = 'flex';
+    document.getElementById('passwordInput').value = '';
+  }
+  
+  async function login() {
+    if (document.getElementById('passwordInput').value === PASSWORD) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('mainApp').style.display = 'grid';
+      await loadData();
+      updateMetrics();
+      renderDashboard();
+      renderDeals();
+    } else {
+      alert('❌ Incorrect password');
+    }
+  }
+  
+  async function refreshFromDB() {
+    await loadData();
+    updateMetrics();
+    renderDashboard();
+    renderDeals();
+    const ind = document.getElementById('saveIndicator');
+    if (ind) { ind.textContent = '✓ Synced latest deals'; ind.style.opacity = '1'; setTimeout(() => ind.style.opacity = '0', 2000); }
+  }
+
+  function logout() {
+    if (confirm('Logout?')) {
+      document.getElementById('mainApp').style.display = 'none';
+      document.getElementById('ndaScreen').style.display = 'flex';
+      document.getElementById('ndaCheckbox').checked = false;
+      updateNDAButton();
+    }
+  }
+  
+  function switchTab(tab) {
+    document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+    document.getElementById(tab).classList.add('active');
+    event.target.classList.add('active');
+    
+    if (tab === 'deals') renderDeals();
+    if (tab === 'underwriting') renderUnderwriting();
+    if (tab === 'pipeline') renderPipeline();
+    if (tab === 'analytics') renderAnalytics();
+    if (tab === 'contacts') renderContacts();
+    if (tab === 'tasks') renderTasks();
+    if (tab === 'dashboard') renderDashboard();
+  }
+  
+  function formatCurrency(num) {
+    if (num >= 1000000000) return '$' + (num / 1000000000).toFixed(1) + 'B';
+    if (num >= 1000000) return '$' + (num / 1000000).toFixed(0) + 'M';
+    if (num >= 1000) return '$' + (num / 1000).toFixed(0) + 'k';
+    return '$' + num.toFixed(0);
+  }
+  
+  function parseCapital(str) {
+    if (!str) return 0;
+    if (str.includes('B')) return parseFloat(str) * 1000000000;
+    if (str.includes('M')) return parseFloat(str) * 1000000;
+    if (str.includes('k')) return parseFloat(str) * 1000;
+    return parseFloat(str) || 0;
+  }
+  
+  function updateMetrics() {
+    const totalCapital = deals.reduce((sum, d) => sum + d.capital, 0);
+    const totalFees = deals.reduce((sum, d) => sum + (d.capital * d.fee / 100), 0);
+    const closedDeals = deals.filter(d => d.status === 'closed').length;
+    const closedCapital = deals.filter(d => d.status === 'closed').reduce((sum, d) => sum + d.capital, 0);
+    const winRate = deals.length > 0 ? (closedDeals / deals.length * 100).toFixed(0) : 0;
+    
+    document.getElementById('metricCapital').textContent = formatCurrency(totalCapital);
+    document.getElementById('metricDeals').textContent = deals.length;
+    document.getElementById('metricFees').textContent = formatCurrency(totalFees);
+    document.getElementById('metricWinRate').textContent = winRate + '%';
+  }
+  
+  // EXPORT
+  function toggleExportMenu() {
+    document.getElementById('exportMenu').classList.toggle('show');
+  }
+  
+  function exportToJSON() {
+    const data = { deals, tasks, contacts, exportDate: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `export_${Date.now()}.json`;
+    a.click();
+    document.getElementById('exportMenu').classList.remove('show');
+  }
+  
+  function exportToCSV() {
+    let csv = 'Deal,Capital,Fee %,Status,Probability,Est. Revenue\n';
+    deals.forEach(d => {
+      csv += `"${d.name}","${formatCurrency(d.capital)}",${d.fee},"${d.status}",${d.probability},"${formatCurrency(d.capital * d.fee / 100)}"\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `deals_${Date.now()}.csv`;
+    a.click();
+    document.getElementById('exportMenu').classList.remove('show');
+  }
+  
+  function exportToPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    let y = 20;
+    
+    doc.setFontSize(20);
+    doc.text('Capital Management Report', 20, y);
+    y += 12;
+    doc.setFontSize(10);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, y);
+    y += 10;
+    
+    const totalCapital = deals.reduce((sum, d) => sum + d.capital, 0);
+    const totalFees = deals.reduce((sum, d) => sum + (d.capital * d.fee / 100), 0);
+    
+    doc.text(`Total Pipeline: ${formatCurrency(totalCapital)}`, 20, y);
+    y += 6;
+    doc.text(`Est. Revenue: ${formatCurrency(totalFees)}`, 20, y);
+    y += 10;
+    
+    doc.setFontSize(12);
+    doc.text('Deals', 20, y);
+    y += 8;
+    doc.setFontSize(9);
+    
+    deals.forEach(d => {
+      if (y > 270) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.text(`${d.name}: ${formatCurrency(d.capital)} | ${d.status} | ${d.probability}%`, 20, y);
+      y += 6;
+    });
+    
+    doc.save(`report_${Date.now()}.pdf`);
+    document.getElementById('exportMenu').classList.remove('show');
+  }
+  
+  function exportBackup() {
+    const backup = { deals, tasks, contacts, backupDate: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `backup_${Date.now()}.json`;
+    a.click();
+    alert('✓ Backup created');
+    document.getElementById('exportMenu').classList.remove('show');
+  }
+  
+  // DEALS
+  let dealFiles = [];
+  let dealDropReady = false;
+
+  function openAddDealModal() {
+    document.getElementById('addDealModal').classList.add('show');
+    dealFiles = [];
+    renderDealFiles();
+    ['dealName','dealCompany','dealContact','dealEmail','dealPhone','dealCapital','dealRevenue','dealYears','dealDescription','dealDocText','dealNotes','dealScore'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    const eq = document.getElementById('dealEquity'); if (eq) eq.value = '0';
+    const memo = document.getElementById('dealMemo');
+    memo.innerHTML = 'Drop documents and click "Underwrite Documentation" to generate.';
+    memo.dataset.raw = '';
+    const ex = document.getElementById('dealExecSummary');
+    if (ex) { ex.textContent = 'Auto-generated when you scan documents.'; ex.style.color = 'var(--secondary)'; }
+    const sb = document.getElementById('scoreBar'); if (sb) sb.style.display = 'none';
+    const ap = document.getElementById('aiAnalysisPanel'); if (ap) ap.style.display = 'none';
+    document.getElementById('underwriteBtn').style.display = 'none';
+    setupDealDrop();
+  }
+
+  function setupDealDrop() {
+    if (dealDropReady) return;
+    const zone = document.getElementById('dealDropZone');
+    if (!zone) return;
+    dealDropReady = true;
+    zone.addEventListener('click', () => document.getElementById('dealFileInput').click());
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = '#0ea5e9'; zone.style.background = '#e0f2fe'; });
+    zone.addEventListener('dragleave', e => { e.preventDefault(); zone.style.borderColor = '#cbd5e1'; zone.style.background = '#f1f5f9'; });
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.style.borderColor = '#cbd5e1';
+      zone.style.background = '#f1f5f9';
+      handleDealFiles(e.dataTransfer.files);
+    });
+  }
+
+  async function handleDealFiles(fileList) {
+    for (const file of fileList) {
+      const entry = { id: Date.now() + Math.random(), name: file.name, size: file.size, status: 'reading' };
+      dealFiles.push(entry);
+      renderDealFiles();
+      if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+        try {
+          const text = await extractPdfText(file);
+          if (text.trim().length < 20) {
+            entry.status = 'no-text';
+          } else {
+            const docs = document.getElementById('dealDocText');
+            docs.value += (docs.value ? '\n\n' : '') + `--- ${file.name} ---\n` + text;
+            entry.status = 'done';
+            entry.chars = text.length;
+          }
+        } catch (err) { entry.status = 'error'; }
+      } else { entry.status = 'not-pdf'; }
+      renderDealFiles();
+    }
+    if (dealFiles.some(f => f.status === 'done')) {
+      document.getElementById('underwriteBtn').style.display = 'block';
+      // Auto-run the AI read as soon as a document is scanned
+      autoReadDocuments();
+    }
+  }
+
+  // Sends extracted text to the AI, which reads it and fills ALL fields + memo
+  async function autoReadDocuments() {
+    const docText = document.getElementById('dealDocText').value.trim();
+    if (!docText) return;
+    const memo = document.getElementById('dealMemo');
+    const btn = document.getElementById('underwriteBtn');
+    btn.disabled = true; btn.textContent = '⏳ Reading documents...';
+    memo.innerHTML = '<span style="color:#0ea5e9;">Reading the documents and extracting the deal details...</span>';
+
+    const prompt = `You are a seasoned underwriter / licensed-broker-level analyst doing a thorough FIRST-PASS workup for a capital-raising firm. This is NOT final verified underwriting — a licensed broker signs off after you — but your analysis should be as deep and rigorous as a real underwriter's. Documents may be in any language; read them natively but OUTPUT EVERYTHING IN ENGLISH.
+
+Read the document text below. Do TWO things.
+
+FIRST, respond with a JSON object on the very first line (no markdown, no backticks), exactly these keys. Use "" or null if not found. Be quantitative; show reasoning briefly inside the string values:
+{"name":"deal/company name","company":"company name","contact":"primary contact","email":"email","phone":"phone","capital":"amount sought e.g. $50M","revenue":"trailing revenue e.g. $30M","years":"years in business (number)","description":"1-2 sentence plain description","sourceLanguage":"language of docs","valuation":"best valuation estimate + basis e.g. '$120M (4x $30M rev)'","bankerFit":75,"investorFit":60,"riskScore":40,"profitabilityScore":70,"dealType":"DEBT/BANK or EQUITY/FUND or HYBRID","roi":"estimated ROI / return profile e.g. '~3x over 5yr, ~25% IRR' or NOT PROVIDED","loiStatus":"LOI / term sheet status if mentioned, else 'No LOI mentioned'","dscr":"debt service coverage ratio if computable, else NOT PROVIDED","leverage":"existing or implied leverage / debt-to-equity, else NOT PROVIDED","margins":"gross/EBITDA margin if available","useOfFunds":"stated use of proceeds","exitStrategy":"exit / repayment path if mentioned","keyTerms":"notable deal terms (rate, equity %, preferences, collateral)","shortTerm":"realistic placeable amount short-term (0-12mo) + reason","longTerm":"realistic placeable amount long-term + reason","greenFlags":["strong positive 1","positive 2","positive 3"],"redFlags":["concern 1","concern 2","concern 3"],"score":75,"execSummary":"3-4 sentence underwriter executive summary","consistency":"plausibility read — do numbers tie out? round-number revenue, unsupported claims, missing audits. Cannot verify authenticity, only internal consistency."}
+
+bankerFit = 1-100 attractiveness as debt/bank deal (cashflow, collateral, DSCR, serviceability). investorFit = 1-100 as equity/fund deal (growth, upside, scalability). riskScore = 1-100 where HIGHER means RISKIER. profitabilityScore = 1-100 profitability strength. score = overall 1-100 deal quality.
+
+SECOND, after the JSON line, write the FULL underwriter memo with these sections: EXECUTIVE SUMMARY, BUSINESS OVERVIEW, THE ASK & USE OF FUNDS, FINANCIAL ANALYSIS (revenue, growth, margins, profitability, show math), VALUATION ANALYSIS (multiple basis, comparables logic), RISK ASSESSMENT (operational, market, financial, concentration, execution), DEAL STRUCTURE (LOI status, proposed terms, ROI/return math, DSCR, leverage, exit/repayment), BANKER VIEW, FUND/INVESTOR VIEW, GREEN FLAGS, RED FLAGS (ranked), CAPACITY (short vs long term), DILIGENCE GAPS (what the licensed broker must obtain), SCREENING VERDICT (ADVANCE TO UNDERWRITING / NEEDS MORE INFO / LIKELY PASS + rationale). Be specific, quantitative, skeptical. Never fabricate figures — write NOT PROVIDED where data is missing.
+
+=== DOCUMENT TEXT ===
+${docText}`;
+
+    try {
+      const response = await fetch("/api/underwrite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: prompt })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      const out = data.result || '';
+      // Split first line (JSON) from the memo
+      const firstNl = out.indexOf('\n');
+      const jsonLine = firstNl === -1 ? out : out.slice(0, firstNl);
+      const memoText = firstNl === -1 ? '' : out.slice(firstNl + 1).trim();
+      try {
+        const fields = JSON.parse(jsonLine.replace(/```json|```/g, '').trim());
+        fillDealFields(fields);
+      } catch (e) { /* if JSON parse fails, just show memo */ }
+      memo.dataset.raw = memoText || out;
+      memo.innerHTML = formatMemo(memoText || out);
+    } catch (err) {
+      memo.innerHTML = `<span style="color:#ef4444;">Could not read documents automatically: ${err.message}. The text was still extracted — you can fill fields manually or click Underwrite Documentation to retry.</span>`;
+    } finally {
+      btn.disabled = false; btn.textContent = '🔍 Re-run Underwriting';
+    }
+  }
+
+  function fillDealFields(f) {
+    window._lastAnalysis = f;
+    const setIf = (id, val) => { const el = document.getElementById(id); if (el && val && !el.value) el.value = val; };
+    setIf('dealName', f.name || f.company);
+    setIf('dealCompany', f.company);
+    setIf('dealContact', f.contact);
+    setIf('dealEmail', f.email);
+    setIf('dealPhone', f.phone);
+    setIf('dealCapital', f.capital);
+    setIf('dealRevenue', f.revenue);
+    setIf('dealYears', f.years);
+    setIf('dealDescription', f.description);
+    if (f.score) {
+      const score = Math.max(1, Math.min(100, parseInt(f.score)));
+      document.getElementById('dealScore').value = score;
+      const bar = document.getElementById('scoreBar');
+      const fill = document.getElementById('scoreFill');
+      const label = document.getElementById('scoreLabel');
+      bar.style.display = 'block';
+      fill.style.width = score + '%';
+      let color, text;
+      if (score >= 75) { color = '#10b981'; text = 'Strong'; }
+      else if (score >= 50) { color = '#f59e0b'; text = 'Moderate'; }
+      else { color = '#ef4444'; text = 'Weak'; }
+      fill.style.background = color;
+      label.textContent = `Deal Score: ${score}/100 — ${text}`;
+      label.style.color = color;
+    }
+    if (f.execSummary) {
+      const ex = document.getElementById('dealExecSummary');
+      ex.textContent = f.execSummary;
+      ex.style.color = 'var(--primary)';
+    }
+
+    // Populate AI underwriter analysis panel
+    const hasAnalysis = f.bankerFit || f.investorFit || f.valuation || (f.greenFlags && f.greenFlags.length) || (f.redFlags && f.redFlags.length);
+    if (hasAnalysis) {
+      document.getElementById('aiAnalysisPanel').style.display = 'block';
+      const bf = Math.max(0, Math.min(100, parseInt(f.bankerFit) || 0));
+      const inv = Math.max(0, Math.min(100, parseInt(f.investorFit) || 0));
+      const risk = Math.max(0, Math.min(100, parseInt(f.riskScore) || 0));
+      const profit = Math.max(0, Math.min(100, parseInt(f.profitabilityScore) || 0));
+      document.getElementById('bankerBar').style.width = bf + '%';
+      document.getElementById('investorBar').style.width = inv + '%';
+      document.getElementById('riskBar').style.width = risk + '%';
+      document.getElementById('profitBar').style.width = profit + '%';
+      document.getElementById('bankerVal').textContent = bf + '/100';
+      document.getElementById('investorVal').textContent = inv + '/100';
+      document.getElementById('riskVal').textContent = risk + '/100' + (risk >= 66 ? ' High' : risk >= 33 ? ' Med' : ' Low');
+      document.getElementById('profitVal').textContent = profit + '/100';
+      document.getElementById('aiValuation').textContent = f.valuation || '—';
+      document.getElementById('aiRoi').textContent = f.roi || '—';
+      document.getElementById('aiLoi').textContent = f.loiStatus || '—';
+      document.getElementById('aiDscr').textContent = f.dscr || '—';
+      document.getElementById('aiLeverage').textContent = f.leverage || '—';
+      document.getElementById('aiMargins').textContent = f.margins || '—';
+      document.getElementById('aiConsistency').textContent = f.consistency || '—';
+      document.getElementById('aiShortTerm').textContent = f.shortTerm || '—';
+      document.getElementById('aiLongTerm').textContent = f.longTerm || '—';
+      if (f.dealType) {
+        const dt = document.getElementById('aiDealType');
+        dt.textContent = f.dealType;
+        dt.style.background = f.dealType.includes('DEBT') || f.dealType.includes('BANK') ? 'rgba(14,165,233,0.3)' : f.dealType.includes('EQUITY') || f.dealType.includes('FUND') ? 'rgba(16,185,129,0.3)' : 'rgba(245,158,11,0.3)';
+      }
+      if (f.sourceLanguage && f.sourceLanguage.toLowerCase() !== 'english') {
+        const ln = document.getElementById('aiLangNote');
+        ln.style.display = 'block';
+        ln.textContent = `📄 Original documents in ${f.sourceLanguage} — translated and analyzed in English.`;
+      }
+      const greens = document.getElementById('aiGreenFlags');
+      const reds = document.getElementById('aiRedFlags');
+      greens.innerHTML = (f.greenFlags || []).map(g => `<li>${g}</li>`).join('') || '<li style="opacity:0.5;">None noted</li>';
+      reds.innerHTML = (f.redFlags || []).map(r => `<li>${r}</li>`).join('') || '<li style="opacity:0.5;">None noted</li>';
+    }
+  }
+
+  async function extractPdfText(file) {
+    const buf = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+    let full = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      full += content.items.map(it => it.str).join(' ') + '\n';
+    }
+    return full;
+  }
+
+  // Pattern-based auto-fill (runs locally, no API needed)
+  function autoFillFromText(text) {
+    const set = (id, val) => { const el = document.getElementById(id); if (el && !el.value && val) el.value = val; };
+    const emailMatch = text.match(/[\w.+-]+@[\w-]+\.[\w.-]+/);
+    if (emailMatch) set('dealEmail', emailMatch[0]);
+    const phoneMatch = text.match(/(\+?\d[\d\s().-]{8,}\d)/);
+    if (phoneMatch) set('dealPhone', phoneMatch[0].trim());
+    const revMatch = text.match(/revenue[:\s]*(?:of\s*)?(\$?\s?[\d,.]+\s?(?:million|billion|m|b|k)?)/i);
+    if (revMatch) set('dealRevenue', revMatch[1].trim());
+    const askMatch = text.match(/(?:seeking|raising|raise|ask|capital|funding)[:\s]*(?:of\s*)?(\$\s?[\d,.]+\s?(?:million|billion|m|b|k)?)/i);
+    if (askMatch) set('dealCapital', askMatch[1].trim());
+    const yearsMatch = text.match(/(?:founded|established|since)[:\s]*(\d{4})/i);
+    if (yearsMatch) { const yrs = new Date().getFullYear() - parseInt(yearsMatch[1]); if (yrs > 0 && yrs < 200) set('dealYears', String(yrs)); }
+  }
+
+  function renderDealFiles() {
+    const list = document.getElementById('dealFileList');
+    if (!list) return;
+    if (dealFiles.length === 0) { list.innerHTML = ''; return; }
+    const statusLabel = {
+      reading: '<span style="color:#0ea5e9;font-size:11px;">⏳ reading...</span>',
+      done: '<span style="color:#10b981;font-size:11px;">✓ scanned</span>',
+      'no-text': '<span style="color:#f59e0b;font-size:11px;">⚠️ scanned image — paste text</span>',
+      'not-pdf': '<span style="color:#f59e0b;font-size:11px;">not a PDF</span>',
+      error: '<span style="color:#ef4444;font-size:11px;">✕ could not read</span>'
+    };
+    list.innerHTML = dealFiles.map(f => `
+      <div class="document-item">
+        <div class="document-name"><div class="document-icon">📄</div>${f.name} ${f.chars ? `<span style="color:#94a3b8;font-size:11px;">(${(f.chars/1000).toFixed(1)}k chars)</span>` : ''}</div>
+        <div style="display:flex;align-items:center;gap:8px;">${statusLabel[f.status] || ''}<button class="doc-btn" style="color:#ef4444;" onclick="removeDealFile(${f.id})">×</button></div>
+      </div>
+    `).join('');
+  }
+
+  function removeDealFile(id) {
+    dealFiles = dealFiles.filter(f => f.id !== id);
+    renderDealFiles();
+  }
+
+  async function underwriteDocs() {
+    const docText = document.getElementById('dealDocText').value.trim();
+    if (!docText) { alert('⚠️ No document text yet. Drop a PDF or paste text first.'); return; }
+    autoReadDocuments();
+  }
+
+  function formatMemo(text) {
+    return text
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/^([A-Z][A-Z\s/&()-]{4,})$/gm, '<div style="font-weight:700;color:#0f172a;margin:1rem 0 0.4rem 0;font-size:13px;text-transform:uppercase;">$1</div>')
+      .replace(/(ADVANCE TO UNDERWRITING)/g, '<span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:5px;font-weight:700;">$1</span>')
+      .replace(/(NEEDS MORE INFO)/g, '<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:5px;font-weight:700;">$1</span>')
+      .replace(/(LIKELY PASS)/g, '<span style="background:#fecaca;color:#991b1b;padding:2px 8px;border-radius:5px;font-weight:700;">$1</span>')
+      .replace(/\n/g, '<br>');
+  }
+  
+  function closeAddDealModal() {
+    document.getElementById('addDealModal').classList.remove('show');
+  }
+  
+  function addDeal() {
+    const name = document.getElementById('dealName').value.trim();
+    const capital = parseCapital(document.getElementById('dealCapital').value);
+    
+    if (!name) {
+      alert('⚠️ Enter deal name');
+      return;
+    }
+    
+    const memoText = document.getElementById('dealMemo').dataset.raw || '';
+    deals.push({
+      id: nextDealId++,
+      name, capital,
+      status: document.getElementById('dealStatus').value,
+      fee: parseFloat(document.getElementById('dealFee').value) || 5,
+      probability: parseInt(document.getElementById('dealProbability').value) || 50,
+      rank: deals.length + 1,
+      reference: '',
+      company: document.getElementById('dealCompany').value,
+      contact: document.getElementById('dealContact').value,
+      email: document.getElementById('dealEmail').value,
+      phone: document.getElementById('dealPhone').value,
+      revenue: document.getElementById('dealRevenue').value,
+      years: document.getElementById('dealYears').value,
+      description: document.getElementById('dealDescription').value,
+      client: document.getElementById('dealContact').value,
+      equity: parseFloat(document.getElementById('dealEquity').value) || 0,
+      score: parseInt(document.getElementById('dealScore').value) || null,
+      bankerFit: window._lastAnalysis?.bankerFit || null,
+      investorFit: window._lastAnalysis?.investorFit || null,
+      riskScore: window._lastAnalysis?.riskScore || null,
+      profitabilityScore: window._lastAnalysis?.profitabilityScore || null,
+      valuation: window._lastAnalysis?.valuation || '',
+      roi: window._lastAnalysis?.roi || '',
+      dealType: window._lastAnalysis?.dealType || '',
+      execSummary: document.getElementById('dealExecSummary').textContent !== 'Auto-generated when you scan documents.' ? document.getElementById('dealExecSummary').textContent : '',
+      files: dealFiles.map(f => ({ id: f.id, name: f.name })),
+      memo: memoText,
+      notes: (document.getElementById('dealNotes').value || '') + (memoText ? '\n\n=== UNDERWRITING MEMO ===\n' + memoText : ''),
+      createdDate: new Date().toISOString()
+    });
+    
+    saveData();
+    updateMetrics();
+    renderDeals();
+    closeAddDealModal();
+  }
+  
+  function deleteDeal(id) {
+    if (confirm('Delete deal?')) {
+      deals = deals.filter(d => d.id !== id);
+      saveData();
+      updateMetrics();
+      renderDeals();
+    }
+  }
+  
+  function updateDeal(id, field, value) {
+    const deal = deals.find(d => d.id === id);
+    if (deal) {
+      if (field === 'capital') deal[field] = parseCapital(value);
+      else if (['fee', 'probability', 'rank'].includes(field)) deal[field] = parseFloat(value) || 0;
+      else deal[field] = value;
+      saveData();
+      updateMetrics();
+    }
+  }
+  
+  function filterDeals(status) {
+    currentFilter = status;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    renderDeals();
+  }
+  
+  function addDocument(dealId) {
+    const name = prompt('Document name:');
+    if (name) {
+      const deal = deals.find(d => d.id === dealId);
+      if (deal) {
+        deal.files.push({id: Date.now(), name});
+        saveData();
+        renderDeals();
+      }
+    }
+  }
+  
+  function deleteDocument(dealId, fileId) {
+    const deal = deals.find(d => d.id === dealId);
+    if (deal) {
+      deal.files = deal.files.filter(f => f.id !== fileId);
+      saveData();
+      renderDeals();
+    }
+  }
+  
+  function renderDashboard() {
+    const statuses = { lead: 0, proposal: 0, negotiation: 0, closed: 0 };
+    const urgencies = { urgent: 0, high: 0, medium: 0 };
+    deals.forEach(d => {
+      statuses[d.status]++;
+      urgencies['high']++;
+    });
+
+    // Dashboard deal ratings
+    const ratingsEl = document.getElementById('dashboardRatings');
+    if (ratingsEl) {
+      const rated = deals.filter(d => d.score).sort((a, b) => b.score - a.score);
+      if (rated.length === 0) {
+        ratingsEl.innerHTML = '<div style="color:var(--secondary); font-size:13px; padding:1rem 0;">No scored deals yet. Drop documents into a New Deal to get an underwriter rating.</div>';
+      } else {
+        ratingsEl.innerHTML = rated.map(d => {
+          const sc = d.score >= 75 ? '#10b981' : d.score >= 50 ? '#f59e0b' : '#ef4444';
+          return `
+            <div style="display:flex; align-items:center; gap:1rem; padding:0.85rem 0; border-bottom:1px solid var(--border);">
+              <div style="width:48px; height:48px; border-radius:10px; background:${sc}; color:white; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:18px; flex-shrink:0;">${d.score}</div>
+              <div style="flex:1; min-width:0;">
+                <div style="font-weight:700; font-size:14px;">${d.name}</div>
+                <div style="font-size:12px; color:var(--secondary);">${formatCurrency(d.capital)}${d.dealType ? ' · ' + d.dealType : ''}${d.valuation ? ' · Val: ' + d.valuation : ''}</div>
+              </div>
+              <div style="display:flex; gap:1rem; text-align:center; flex-shrink:0;">
+                ${d.bankerFit ? `<div><div style="font-size:10px; color:var(--secondary); text-transform:uppercase;">Bank</div><div style="font-weight:700; color:#0284c7;">${d.bankerFit}</div></div>` : ''}
+                ${d.investorFit ? `<div><div style="font-size:10px; color:var(--secondary); text-transform:uppercase;">Invest</div><div style="font-weight:700; color:#10b981;">${d.investorFit}</div></div>` : ''}
+                ${d.riskScore ? `<div><div style="font-size:10px; color:var(--secondary); text-transform:uppercase;">Risk</div><div style="font-weight:700; color:#ef4444;">${d.riskScore}</div></div>` : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    const statusCtx = document.getElementById('statusChart');
+    if (statusCtx && statusCtx.chart) statusCtx.chart.destroy();
+    statusCtx.chart = new Chart(statusCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Lead', 'Proposal', 'Negotiation', 'Closed'],
+        datasets: [{
+          data: [statuses.lead, statuses.proposal, statuses.negotiation, statuses.closed],
+          backgroundColor: ['#dbeafe', '#fef3c7', '#fecaca', '#d1fae5'],
+          borderColor: ['#0284c7', '#f59e0b', '#dc2626', '#10b981'],
+          borderWidth: 2
+        }]
+      }
+    });
+  }
+  
+  function renderPipeline() {
+    const container = document.getElementById('pipelineContainer');
+    const statuses = ['lead', 'proposal', 'negotiation', 'closed'];
+    const titles = { lead: 'Leads', proposal: 'Proposals', negotiation: 'Negotiating', closed: 'Closed' };
+    
+    let html = '';
+    statuses.forEach(status => {
+      const dealsInStatus = deals.filter(d => d.status === status).sort((a, b) => b.capital - a.capital);
+      const totalCapital = dealsInStatus.reduce((sum, d) => sum + d.capital, 0);
+      const avgProb = dealsInStatus.length > 0 ? (dealsInStatus.reduce((sum, d) => sum + d.probability, 0) / dealsInStatus.length).toFixed(0) : 0;
+      
+      html += `
+        <div class="pipeline-card">
+          <div class="pipeline-title">${titles[status]} (${dealsInStatus.length} deals | ${formatCurrency(totalCapital)} | ${avgProb}% avg)</div>
+          ${dealsInStatus.map(d => `
+            <div class="pipeline-item">
+              <span><strong>${d.name}</strong> • ${formatCurrency(d.capital)}</span>
+              <span>${d.probability}%</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    });
+    
+    container.innerHTML = html;
+  }
+  
+  function renderAnalytics() {
+    const totalCapital = deals.reduce((sum, d) => sum + d.capital, 0);
+    const totalFees = deals.reduce((sum, d) => sum + (d.capital * d.fee / 100), 0);
+    const avgCapital = deals.length > 0 ? totalCapital / deals.length : 0;
+    const closedCount = deals.filter(d => d.status === 'closed').length;
+    const closedCapital = deals.filter(d => d.status === 'closed').reduce((sum, d) => sum + d.capital, 0);
+    const closedFees = deals.filter(d => d.status === 'closed').reduce((sum, d) => sum + (d.capital * d.fee / 100), 0);
+    const weightedProbability = deals.length > 0 ? (deals.reduce((sum, d) => sum + (d.capital * d.probability / 100), 0) / totalCapital * 100).toFixed(0) : 0;
+    
+    let metricsHtml = `
+      <tr><td>Total Pipeline</td><td>${formatCurrency(totalCapital)}</td><td>All active & closed</td></tr>
+      <tr><td>Est. Revenue</td><td>${formatCurrency(totalFees)}</td><td>At current terms</td></tr>
+      <tr><td>Avg Deal Size</td><td>${formatCurrency(avgCapital)}</td><td>Across all deals</td></tr>
+      <tr><td>Closed Value</td><td>${formatCurrency(closedCapital)}</td><td>${closedCount} deals closed</td></tr>
+      <tr><td>Realized Revenue</td><td>${formatCurrency(closedFees)}</td><td>From closed deals</td></tr>
+      <tr><td>Weighted Probability</td><td>${weightedProbability}%</td><td>All deals weighted</td></tr>
+    `;
+    document.getElementById('metricsTable').innerHTML = metricsHtml;
+    
+    let perfHtml = '';
+    [...deals].sort((a, b) => b.capital - a.capital).slice(0, 10).forEach(d => {
+      const revenue = d.capital * d.fee / 100;
+      perfHtml += `
+        <tr>
+          <td>${d.name}</td>
+          <td>${formatCurrency(d.capital)}</td>
+          <td>${d.fee}%</td>
+          <td>${formatCurrency(revenue)}</td>
+          <td>${d.status}</td>
+          <td>${d.probability}%</td>
+        </tr>
+      `;
+    });
+    document.getElementById('performanceTable').innerHTML = perfHtml;
+  }
+  
+  // Drag-and-drop urgency reorder
+  let draggedDealId = null;
+  function dealDragStart(e, id) {
+    draggedDealId = id;
+    e.currentTarget.style.opacity = '0.4';
+  }
+  function dealDragOver(e) {
+    e.preventDefault();
+    const card = e.currentTarget;
+    card.style.borderColor = 'var(--accent)';
+  }
+  function dealDragEnd(e) {
+    e.currentTarget.style.opacity = '1';
+    document.querySelectorAll('.deal-card').forEach(c => c.style.borderColor = '');
+  }
+  function dealDrop(e, targetId) {
+    e.preventDefault();
+    if (draggedDealId === null || draggedDealId === targetId) return;
+    const fromIdx = deals.findIndex(d => d.id === draggedDealId);
+    const toIdx = deals.findIndex(d => d.id === targetId);
+    if (fromIdx === -1 || toIdx === -1) return;
+    const [moved] = deals.splice(fromIdx, 1);
+    deals.splice(toIdx, 0, moved);
+    // Renumber ranks by new order
+    deals.forEach((d, i) => d.rank = i + 1);
+    draggedDealId = null;
+    saveData();
+    renderDeals();
+  }
+
+  function renderDeals() {
+    const container = document.getElementById('dealsContainer');
+    const search = document.getElementById('dealSearch')?.value?.toLowerCase() || '';
+    
+    let filtered = deals.filter(d => {
+      const matchStatus = currentFilter === 'all' || d.status === currentFilter;
+      const matchSearch = !search || d.name.toLowerCase().includes(search);
+      return matchStatus && matchSearch;
+    });
+    
+    if (filtered.length === 0) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div></div>';
+      return;
+    }
+    
+    container.innerHTML = filtered.map(d => {
+      const statusLabels = { lead: 'Lead', proposal: 'Proposal', negotiation: 'Negotiating', closed: 'Closed' };
+      const statusClasses = { lead: 'status-lead', proposal: 'status-proposal', negotiation: 'status-negotiation', closed: 'status-closed' };
+      const revenue = d.capital * d.fee / 100;
+      const expRevenue = (d.capital * d.fee / 100) * (d.probability / 100);
+      const scoreColor = d.score >= 75 ? '#10b981' : d.score >= 50 ? '#f59e0b' : '#ef4444';
+      
+      return `
+        <div class="deal-card" draggable="true" data-deal-id="${d.id}" ondragstart="dealDragStart(event, ${d.id})" ondragover="dealDragOver(event)" ondrop="dealDrop(event, ${d.id})" ondragend="dealDragEnd(event)">
+          <div class="deal-header">
+            <div class="deal-header-content">
+              <div class="deal-rank">⠿ #${d.rank}${d.score ? ` · Score ${d.score}` : ''}</div>
+              <div class="deal-name">${d.name}</div>
+              <div class="deal-amount">${formatCurrency(d.capital)}</div>
+            </div>
+            <button class="deal-delete" onclick="deleteDeal(${d.id})">✕</button>
+          </div>
+          
+          <div class="deal-body">
+            ${d.score ? `<div style="height:6px; background:var(--lighter); border-radius:4px; overflow:hidden; margin-bottom:0.75rem;"><div style="height:100%; width:${d.score}%; background:${scoreColor};"></div></div>` : ''}
+            ${d.execSummary ? `<div style="font-size:12px; color:var(--secondary); font-style:italic; margin-bottom:1rem; line-height:1.5;">${d.execSummary}</div>` : ''}
+            <div class="status-badges">
+              <span class="status-badge ${statusClasses[d.status]}">${statusLabels[d.status]}</span>
+            </div>
+            
+            <div class="deal-row">
+              <div class="deal-field">
+                <label class="deal-field-label">Capital</label>
+                <input type="text" class="deal-field-input" value="${formatCurrency(d.capital)}" onchange="updateDeal(${d.id}, 'capital', this.value)">
+              </div>
+              <div class="deal-field">
+                <label class="deal-field-label">Status</label>
+                <select class="deal-field-input" onchange="updateDeal(${d.id}, 'status', this.value)">
+                  <option value="lead" ${d.status === 'lead' ? 'selected' : ''}>Lead</option>
+                  <option value="proposal" ${d.status === 'proposal' ? 'selected' : ''}>Proposal</option>
+                  <option value="negotiation" ${d.status === 'negotiation' ? 'selected' : ''}>Negotiation</option>
+                  <option value="closed" ${d.status === 'closed' ? 'selected' : ''}>Closed</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="deal-row">
+              <div class="deal-field">
+                <label class="deal-field-label">Fee %</label>
+                <input type="number" class="deal-field-input" value="${d.fee}" step="0.1" onchange="updateDeal(${d.id}, 'fee', this.value)">
+              </div>
+              <div class="deal-field">
+                <label class="deal-field-label">Win Probability %</label>
+                <input type="number" class="deal-field-input" value="${d.probability}" step="5" min="0" max="100" onchange="updateDeal(${d.id}, 'probability', this.value)">
+              </div>
+            </div>
+            
+            <div class="deal-metrics">
+              <div class="metric-row">
+                <span class="metric-label">Revenue (100%):</span>
+                <span class="metric-value-small">${formatCurrency(revenue)}</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-label">Expected Value:</span>
+                <span class="metric-value-small">${formatCurrency(expRevenue)}</span>
+              </div>
+            </div>
+            
+            <div class="documents-section">
+              <div class="documents-title">Docs (${d.files.length})</div>
+              <div class="document-list">
+                ${d.files.length > 0 ? d.files.map(f => `
+                  <div class="document-item">
+                    <div class="document-name"><div class="document-icon">📄</div>${f.name}</div>
+                    <button class="doc-btn" style="color: #ef4444;" onclick="deleteDocument(${d.id}, ${f.id})">×</button>
+                  </div>
+                `).join('') : '<div style="color: #64748b; font-size: 12px;">None</div>'}
+              </div>
+              <button class="add-doc-btn" onclick="addDocument(${d.id})">+ Document</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+  
+  // UNDERWRITING STATION
+  let uwFiles = [];
+  let uwAudits = [];
+  let uwDropReady = false;
+  let lastUwAnalysis = null;
+
+  function renderUnderwriting() {
+    setupUwDrop();
+    renderUwAuditLog();
+  }
+
+  function setupUwDrop() {
+    if (uwDropReady) return;
+    const zone = document.getElementById('uwDropZone');
+    if (!zone) return;
+    uwDropReady = true;
+    zone.addEventListener('click', () => document.getElementById('uwFileInput').click());
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = '#0ea5e9'; zone.style.background = '#e0f2fe'; });
+    zone.addEventListener('dragleave', e => { e.preventDefault(); zone.style.borderColor = '#cbd5e1'; zone.style.background = '#f1f5f9'; });
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.style.borderColor = '#cbd5e1'; zone.style.background = '#f1f5f9';
+      handleUwFiles(e.dataTransfer.files);
+    });
+  }
+
+  async function handleUwFiles(fileList) {
+    for (const file of fileList) {
+      const entry = { id: Date.now() + Math.random(), name: file.name, status: 'reading' };
+      uwFiles.push(entry);
+      renderUwFiles();
+      if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+        try {
+          const text = await extractPdfText(file);
+          if (text.trim().length < 20) { entry.status = 'no-text'; }
+          else {
+            const docs = document.getElementById('uwDocText');
+            docs.value += (docs.value ? '\n\n' : '') + `--- ${file.name} ---\n` + text;
+            entry.status = 'done'; entry.chars = text.length;
+          }
+        } catch (err) { entry.status = 'error'; }
+      } else { entry.status = 'not-pdf'; }
+      renderUwFiles();
+    }
+    // Auto-run as soon as something readable is in
+    if (uwFiles.some(f => f.status === 'done')) runUwAnalysis();
+  }
+
+  function renderUwFiles() {
+    const list = document.getElementById('uwFileList');
+    if (!list) return;
+    if (uwFiles.length === 0) { list.innerHTML = ''; return; }
+    const lbl = { reading:'<span style="color:#0ea5e9;font-size:11px;">⏳ reading...</span>', done:'<span style="color:#10b981;font-size:11px;">✓ scanned</span>', 'no-text':'<span style="color:#f59e0b;font-size:11px;">⚠️ scanned image</span>', 'not-pdf':'<span style="color:#f59e0b;font-size:11px;">not a PDF</span>', error:'<span style="color:#ef4444;font-size:11px;">✕ error</span>' };
+    list.innerHTML = uwFiles.map(f => `<div class="document-item"><div class="document-name"><div class="document-icon">📄</div>${f.name}</div>${lbl[f.status]||''}</div>`).join('');
+  }
+
+  function clearUw() {
+    uwFiles = []; lastUwAnalysis = null;
+    document.getElementById('uwDocText').value = '';
+    document.getElementById('uwResultPanel').style.display = 'none';
+    document.getElementById('uwActions').style.display = 'none';
+    renderUwFiles();
+  }
+
+  async function runUwAnalysis() {
+    const docText = document.getElementById('uwDocText').value.trim();
+    if (!docText) { alert('⚠️ Drop a PDF or paste document text first.'); return; }
+    const btn = document.getElementById('uwAnalyzeBtn');
+    const panel = document.getElementById('uwResultPanel');
+    btn.disabled = true; btn.textContent = '⏳ Reading & underwriting...';
+    panel.style.display = 'block';
+    panel.innerHTML = '<div style="color:#0ea5e9; padding:1rem;">Reading documents and running underwriter analysis...</div>';
+
+    const prompt = `You are a seasoned underwriter / licensed-broker-level analyst doing a thorough FIRST-PASS workup. NOT final verified underwriting — a licensed broker signs off after. Documents may be in any language; read natively but OUTPUT IN ENGLISH.
+
+Respond with a JSON object on the very first line (no markdown/backticks), exactly these keys, "" or null if missing:
+{"name":"deal/company name","company":"company","contact":"contact","email":"","phone":"","capital":"amount sought","revenue":"trailing revenue","years":"years in business","description":"1-2 sentence description","sourceLanguage":"language","valuation":"valuation estimate + basis","bankerFit":75,"investorFit":60,"riskScore":40,"profitabilityScore":70,"dealType":"DEBT/BANK or EQUITY/FUND or HYBRID","roi":"ROI/return profile","loiStatus":"LOI status","dscr":"debt service coverage","leverage":"leverage/debt-to-equity","margins":"margins","shortTerm":"short-term placeable amount + reason","longTerm":"long-term placeable amount + reason","greenFlags":["g1","g2","g3"],"redFlags":["r1","r2","r3"],"score":75,"execSummary":"3-4 sentence summary","consistency":"plausibility read — cannot verify authenticity, only internal consistency"}
+
+riskScore: higher = riskier. Then after the JSON line write the full memo: EXECUTIVE SUMMARY, BUSINESS OVERVIEW, FINANCIAL ANALYSIS, VALUATION ANALYSIS, RISK ASSESSMENT, DEAL STRUCTURE (LOI/terms/ROI/DSCR/leverage/exit), BANKER VIEW, FUND VIEW, GREEN FLAGS, RED FLAGS, CAPACITY (short vs long), DILIGENCE GAPS, SCREENING VERDICT. Specific, quantitative, skeptical. Never fabricate — write NOT PROVIDED where missing.
+
+=== DOCUMENT TEXT ===
+${docText}`;
+
+    try {
+      const res = await fetch('/api/underwrite', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ prompt }) });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      const out = data.result || '';
+      const nl = out.indexOf('\n');
+      const jsonLine = nl === -1 ? out : out.slice(0, nl);
+      const memoText = nl === -1 ? '' : out.slice(nl + 1).trim();
+      let f = {};
+      try { f = JSON.parse(jsonLine.replace(/```json|```/g,'').trim()); } catch(e){}
+      f.memo = memoText; f.docText = docText;
+      lastUwAnalysis = f;
+      panel.innerHTML = renderUwResult(f);
+      document.getElementById('uwActions').style.display = 'flex';
+    } catch (err) {
+      panel.innerHTML = `<div style="color:#ef4444; padding:1rem;">Analysis failed: ${err.message}. This needs the API key + billing active on the deployed site.</div>`;
+    } finally {
+      btn.disabled = false; btn.textContent = '🔍 Run Underwriting Analysis';
+    }
+  }
+
+  function renderUwResult(f) {
+    const bf = parseInt(f.bankerFit)||0, inv = parseInt(f.investorFit)||0, risk = parseInt(f.riskScore)||0, profit = parseInt(f.profitabilityScore)||0, score = parseInt(f.score)||0;
+    const sc = score>=75?'#10b981':score>=50?'#f59e0b':'#ef4444';
+    const bar = (val,color) => `<div style="height:8px;background:rgba(255,255,255,0.15);border-radius:5px;overflow:hidden;"><div style="height:100%;width:${val}%;background:${color};"></div></div>`;
+    const tile = (label,val) => `<div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:0.75rem;"><div style="font-size:10px;opacity:0.7;text-transform:uppercase;">${label}</div><div style="font-size:13px;font-weight:700;margin-top:4px;line-height:1.3;">${val||'—'}</div></div>`;
+    return `
+      <div style="background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:14px;padding:1.5rem;color:white;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+          <div>
+            <div style="font-size:11px;opacity:0.6;text-transform:uppercase;letter-spacing:0.5px;">${f.company||f.name||'Unnamed'}</div>
+            <div style="font-size:20px;font-weight:800;">Deal Score: ${score}/100</div>
+          </div>
+          <div style="width:64px;height:64px;border-radius:14px;background:${sc};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:24px;">${score}</div>
+        </div>
+        ${f.sourceLanguage && f.sourceLanguage.toLowerCase()!=='english' ? `<div style="font-size:11px;opacity:0.6;margin-bottom:1rem;">📄 Original in ${f.sourceLanguage} — translated to English.</div>`:''}
+        <div style="font-size:13px;line-height:1.6;margin-bottom:1.25rem;opacity:0.95;">${f.execSummary||''}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;">
+          <div><div style="font-size:11px;opacity:0.7;margin-bottom:4px;">Banker Fit ${bf}/100</div>${bar(bf,'#0ea5e9')}</div>
+          <div><div style="font-size:11px;opacity:0.7;margin-bottom:4px;">Investor Fit ${inv}/100</div>${bar(inv,'#10b981')}</div>
+          <div><div style="font-size:11px;opacity:0.7;margin-bottom:4px;">Risk ${risk}/100 ${risk>=66?'(High)':risk>=33?'(Med)':'(Low)'}</div>${bar(risk,'#ef4444')}</div>
+          <div><div style="font-size:11px;opacity:0.7;margin-bottom:4px;">Profitability ${profit}/100</div>${bar(profit,'#f59e0b')}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-bottom:1.25rem;">
+          ${tile('Valuation',f.valuation)}${tile('ROI',f.roi)}${tile('Deal Type',f.dealType)}
+          ${tile('LOI/Terms',f.loiStatus)}${tile('DSCR',f.dscr)}${tile('Margins',f.margins)}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;">
+          <div style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);border-radius:10px;padding:0.85rem;"><div style="font-size:11px;font-weight:700;color:#6ee7b7;margin-bottom:6px;">🟢 Green Flags</div><ul style="font-size:12px;line-height:1.6;padding-left:1rem;margin:0;">${(f.greenFlags||[]).map(g=>`<li>${g}</li>`).join('')||'<li style="opacity:0.5;">None</li>'}</ul></div>
+          <div style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:0.85rem;"><div style="font-size:11px;font-weight:700;color:#fca5a5;margin-bottom:6px;">🔴 Red Flags</div><ul style="font-size:12px;line-height:1.6;padding-left:1rem;margin:0;">${(f.redFlags||[]).map(r=>`<li>${r}</li>`).join('')||'<li style="opacity:0.5;">None</li>'}</ul></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          ${tile('Short-Term Capacity',f.shortTerm)}${tile('Long-Term Capacity',f.longTerm)}
+        </div>
+      </div>
+      <div style="background:var(--lighter);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-top:1rem;font-size:13px;line-height:1.7;">${formatMemo(f.memo||'')}</div>
+      <p style="font-size:11px;color:var(--secondary);font-style:italic;margin-top:0.75rem;">First-pass screening only. Not verified underwriting. A licensed broker must complete formal review before any decision.</p>
+    `;
+  }
+
+  function pushUwToDeal() {
+    if (!lastUwAnalysis) return;
+    const f = lastUwAnalysis;
+    deals.push({
+      id: nextDealId++,
+      name: f.name || f.company || 'Audited Deal',
+      capital: parseCapital(f.capital || '0'),
+      status: 'lead',
+      fee: 5,
+      probability: 50,
+      rank: deals.length + 1,
+      reference: '', company: f.company||'', contact: f.contact||'', email: f.email||'', phone: f.phone||'',
+      revenue: f.revenue||'', years: f.years||'', description: f.description||'', client: f.contact||'',
+      equity: 0, score: parseInt(f.score)||null,
+      bankerFit: parseInt(f.bankerFit)||null, investorFit: parseInt(f.investorFit)||null,
+      riskScore: parseInt(f.riskScore)||null, profitabilityScore: parseInt(f.profitabilityScore)||null,
+      valuation: f.valuation||'', roi: f.roi||'', dealType: f.dealType||'',
+      execSummary: f.execSummary||'', files: uwFiles.map(x=>({id:x.id,name:x.name})),
+      memo: f.memo||'', notes: f.memo ? '=== UNDERWRITING MEMO ===\n'+f.memo : '',
+      createdDate: new Date().toISOString()
+    });
+    saveData(); updateMetrics(); renderDeals();
+    alert('✓ Added "'+(f.name||f.company||'deal')+'" to your pipeline.');
+    switchTabTo('deals');
+  }
+
+  function switchTabTo(tab) {
+    document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+    document.getElementById(tab).classList.add('active');
+    if (tab === 'deals') renderDeals();
+  }
+
+  function renderUwAuditLog() {
+    const log = document.getElementById('uwAuditLog');
+    if (!log) return;
+    const audited = deals.filter(d => d.score).sort((a,b)=>new Date(b.createdDate)-new Date(a.createdDate));
+    if (audited.length === 0) { log.innerHTML = '<div style="color:var(--secondary);font-size:13px;padding:0.5rem 0;">Nothing audited yet. Drop documents above to start.</div>'; return; }
+    log.innerHTML = audited.map(d => {
+      const sc = d.score>=75?'#10b981':d.score>=50?'#f59e0b':'#ef4444';
+      return `<div style="display:flex;align-items:center;gap:1rem;padding:0.75rem 0;border-bottom:1px solid var(--border);">
+        <div style="width:40px;height:40px;border-radius:9px;background:${sc};color:white;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;">${d.score}</div>
+        <div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:13px;">${d.name}</div><div style="font-size:11px;color:var(--secondary);">${formatCurrency(d.capital)}${d.dealType?' · '+d.dealType:''}${d.riskScore?' · Risk '+d.riskScore:''}</div></div>
+      </div>`;
+    }).join('');
+  }
+
+  // CONTACTS
+  function openAddContactModal() {
+    document.getElementById('addContactModal').classList.add('show');
+  }
+  
+  function closeAddContactModal() {
+    document.getElementById('addContactModal').classList.remove('show');
+  }
+  
+  function addContact() {
+    const name = document.getElementById('contactName').value.trim();
+    if (!name) {
+      alert('⚠️ Enter name');
+      return;
+    }
+    
+    contacts.push({
+      id: nextContactId++,
+      name,
+      company: document.getElementById('contactCompany').value,
+      role: document.getElementById('contactRole').value,
+      email: document.getElementById('contactEmail').value,
+      phone: document.getElementById('contactPhone').value
+    });
+    
+    saveData();
+    renderContacts();
+    closeAddContactModal();
+  }
+  
+  function deleteContact(id) {
+    contacts = contacts.filter(c => c.id !== id);
+    saveData();
+    renderContacts();
+  }
+  
+  function renderContacts() {
+    const container = document.getElementById('contactsContainer');
+    const search = document.getElementById('contactSearch')?.value?.toLowerCase() || '';
+    
+    let filtered = contacts.filter(c =>
+      !search || c.name.toLowerCase().includes(search) || c.email.toLowerCase().includes(search)
+    );
+    
+    if (filtered.length === 0) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div></div>';
+      return;
+    }
+    
+    container.innerHTML = filtered.map(c => `
+      <div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: var(--shadow-sm);">
+        <div style="font-weight: 700; margin-bottom: 0.5rem;">${c.name}</div>
+        <div style="font-size: 13px; color: var(--secondary); margin-bottom: 0.5rem;"><strong>Company:</strong> ${c.company || '-'}</div>
+        <div style="font-size: 13px; color: var(--secondary); margin-bottom: 0.5rem;"><strong>Role:</strong> ${c.role || '-'}</div>
+        <div style="font-size: 13px; color: var(--secondary); margin-bottom: 0.5rem;"><strong>Email:</strong> ${c.email || '-'}</div>
+        <div style="font-size: 13px; color: var(--secondary); margin-bottom: 1rem;"><strong>Phone:</strong> ${c.phone || '-'}</div>
+        <button class="btn btn-danger btn-small" style="width: 100%;" onclick="deleteContact(${c.id})">Delete</button>
+      </div>
+    `).join('');
+  }
+  
+  // TASKS
+  function openAddTaskModal() {
+    document.getElementById('addTaskModal').classList.add('show');
+  }
+  
+  function closeAddTaskModal() {
+    document.getElementById('addTaskModal').classList.remove('show');
+  }
+  
+  function addTask() {
+    const title = document.getElementById('taskTitle').value.trim();
+    if (!title) {
+      alert('⚠️ Enter task');
+      return;
+    }
+    
+    tasks.push({
+      id: nextTaskId++,
+      title,
+      due: document.getElementById('taskDue').value,
+      priority: document.getElementById('taskPriority').value,
+      deal: document.getElementById('taskDeal').value,
+      completed: false
+    });
+    
+    saveData();
+    updateMetrics();
+    renderTasks();
+    closeAddTaskModal();
+  }
+  
+  function toggleTask(id) {
+    const task = tasks.find(t => t.id === id);
+    if (task) {
+      task.completed = !task.completed;
+      saveData();
+      updateMetrics();
+      renderTasks();
+    }
+  }
+  
+  function deleteTask(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    saveData();
+    updateMetrics();
+    renderTasks();
+  }
+  
+  function renderTasks() {
+    const container = document.getElementById('tasksContainer');
+    if (tasks.length === 0) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">✓</div></div>';
+      return;
+    }
+    
+    container.innerHTML = tasks.sort((a, b) => a.completed - b.completed).map(t => `
+      <div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: var(--shadow-sm); opacity: ${t.completed ? 0.6 : 1};">
+        <div style="display: flex; gap: 12px; margin-bottom: 1rem;">
+          <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleTask(${t.id})" style="cursor: pointer;">
+          <div style="flex: 1;">
+            <div style="font-weight: 700; text-decoration: ${t.completed ? 'line-through' : 'none'};">${t.title}</div>
+          </div>
+        </div>
+        <div style="font-size: 12px; color: var(--secondary); margin-bottom: 1rem;">
+          ${t.due ? `📅 ${t.due} | ` : ''}Priority: <strong>${t.priority}</strong>${t.deal ? ` | Deal: ${t.deal}` : ''}
+        </div>
+        <button class="btn btn-danger btn-small" style="width: 100%;" onclick="deleteTask(${t.id})">Delete</button>
+      </div>
+    `).join('');
+  }
+</script>
+
+</body>
+</html>
+
