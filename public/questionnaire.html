@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HGC &amp; ARK — Deal Platform Requirements</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap');
+:root{--bg:#0a0a0a;--surface:#111113;--surface-2:#19191d;--border:#2a2a30;--border-active:#4a4a55;--text:#e8e8ec;--text-dim:#8a8a95;--text-muted:#55555f;--accent:#38bdf8;--accent-dim:#38bdf822;--radius:12px}
+*{margin:0;padding:0;box-sizing:border-box}
+html{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
+body{min-height:100dvh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.container{max-width:720px;margin:0 auto;padding:24px 16px 160px}
+.header{margin-bottom:24px}
+.header-tag{display:inline-flex;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:var(--accent-dim);border:1px solid var(--accent);border-radius:6px;padding:5px 10px;margin-bottom:12px}
+.header h1{font-size:23px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+.header p{color:var(--text-dim);font-size:13px;line-height:1.5}
+.legend{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:16px 0;font-size:12px;color:var(--text-dim);line-height:1.6}
+.legend b{color:var(--text)}
+.respondent{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+.field{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--text);outline:none}
+.field:focus{border-color:var(--accent)}
+.section{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin:30px 0 6px;padding:8px 0;border-bottom:1px solid var(--border)}
+.section-intro{font-size:12px;color:var(--text-dim);line-height:1.5;margin-bottom:14px}
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.q-text{font-size:14px;font-weight:500;line-height:1.4;margin-bottom:10px}
+textarea.field{resize:vertical;min-height:60px;max-height:240px}
+.prio{display:flex;gap:6px;flex-wrap:wrap}
+.prio label{cursor:pointer}
+.prio input{display:none}
+.pill{display:inline-flex;align-items:center;padding:6px 12px;border:1px solid var(--border-active);border-radius:8px;font-size:12px;font-weight:600;color:var(--text-dim);transition:all .12s}
+.prio input:checked + .pill{border-color:var(--accent);background:var(--accent-dim);color:var(--text)}
+.pill.must{} .prio input:checked + .pill.must{background:#22c55e22;border-color:#22c55e;color:#bbf7d0}
+.prio input:checked + .pill.nice{background:#38bdf822;border-color:#38bdf8;color:#bae6fd}
+.prio input:checked + .pill.later{background:#f59e0b22;border-color:#f59e0b;color:#fde68a}
+.prio input:checked + .pill.no{background:#ef444422;border-color:#ef4444;color:#fecaca}
+.opt-row{display:flex;align-items:flex-start;gap:10px;padding:7px 8px;border-radius:8px;cursor:pointer}
+.opt-row:hover{background:var(--surface-2)}
+.opt-row input{appearance:none;-webkit-appearance:none;width:16px;height:16px;border:2px solid var(--border-active);border-radius:50%;flex-shrink:0;margin-top:2px}
+.opt-row input:checked{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 3px var(--surface)}
+.opt-label{font-size:13px;color:var(--text-dim);line-height:1.4}
+.opt-row input:checked ~ .opt-label{color:var(--text)}
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--bg) 60%,transparent);z-index:50;display:flex;gap:8px;max-width:720px;margin:0 auto}
+.submit-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:14px 16px;border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;cursor:pointer;background:var(--accent);color:#0a0a0a}
+.submit-btn:disabled{opacity:.6}
+.submit-btn.done{background:#22c55e;color:#fff}
+.progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--accent);z-index:100;transition:width .3s}
+.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}.toast.error{background:#ef4444}
+.hp{position:absolute;left:-9999px}
+code{font-family:'JetBrains Mono',monospace;font-size:.9em;background:var(--surface-2);padding:1px 4px;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progress" style="width:0"></div>
+<div class="toast" id="toast"></div>
+<div class="container">
+  <div class="header">
+    <div class="header-tag">HGC &amp; ARK · Requirements Intake</div>
+    <h1>Deal Platform &amp; Data Room — what should it do?</h1>
+    <p>Help us capture everything you want this platform to be. Answer what's relevant; skip what isn't. For feature lists, tap a priority. It only takes the answers you give — partial is fine.</p>
+  </div>
+  <div class="legend">
+    <b>Priority key:</b> &nbsp;<b style="color:#bbf7d0">M</b> Must-have &nbsp;·&nbsp; <b style="color:#bae6fd">N</b> Nice-to-have &nbsp;·&nbsp; <b style="color:#fde68a">L</b> Later &nbsp;·&nbsp; <b style="color:#fecaca">X</b> Don't want<br>
+    Items already live are noted in the question. This is informed by what pro data rooms (Datasite, Intralinks, iDeals, Ansarada) actually do.
+  </div>
+  <div class="respondent">
+    <input class="field" id="r-name" placeholder="Your name">
+    <input class="field" id="r-email" type="email" placeholder="Your email (optional)">
+  </div>
+  <input class="hp" id="hp" tabindex="-1" autocomplete="off" placeholder="Leave blank">
+  <div id="form"></div>
+  <div class="bottom-bar">
+    <button class="submit-btn" id="submitBtn" onclick="submitAll()">Submit responses</button>
+  </div>
+</div>
+
+<script>
+const Q = [
+ {id:'A',title:'A · Vision, users & roles',intro:'',items:[
+   {t:'In one or two sentences, what is this platform for you — a deal CRM, a data room, or both as one system?'},
+   {t:'Who logs in and uses it? (you, Corey, other partners, analysts, assistants…)'},
+   {t:'Do outside parties ever get access — the companies raising capital, or the investors/lenders? Or internal-only for now?'},
+   {t:'Roughly how many deals run at once, and how many people touch the platform?'},
+   {p:'Multiple user accounts, each with their own login'},
+   {p:'Role levels (Admin / Team member / Read-only / Investor-guest)'},
+   {p:'Per-deal access (a teammate or investor only sees assigned deals)'},
+ ]},
+ {id:'B',title:'B · Deals & pipeline (CRM)',intro:'Live today: deals with capital, fee %, equity %, win probability, status, drag-to-rank, dashboard, pipeline, analytics, CSV/JSON/PDF export.',items:[
+   {t:'Are the stages right (Lead → Proposal → Negotiation → Closed), or do you think in different stages (Sourcing, Screening, Underwriting, Term Sheet, Diligence, Funded)?'},
+   {t:'What fields do you wish every deal had? (deal type, industry, geography, debt/equity, target close date, source/referrer, lender vs investor target…)'},
+   {t:'What economics do you track beyond fee % and equity %? (success fees, retainers, expected vs realized revenue, splits)'},
+   {p:'Custom fields you can add yourself per deal'},
+   {p:'Deal-stage automation (moving to "Diligence" prompts a document request)'},
+   {p:'Deal templates / duplication'},
+ ]},
+ {id:'C',title:'C · Data Room — documents & structure',intro:'Live today: every deal carries your 120-doc Capital Raise checklist, per-doc intake status, real uploads, completeness % by deal size + international toggle.',items:[
+   {t:'Is the 120-doc template the right master checklist, or do you want to edit it (add/remove/rename, change which are Required)?'},
+   {t:'Should you be able to customize the checklist per deal (real-estate vs operating business need different docs)?'},
+   {p:'Bulk upload (drag a whole folder; auto-sort into sections)'},
+   {p:'Document versioning (keep v1, v2… with history)'},
+   {p:'In-app document viewer (read PDFs/Excel without downloading)'},
+   {p:'Full-text search / OCR across all documents'},
+   {p:'Document requests (send the company a checklist; they upload directly)'},
+   {p:'Redaction (black out sensitive info before sharing)'},
+   {p:'Per-document notes/comments and an assigned owner'},
+ ]},
+ {id:'D',title:'D · Access control & investor sharing',intro:'The heart of a "data room": controlling who sees which documents. Not built yet (internal-only today).',items:[
+   {t:'Do you need to share a deal’s data room with an outside investor/lender and control exactly what they see?'},
+   {t:'Should different investors see different document sets for the same deal (teaser → full diligence after NDA)?'},
+   {p:'Invite an investor by email to view a specific deal’s data room'},
+   {p:'Granular permissions per investor: view / download / print / none — per document'},
+   {p:'Expiring access / time-limited links'},
+   {p:'Instant revoke'},
+   {p:'NDA gate before an investor can enter'},
+   {p:'Dynamic watermarking (investor’s name on every page they view)'},
+   {p:'View-only / fence view (no download, screenshot-resistant)'},
+ ]},
+ {id:'E',title:'E · Security & compliance',intro:'Live today: server-side password + session, isolated transferable cloud, private file storage, nothing public.',items:[
+   {t:'What’s your security-messaging bar for investors — "SOC 2 / bank-grade / encrypted", or is a clean private login enough for now?'},
+   {p:'Two-factor authentication (2FA)'},
+   {p:'Audit log (immutable record of every view/download/login, exportable)'},
+   {p:'IP restrictions'},
+   {p:'KYC / AML / OFAC screening tracking'},
+   {p:'Data retention / auto-delete after a deal closes'},
+   {p:'Formal compliance posture (SOC 2 / GDPR data-residency)'},
+ ]},
+ {id:'F',title:'F · Q&A, collaboration & workflow',intro:'Live today: basic Tasks tab. No Q&A/comments yet.',items:[
+   {t:'How do diligence questions from investors reach you today, and do you want them tracked inside the platform?'},
+   {p:'Q&A module (investor submits a question; you assign, answer, close it; full thread history)'},
+   {p:'Comments / discussion threads on a deal or document'},
+   {p:'Task assignment to teammates with due dates & status'},
+   {p:'Approval workflow (a doc must be reviewed before it’s shared)'},
+   {p:'Internal notes vs investor-visible messages'},
+ ]},
+ {id:'G',title:'G · Analytics, tracking & reporting',intro:'Live today: pipeline metrics, deal performance tables, data-room completeness %, exports.',items:[
+   {t:'What do you most want to see at a glance about your pipeline and each deal?'},
+   {p:'Investor engagement tracking (who viewed which doc, when, how long — interest heatmap)'},
+   {p:'Data-room readiness dashboard across the whole portfolio'},
+   {p:'Activity feed (recent uploads, status changes, investor visits)'},
+   {p:'Custom reports / exports (per investor, per deal, per period)'},
+   {p:'Revenue forecasting (weighted pipeline, expected fees over time)'},
+ ]},
+ {id:'H',title:'H · AI & automation',intro:'The underwriting engine is built but the AI is off (needs a key). Modern data rooms increasingly bundle the items below.',items:[
+   {t:'Is turning the AI underwriter back on a priority (drop docs → instant risk read, ratings, flags, valuation, memo)?'},
+   {p:'AI underwriting memo from dropped documents'},
+   {p:'AI document classification (auto-file an upload into the right slot)'},
+   {p:'AI completeness check (read the docs, flag what’s missing or inconsistent)'},
+   {p:'Ask-the-data-room (natural-language Q&A over a deal’s docs, with citations)'},
+   {p:'AI redaction (auto-detect & black out PII)'},
+   {p:'AI deal-readiness scoring'},
+   {p:'AI document summaries'},
+ ]},
+ {id:'I',title:'I · Investor / lender relations',intro:'Tracking the capital side. Live today: basic Contacts tab.',items:[
+   {t:'Do you keep a list of investors/lenders/family offices and track outreach (who you pitched which deal, interest, criteria)?'},
+   {p:'Investor CRM (profiles, check size, sector/geo preferences, debt vs equity)'},
+   {p:'Match deals to investors (surface who fits a given deal)'},
+   {p:'Outreach tracking (contacted → interested → passed → committed)'},
+   {p:'Commitment / allocation tracking (who committed how much)'},
+ ]},
+ {id:'J',title:'J · Notifications & reminders',intro:'None yet.',items:[
+   {p:'Email alerts (new investor view, new Q&A, document uploaded, task due)'},
+   {p:'Reminders (follow up on a deal, chase a missing required doc)'},
+   {p:'Daily/weekly digest of pipeline activity'},
+   {p:'In-app notifications'},
+ ]},
+ {id:'K',title:'K · Integrations',intro:'',items:[
+   {p:'E-signature (DocuSign/equivalent for NDAs, term sheets)'},
+   {p:'Email / calendar (log emails to a deal; schedule from the app)'},
+   {p:'Import from Google Drive / Dropbox'},
+   {p:'Accounting / financial data (QuickBooks, Plaid)'},
+   {p:'External CRM (HubSpot/Salesforce) sync'},
+   {p:'Public API'},
+ ]},
+ {id:'L',title:'L · Branding, white-label & multi-client',intro:'Built isolated/transferable so it can become its own product or move to another org.',items:[
+   {t:'Should it carry HGC & ARK branding — and would you ever white-label it for clients/partners under their brand?'},
+   {p:'Custom branding (logo, colors, domain like data.hgc….com)'},
+   {p:'Multi-client / multi-tenant (separate walled-off instances per firm)'},
+   {p:'Per-deal branded investor portals'},
+ ]},
+ {id:'M',title:'M · Mobile & UX',intro:'',items:[
+   {p:'Mobile-friendly investor & team experience'},
+   {p:'Dark mode / accessibility'},
+   {t:'Anything about the current look & feel you’d change?'},
+ ]},
+ {id:'P',title:'P · Client portals, NCNDA e-sign & certificates',intro:'A first version is LIVE: per-deal client link, client signs your NCNDA before they can upload, internal team countersigns, verifiable certificate generated.',items:[
+   {t:'Confirm the flow: internal team signs first (arrives "already signed by us"), then client countersigns before uploading. Right?'},
+   {t:'Who on your side must sign — specific people or any partner? Must all of them sign, or is one authorized signer enough?'},
+   {t:'Single standing NCNDA (same doc every deal) or does the text change per deal/client?'},
+   {t:'Does the certificate need to be legally robust (counsel-reviewed text, real e-sign like DocuSign), or is the in-house signature + tamper-evident certificate enough for now?'},
+   {p:'Hard gate — eventually block internal platform/data access too if NCNDA unsigned'},
+   {p:'Real e-signature provider (DocuSign/Dropbox Sign) for legal-grade signatures'},
+   {p:'Countersigned PDF of the NCNDA itself (not just a certificate)'},
+   {p:'Per-document NDA (different docs require additional agreements)'},
+   {p:'Client sees a checklist of what to upload on their portal'},
+   {p:'Notify the team when a client signs or uploads'},
+ ]},
+ {id:'N',title:'N · Commercial, deployment & ownership',intro:'',items:[
+   {t:'Purely internal for HGC & ARK, or becoming a product you sell/license?'},
+   {t:'Where should it ultimately live — keep it here, or a domain like data.hgcark.com?'},
+   {t:'Any requirement around owning/exporting all the data at any time? (already isolated + transferable)'},
+   {t:'Timeline, and which 2–3 capabilities above would move the needle most right now?'},
+ ]},
+ {id:'O',title:'O · Anything else',intro:'',items:[
+   {t:'What does this platform need to do that isn’t captured above? What does a "perfect" version look like a year from now?'},
+ ]},
+];
+
+const PRIOS = [['M','must','Must'],['N','nice','Nice'],['L','later','Later'],['X','no','No']];
+const form = document.getElementById('form');
+let uid = 0;
+
+Q.forEach(sec => {
+  const h = document.createElement('div'); h.className='section'; h.textContent = sec.title; form.appendChild(h);
+  if (sec.intro){ const p=document.createElement('div'); p.className='section-intro'; p.textContent=sec.intro; form.appendChild(p); }
+  sec.items.forEach(it => {
+    const card=document.createElement('div'); card.className='q-card';
+    uid++;
+    if (it.t){
+      const q=document.createElement('div'); q.className='q-text'; q.textContent=it.t; card.appendChild(q);
+      const ta=document.createElement('textarea'); ta.className='field'; ta.placeholder='Your answer…'; ta.dataset.section=sec.title; ta.dataset.label=it.t; ta.dataset.kind='text';
+      card.appendChild(ta);
+    } else if (it.p){
+      const q=document.createElement('div'); q.className='q-text'; q.textContent=it.p; card.appendChild(q);
+      const wrap=document.createElement('div'); wrap.className='prio';
+      PRIOS.forEach(([val,cls,lbl])=>{
+        const id='p'+uid+'_'+val;
+        const l=document.createElement('label'); l.htmlFor=id;
+        const inp=document.createElement('input'); inp.type='radio'; inp.name='p'+uid; inp.id=id; inp.value=lbl; inp.dataset.section=sec.title; inp.dataset.label=it.p; inp.dataset.kind='prio';
+        const span=document.createElement('span'); span.className='pill '+cls; span.textContent=lbl;
+        l.appendChild(inp); l.appendChild(span); wrap.appendChild(l);
+      });
+      card.appendChild(wrap);
+    }
+    form.appendChild(card);
+  });
+});
+
+// progress bar based on scroll
+window.addEventListener('scroll',()=>{ const h=document.documentElement; const p=h.scrollTop/(h.scrollHeight-h.clientHeight||1); document.getElementById('progress').style.width=(p*100)+'%'; });
+
+function toast(msg,err){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show'+(err?' error':''); setTimeout(()=>t.className='toast',3200); }
+
+async function submitAll(){
+  // gather answers per section
+  const map={};
+  function add(sectionTitle,label,answer){ (map[sectionTitle]=map[sectionTitle]||[]).push({label,answer}); }
+  document.querySelectorAll('textarea[data-kind="text"]').forEach(t=>{ if(t.value.trim()) add(t.dataset.section,t.dataset.label,t.value.trim()); });
+  document.querySelectorAll('input[data-kind="prio"]:checked').forEach(i=>{ add(i.dataset.section,i.dataset.label,i.value); });
+  const sections=Object.keys(map).map(title=>({title,items:map[title]}));
+  if(!sections.length){ toast('Answer at least one question first.',true); return; }
+  const btn=document.getElementById('submitBtn'); btn.disabled=true; btn.textContent='Sending…';
+  try{
+    const r=await fetch('/api/questionnaire-submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      title:'HGC & ARK Deal Platform — Requirements',
+      respondent:document.getElementById('r-name').value.trim(),
+      email:document.getElementById('r-email').value.trim(),
+      website:document.getElementById('hp').value, // honeypot
+      sections
+    })});
+    if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error(e.error||'submit failed'); }
+    btn.textContent='Submitted ✓'; btn.classList.add('done');
+    toast('Thanks — your responses were sent to the HGC & ARK team.');
+  }catch(e){ btn.disabled=false; btn.textContent='Submit responses'; toast('Error: '+e.message,true); }
+}
+</script>
+</body>
+</html>
