@@ -1,17 +1,22 @@
 // Stateless signed-cookie session. Token = base64url(payload).hmacSHA256(payload).
 const crypto = require('crypto');
 
-const SECRET = process.env.SESSION_SECRET || 'insecure-dev-secret';
+// Fail closed: never fall back to a guessable secret. A missing SESSION_SECRET
+// means we cannot sign or verify — login fails and all sessions are rejected,
+// rather than signing with a known value an attacker could forge.
+const SECRET = process.env.SESSION_SECRET || null;
 const COOKIE = 'hgc_session';
 const TTL_MS = 12 * 60 * 60 * 1000; // 12h
 
 function sign(payload) {
+  if (!SECRET) throw new Error('SESSION_SECRET is not configured');
   const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
   const mac = crypto.createHmac('sha256', SECRET).update(body).digest('base64url');
   return `${body}.${mac}`;
 }
 
 function verifyToken(token) {
+  if (!SECRET) return null;
   if (!token || token.indexOf('.') === -1) return null;
   const [body, mac] = token.split('.');
   const expected = crypto.createHmac('sha256', SECRET).update(body).digest('base64url');
