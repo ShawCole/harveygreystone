@@ -1,0 +1,221 @@
+{
+  "version": "1.0",
+  "title": "Capital Raise Data Room — Universal Template",
+  "source": "Ethan / HGC & ARK — Capital Raise Data Room Index & Folder Structure (Prepared 2026-06-09)",
+  "scope": "Capital raises $1,000,000–$100,000,000, US & International",
+  "totals": { "sections": 10, "subfolders": 28, "documents": 120, "required": 61 },
+  "dealSizeGuidance": [
+    { "range": "1M-5M", "note": "Focus on Sections 01-04 and 07. Legal (05) can be lighter. International (06) only if applicable." },
+    { "range": "5M-25M", "note": "All required documents across Sections 01-07 mandatory. ESG (08) increasingly expected. Full audit required." },
+    { "range": "25M-100M", "note": "All 10 sections expected to be substantially complete. Third-party audits, legal opinions, and compliance certifications required. ESG often mandatory for institutional investors." }
+  ],
+  "internationalRule": "For any deal with non-US entities, investors, or assets, Section 06 becomes required in full (FATCA/CRS, certified translations, OFAC screening, local counsel opinions).",
+  "sections": [
+    { "id": "01", "name": "Executive Summary", "description": "The investor's first impression — concise, compelling, deal-defining.",
+      "subfolders": [
+        { "name": "Investment Teaser / One-Pager", "documents": [
+          { "name": "One-page deal teaser", "required": true },
+          { "name": "Transaction overview memo", "required": true },
+          { "name": "Key investment highlights", "required": true },
+          { "name": "Elevator pitch deck (3–5 slides)", "required": false }
+        ]},
+        { "name": "Executive Summary Deck", "documents": [
+          { "name": "Executive summary presentation", "required": true },
+          { "name": "Deal timeline & milestones", "required": true },
+          { "name": "Summary financials snapshot", "required": true }
+        ]}
+      ]},
+    { "id": "02", "name": "Business Plan", "description": "Strategic narrative, market opportunity, and operational roadmap.",
+      "subfolders": [
+        { "name": "Business Plan & Model", "documents": [
+          { "name": "Full business plan document", "required": true },
+          { "name": "Mission, vision & values", "required": false },
+          { "name": "Business model canvas", "required": true },
+          { "name": "Go-to-market strategy", "required": true },
+          { "name": "Revenue model explanation", "required": true }
+        ]},
+        { "name": "Market Analysis", "documents": [
+          { "name": "Total addressable market (TAM) analysis", "required": true },
+          { "name": "Serviceable addressable market (SAM)", "required": true },
+          { "name": "Competitive landscape matrix", "required": true },
+          { "name": "Industry reports & research (3rd party)", "required": false },
+          { "name": "Customer segmentation analysis", "required": false }
+        ]},
+        { "name": "Product / Service Overview", "documents": [
+          { "name": "Product/service description", "required": true },
+          { "name": "Product roadmap", "required": true },
+          { "name": "IP / technology overview", "required": false },
+          { "name": "Proprietary process documentation", "required": false }
+        ]}
+      ]},
+    { "id": "03", "name": "Management & Team", "description": "Leadership credentials, organizational structure, and key personnel.",
+      "subfolders": [
+        { "name": "Bios & Credentials", "documents": [
+          { "name": "CEO / Founder biography", "required": true },
+          { "name": "Full executive team bios", "required": true },
+          { "name": "LinkedIn profiles (compiled PDF)", "required": false },
+          { "name": "Resumes / CVs for key personnel", "required": true }
+        ]},
+        { "name": "Org Structure", "documents": [
+          { "name": "Organizational chart", "required": true },
+          { "name": "Board of directors list & bios", "required": true },
+          { "name": "Advisory board list & bios", "required": false },
+          { "name": "Key employee retention agreements", "required": false }
+        ]},
+        { "name": "Compensation & Incentives", "documents": [
+          { "name": "Management compensation summary", "required": false },
+          { "name": "Equity / option pool summary", "required": true },
+          { "name": "Employment agreements (redacted)", "required": false }
+        ]}
+      ]},
+    { "id": "04", "name": "Financials", "description": "Historical performance, projections, and financial model assumptions.",
+      "subfolders": [
+        { "name": "Historical Financials", "documents": [
+          { "name": "3-5 year income statements (audited)", "required": true },
+          { "name": "Balance sheets (audited)", "required": true },
+          { "name": "Cash flow statements (audited)", "required": true },
+          { "name": "Tax returns (3 years)", "required": true },
+          { "name": "Auditor / CPA reports", "required": true }
+        ]},
+        { "name": "Financial Projections", "documents": [
+          { "name": "5-year P&L projections", "required": true },
+          { "name": "Revenue model with assumptions", "required": true },
+          { "name": "Cash flow forecast (monthly yr 1-2)", "required": true },
+          { "name": "Break-even analysis", "required": true },
+          { "name": "Sensitivity / scenario analysis", "required": false }
+        ]},
+        { "name": "Financial Model", "documents": [
+          { "name": "Integrated Excel financial model", "required": true },
+          { "name": "Unit economics breakdown", "required": true },
+          { "name": "EBITDA bridge / waterfall", "required": false },
+          { "name": "Cap table (current & post-money)", "required": true },
+          { "name": "Returns analysis / IRR model", "required": false }
+        ]}
+      ]},
+    { "id": "05", "name": "Legal & Compliance", "description": "Corporate structure, contracts, regulatory standing, and compliance.",
+      "subfolders": [
+        { "name": "Corporate Documents", "documents": [
+          { "name": "Certificate of incorporation / formation", "required": true },
+          { "name": "Articles / bylaws (current version)", "required": true },
+          { "name": "Shareholder / operating agreement", "required": true },
+          { "name": "Cap table (fully diluted)", "required": true },
+          { "name": "Corporate org chart (legal entities)", "required": true }
+        ]},
+        { "name": "Material Contracts", "documents": [
+          { "name": "Key customer contracts", "required": true },
+          { "name": "Supplier / vendor agreements", "required": true },
+          { "name": "Partnership agreements", "required": false },
+          { "name": "Licensing agreements", "required": false },
+          { "name": "LOIs / MOUs in place", "required": false }
+        ]},
+        { "name": "Regulatory & Compliance", "documents": [
+          { "name": "Licenses & permits (all jurisdictions)", "required": true },
+          { "name": "Regulatory filings & approvals", "required": true },
+          { "name": "Anti-money laundering (AML) policy", "required": false },
+          { "name": "KYC documentation", "required": false },
+          { "name": "FCPA / anti-bribery compliance memo", "required": false }
+        ]},
+        { "name": "Litigation & Disputes", "documents": [
+          { "name": "Litigation summary (or clean certificate)", "required": true },
+          { "name": "Outstanding claims / disputes", "required": false },
+          { "name": "Insurance coverage summary", "required": true }
+        ]}
+      ]},
+    { "id": "06", "name": "International / Cross-Border", "description": "Jurisdiction-specific documents for overseas projects and investors.",
+      "subfolders": [
+        { "name": "Foreign Entity Docs", "documents": [
+          { "name": "Foreign entity registration certificates", "required": true },
+          { "name": "Local legal opinions (counsel letter)", "required": true },
+          { "name": "Translation of key docs (certified)", "required": true },
+          { "name": "Beneficial ownership disclosure", "required": true }
+        ]},
+        { "name": "Tax & FX", "documents": [
+          { "name": "Tax residency certificates", "required": true },
+          { "name": "Double-taxation treaty analysis", "required": false },
+          { "name": "FX hedging strategy memo", "required": false },
+          { "name": "Transfer pricing documentation", "required": false },
+          { "name": "FATCA / CRS compliance confirmation", "required": true }
+        ]},
+        { "name": "Country Risk", "documents": [
+          { "name": "Country risk assessment", "required": true },
+          { "name": "Political risk insurance docs", "required": false },
+          { "name": "OFAC / sanctions screening confirmation", "required": true },
+          { "name": "Local counsel contact list", "required": false }
+        ]}
+      ]},
+    { "id": "07", "name": "Deal Structure & Terms", "description": "Proposed transaction, use of proceeds, and investor economics.",
+      "subfolders": [
+        { "name": "Offering Documents", "documents": [
+          { "name": "Term sheet (proposed)", "required": true },
+          { "name": "Private placement memorandum (PPM)", "required": true },
+          { "name": "Offering memorandum / prospectus", "required": false },
+          { "name": "Investor presentation deck", "required": true }
+        ]},
+        { "name": "Use of Proceeds", "documents": [
+          { "name": "Use-of-proceeds schedule", "required": true },
+          { "name": "Capital allocation plan", "required": true },
+          { "name": "Milestone-based draw schedule", "required": false }
+        ]},
+        { "name": "Exit Strategy", "documents": [
+          { "name": "Exit strategy narrative", "required": true },
+          { "name": "Comparable transactions / M&A comps", "required": false },
+          { "name": "IPO readiness assessment", "required": false },
+          { "name": "Secondary market / buyback plan", "required": false }
+        ]}
+      ]},
+    { "id": "08", "name": "ESG & Impact", "description": "Environmental, social, governance disclosures and sustainability.",
+      "subfolders": [
+        { "name": "Environmental", "documents": [
+          { "name": "Carbon footprint / emissions report", "required": false },
+          { "name": "Environmental impact assessment", "required": false },
+          { "name": "Sustainability policy", "required": false },
+          { "name": "Climate risk disclosure", "required": false }
+        ]},
+        { "name": "Social & Governance", "documents": [
+          { "name": "DEI policy & metrics", "required": false },
+          { "name": "Community impact summary", "required": false },
+          { "name": "Board governance framework", "required": false },
+          { "name": "Whistleblower / ethics policy", "required": false },
+          { "name": "ESG rating or third-party certification", "required": false }
+        ]}
+      ]},
+    { "id": "09", "name": "IP & Technology", "description": "Patents, trademarks, trade secrets, and technology stack.",
+      "subfolders": [
+        { "name": "Intellectual Property", "documents": [
+          { "name": "Patent list & status register", "required": false },
+          { "name": "Trademark registrations", "required": false },
+          { "name": "Copyright portfolio summary", "required": false },
+          { "name": "IP assignment agreements", "required": true },
+          { "name": "Trade secret policy", "required": false }
+        ]},
+        { "name": "Technology & Systems", "documents": [
+          { "name": "Technology architecture overview", "required": false },
+          { "name": "Data privacy / GDPR compliance docs", "required": false },
+          { "name": "Cybersecurity policy", "required": false },
+          { "name": "Software license inventory", "required": false },
+          { "name": "System uptime / reliability data", "required": false }
+        ]}
+      ]},
+    { "id": "10", "name": "Operations & Assets", "description": "Physical assets, operations data, and supply chain documentation.",
+      "subfolders": [
+        { "name": "Real Estate & Physical Assets", "documents": [
+          { "name": "Property ownership / lease agreements", "required": false },
+          { "name": "Site plans & appraisals", "required": false },
+          { "name": "Environmental site assessment", "required": false },
+          { "name": "Equipment list & valuations", "required": false }
+        ]},
+        { "name": "Operations", "documents": [
+          { "name": "Operations manual / SOP summary", "required": false },
+          { "name": "Supply chain overview", "required": false },
+          { "name": "Key supplier list & terms", "required": false },
+          { "name": "Quality control certification", "required": false }
+        ]},
+        { "name": "Sales & Pipeline", "documents": [
+          { "name": "Customer list & contract summary", "required": true },
+          { "name": "Sales pipeline (anonymized)", "required": false },
+          { "name": "Signed LOIs / purchase orders", "required": true },
+          { "name": "Churn & retention data", "required": false }
+        ]}
+      ]}
+  ]
+}
