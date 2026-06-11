@@ -353,6 +353,11 @@
       </div>
 
       <div class="chart-card" style="margin-top:1.5rem;">
+        <div class="chart-title">Data Room Readiness — Diligence Completeness</div>
+        <div id="dashboardReadiness"></div>
+      </div>
+
+      <div class="chart-card" style="margin-top:1.5rem;">
         <div class="chart-title">Deal Ratings — Underwriter Scores</div>
         <div id="dashboardRatings"></div>
       </div>
@@ -1504,6 +1509,7 @@ ${docText}`;
   }
   
   function renderDashboard() {
+    if (window.HGCDataRoom) HGCDataRoom.portfolioReadiness();
     const statuses = { lead: 0, proposal: 0, negotiation: 0, closed: 0 };
     const urgencies = { urgent: 0, high: 0, medium: 0 };
     deals.forEach(d => {

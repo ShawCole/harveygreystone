@@ -253,6 +253,29 @@
     render();
   }
 
-  window.HGCDataRoom = { open, close, setStatus, toggleIntl, upload, download, removeFile, cardSummary, completeness };
+  // Portfolio-wide diligence readiness, rendered on the dashboard.
+  function portfolioReadiness() {
+    const el = document.getElementById('dashboardReadiness');
+    if (!el || !TEMPLATE) return;
+    const rated = deals.map((d) => ({ d, c: completeness(d) }));
+    const totReq = rated.reduce((s, x) => s + x.c.req, 0);
+    const totDone = rated.reduce((s, x) => s + x.c.reqDone, 0);
+    const overall = totReq ? Math.round((totDone / totReq) * 100) : 0;
+    const sorted = [...rated].sort((a, b) => a.c.pct - b.c.pct);
+    el.innerHTML =
+      `<div style="margin-bottom:1rem;font-size:13px;color:var(--secondary);">Portfolio readiness: <strong style="color:var(--primary);">${totDone}/${totReq} required docs (${overall}%)</strong> across ${deals.length} deals</div>` +
+      sorted.map(({ d, c }) => {
+        const color = c.pct >= 100 ? '#10b981' : c.pct >= 50 ? '#f59e0b' : '#ef4444';
+        return `<div style="display:flex;align-items:center;gap:1rem;padding:.55rem 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="HGCDataRoom.open(${d.id})">
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;font-size:13px;">${esc(d.name)}</div>
+            <div style="height:6px;background:var(--lighter);border-radius:4px;overflow:hidden;margin-top:4px;"><div style="height:100%;width:${c.pct}%;background:${color};"></div></div>
+          </div>
+          <div style="font-size:12px;color:var(--secondary);white-space:nowrap;">${c.reqDone}/${c.req} · ${c.pct}%</div>
+        </div>`;
+      }).join('');
+  }
+
+  window.HGCDataRoom = { open, close, setStatus, toggleIntl, upload, download, removeFile, cardSummary, completeness, portfolioReadiness };
   loadTemplate();
 })();
