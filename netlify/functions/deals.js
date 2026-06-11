@@ -22,6 +22,7 @@ exports.handler = async (event) => {
         deals: body.deals || [],
         tasks: body.tasks || [],
         contacts: body.contacts || [],
+        investors: body.investors, // undefined => preserved (older clients won't wipe it)
       });
       return { statusCode: 200, headers: JSON_HEADERS, body: JSON.stringify({ ok: true }) };
     }

@@ -308,6 +308,7 @@
     <button class="nav-tab" onclick="switchTab('pipeline')">📈 Pipeline</button>
     <button class="nav-tab" onclick="switchTab('deals')">💰 Deals</button>
     <button class="nav-tab" onclick="switchTab('analytics')">📉 Analytics</button>
+    <button class="nav-tab" onclick="switchTab('investors')">🏦 Investors</button>
     <button class="nav-tab" onclick="switchTab('contacts')">👥 Contacts</button>
     <button class="nav-tab" onclick="switchTab('tasks')">✓ Tasks</button>
   </div>
@@ -566,6 +567,27 @@
     </div>
 
     <!-- CONTACTS -->
+    <!-- INVESTORS -->
+    <div id="investors" class="content-section">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <h2 style="margin: 0; font-weight: 700;">Investors &amp; Lenders</h2>
+          <input type="text" class="search-box" id="investorSearch" placeholder="Search investors..." onkeyup="HGCInvestors.render()">
+        </div>
+        <div class="toolbar-right">
+          <select id="investorTypeFilter" class="filter-btn" onchange="HGCInvestors.render()" style="cursor:pointer;">
+            <option value="all">All types</option>
+            <option value="investor">Investors</option>
+            <option value="lender">Lenders</option>
+            <option value="family-office">Family offices</option>
+          </select>
+          <button class="btn btn-primary" onclick="HGCInvestors.openEdit()">+ New Investor</button>
+        </div>
+      </div>
+      <div id="investorsSummary" style="padding:1rem 2rem 0;"></div>
+      <div id="investorsContainer" class="deals-container" style="padding: 1.5rem 2rem;"></div>
+    </div>
+
     <div id="contacts" class="content-section">
       <div class="toolbar">
         <div class="toolbar-left">
@@ -886,9 +908,11 @@
   
   let tasks = [];
   let contacts = [];
+  let investors = [];
   let nextDealId = 17;
   let nextTaskId = 1;
   let nextContactId = 1;
+  let nextInvestorId = 1;
   let currentFilter = 'all';
   
   let saveTimer = null;
@@ -902,11 +926,13 @@
         if (data.deals && data.deals.length) deals = data.deals;
         tasks = data.tasks || tasks;
         contacts = data.contacts || contacts;
+        investors = data.investors || investors;
         dbReady = true;
         // recompute next IDs so we don't collide
         nextDealId = (deals.reduce((m, d) => Math.max(m, d.id), 0) || 16) + 1;
         nextTaskId = (tasks.reduce((m, t) => Math.max(m, t.id), 0) || 0) + 1;
         nextContactId = (contacts.reduce((m, c) => Math.max(m, c.id), 0) || 0) + 1;
+        nextInvestorId = (investors.reduce((m, i) => Math.max(m, i.id), 0) || 0) + 1;
       }
     } catch (err) {
       // fall back to local cache if server unreachable
@@ -916,13 +942,14 @@
         deals = data.deals || deals;
         tasks = data.tasks || tasks;
         contacts = data.contacts || contacts;
+        investors = data.investors || investors;
       }
     }
   }
 
   async function saveData() {
     // keep a local cache as backup
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ deals, tasks, contacts }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ deals, tasks, contacts, investors }));
     // debounce server writes so rapid edits don't spam
     clearTimeout(saveTimer);
     saveTimer = setTimeout(async () => {
@@ -930,7 +957,7 @@
         await fetch('/api/deals', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ deals, tasks, contacts })
+          body: JSON.stringify({ deals, tasks, contacts, investors })
         });
         const ind = document.getElementById('saveIndicator');
         if (ind) { ind.textContent = '✓ Saved to shared database'; ind.style.opacity = '1'; setTimeout(() => ind.style.opacity = '0', 2000); }
@@ -1008,6 +1035,7 @@
     if (tab === 'analytics') renderAnalytics();
     if (tab === 'contacts') renderContacts();
     if (tab === 'tasks') renderTasks();
+    if (tab === 'investors') HGCInvestors.render();
     if (tab === 'dashboard') renderDashboard();
   }
   
@@ -1696,7 +1724,8 @@ ${docText}`;
                 <span class="metric-value-small">${formatCurrency(expRevenue)}</span>
               </div>
             </div>
-            
+            ${window.HGCInvestors ? HGCInvestors.dealSummary(d) : ''}
+
             <div class="documents-section">
               <div class="documents-title">Data Room</div>
               <div id="dr-summary-${d.id}">${window.HGCDataRoom ? HGCDataRoom.cardSummary(d) : '<div style="color:#64748b;font-size:12px;">Loading…</div>'}</div>
@@ -2062,8 +2091,65 @@ ${docText}`;
   </div>
 </div>
 
+<!-- INVESTOR EDIT MODAL -->
+<div class="modal-overlay" id="investorModal">
+  <div class="modal">
+    <div class="modal-header"><h2 id="invModalTitle">New Investor</h2></div>
+    <div class="modal-body">
+      <input type="hidden" id="invId">
+      <div class="form-group"><label>Name *</label><input type="text" id="invName" placeholder="Person or firm contact"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="form-group"><label>Firm</label><input type="text" id="invFirm"></div>
+        <div class="form-group"><label>Type</label>
+          <select id="invType"><option value="investor">Investor</option><option value="lender">Lender</option><option value="family-office">Family office</option></select></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="form-group"><label>Email</label><input type="email" id="invEmail"></div>
+        <div class="form-group"><label>Phone</label><input type="tel" id="invPhone"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+        <div class="form-group"><label>Instrument</label>
+          <select id="invInstrument"><option value="both">Debt &amp; Equity</option><option value="debt">Debt</option><option value="equity">Equity</option></select></div>
+        <div class="form-group"><label>Check min</label><input type="text" id="invCheckMin" placeholder="$1M"></div>
+        <div class="form-group"><label>Check max</label><input type="text" id="invCheckMax" placeholder="$50M"></div>
+      </div>
+      <div class="form-group"><label>Sectors (comma-separated)</label><input type="text" id="invSectors" placeholder="real estate, energy, tech"></div>
+      <div class="form-group"><label>Geographies</label><input type="text" id="invGeos" placeholder="US, LATAM"></div>
+      <div class="form-group"><label>Notes</label><textarea id="invNotes"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-small" id="invDeleteBtn" onclick="HGCInvestors.remove()" style="margin-right:auto;">Delete</button>
+      <button class="btn btn-secondary" onclick="HGCInvestors.closeEdit()">Cancel</button>
+      <button class="btn btn-primary" onclick="HGCInvestors.save()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ENGAGEMENT MODAL (link an investor to a deal) -->
+<div class="modal-overlay" id="engagementModal">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header"><h2>Deal engagement</h2><p id="engInvName"></p></div>
+    <div class="modal-body">
+      <input type="hidden" id="engInvId"><input type="hidden" id="engIdx">
+      <div class="form-group"><label>Deal *</label><select id="engDeal"></select></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="form-group"><label>Status</label>
+          <select id="engStatus"><option value="contacted">Contacted</option><option value="interested">Interested</option><option value="passed">Passed</option><option value="committed">Committed</option></select></div>
+        <div class="form-group"><label>Amount</label><input type="text" id="engAmount" placeholder="$5M"></div>
+      </div>
+      <div class="form-group"><label>Notes</label><textarea id="engNotes"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-small" onclick="HGCInvestors.removeEngagement()" style="margin-right:auto;">Remove</button>
+      <button class="btn btn-secondary" onclick="HGCInvestors.closeEngagement()">Cancel</button>
+      <button class="btn btn-primary" onclick="HGCInvestors.saveEngagement()">Save</button>
+    </div>
+  </div>
+</div>
+
 <script src="/dataroom.js"></script>
 <script src="/ncnda.js"></script>
+<script src="/investors.js"></script>
 </body>
 </html>
 

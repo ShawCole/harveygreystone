@@ -30,9 +30,10 @@ async function ensureSchema() {
   if (schemaReady) return;
   const pool = await getPool();
   await pool.query(`
-    CREATE TABLE IF NOT EXISTS deals    (id BIGINT PRIMARY KEY, payload JSONB NOT NULL, updated_at TIMESTAMPTZ DEFAULT now());
-    CREATE TABLE IF NOT EXISTS tasks    (id BIGINT PRIMARY KEY, payload JSONB NOT NULL, updated_at TIMESTAMPTZ DEFAULT now());
-    CREATE TABLE IF NOT EXISTS contacts (id BIGINT PRIMARY KEY, payload JSONB NOT NULL, updated_at TIMESTAMPTZ DEFAULT now());
+    CREATE TABLE IF NOT EXISTS deals     (id BIGINT PRIMARY KEY, payload JSONB NOT NULL, updated_at TIMESTAMPTZ DEFAULT now());
+    CREATE TABLE IF NOT EXISTS tasks     (id BIGINT PRIMARY KEY, payload JSONB NOT NULL, updated_at TIMESTAMPTZ DEFAULT now());
+    CREATE TABLE IF NOT EXISTS contacts  (id BIGINT PRIMARY KEY, payload JSONB NOT NULL, updated_at TIMESTAMPTZ DEFAULT now());
+    CREATE TABLE IF NOT EXISTS investors (id BIGINT PRIMARY KEY, payload JSONB NOT NULL, updated_at TIMESTAMPTZ DEFAULT now());
   `);
   // Seed the 15 real deals only when the table is empty.
   const { rows } = await pool.query('SELECT count(*)::int AS n FROM deals');
@@ -48,15 +49,17 @@ async function ensureSchema() {
 
 async function readAll() {
   const pool = await getPool();
-  const [deals, tasks, contacts] = await Promise.all([
+  const [deals, tasks, contacts, investors] = await Promise.all([
     pool.query('SELECT payload FROM deals ORDER BY id'),
     pool.query('SELECT payload FROM tasks ORDER BY id'),
     pool.query('SELECT payload FROM contacts ORDER BY id'),
+    pool.query('SELECT payload FROM investors ORDER BY id'),
   ]);
   return {
     deals: deals.rows.map((r) => r.payload),
     tasks: tasks.rows.map((r) => r.payload),
     contacts: contacts.rows.map((r) => r.payload),
+    investors: investors.rows.map((r) => r.payload),
   };
 }
 
@@ -81,7 +84,7 @@ async function syncTable(client, table, items) {
   }
 }
 
-async function writeAll({ deals, tasks, contacts }) {
+async function writeAll({ deals, tasks, contacts, investors }) {
   const pool = await getPool();
   const client = await pool.connect();
   try {
@@ -89,6 +92,7 @@ async function writeAll({ deals, tasks, contacts }) {
     await syncTable(client, 'deals', deals);
     await syncTable(client, 'tasks', tasks);
     await syncTable(client, 'contacts', contacts);
+    if (investors !== undefined) await syncTable(client, 'investors', investors);
     await client.query('COMMIT');
   } catch (err) {
     await client.query('ROLLBACK');
