@@ -1,0 +1,12 @@
+# Keep secrets and local cruft out of the Cloud Build source upload.
+.secrets.env
+.git/
+.gitignore
+node_modules/
+npm-debug.log
+docs/
+*.md
+.netlify/
+netlify.toml
+.env
+.env.*

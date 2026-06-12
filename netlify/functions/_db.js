@@ -7,6 +7,19 @@ let poolPromise = null;
 let schemaReady = false;
 
 async function buildPool() {
+  // On Cloud Run (K_SERVICE is set) connect over the built-in Cloud SQL unix
+  // socket mounted by `--add-cloudsql-instances` — no key file, no public IP,
+  // auth via the container's service account. Off Cloud Run (local/other) fall
+  // back to the Cloud SQL connector over public IP using ADC.
+  if (process.env.K_SERVICE) {
+    return new Pool({
+      host: `/cloudsql/${process.env.CLOUD_SQL_CONNECTION_NAME}`,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB_NAME,
+      max: 5,
+    });
+  }
   const connector = new Connector();
   const clientOpts = await connector.getOptions({
     instanceConnectionName: process.env.CLOUD_SQL_CONNECTION_NAME,

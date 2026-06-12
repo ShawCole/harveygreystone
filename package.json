@@ -2,11 +2,16 @@
   "name": "hgc-deal-platform",
   "version": "1.0.0",
   "private": true,
-  "description": "HGC & ARK Capital Consulting — deal platform + data room backend (Netlify Functions + Cloud SQL + GCS)",
+  "description": "HGC & ARK Capital Consulting — deal platform + data room (Cloud Run + Cloud SQL + GCS, GCP-only)",
   "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.0",
     "@google-cloud/cloud-sql-connector": "^1.4.0",
     "@google-cloud/storage": "^7.14.0",
+    "express": "^4.21.2",
     "nodemailer": "^6.9.16",
     "pg": "^8.13.1"
   }
