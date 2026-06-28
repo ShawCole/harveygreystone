@@ -5,36 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Secure Document Upload — HGC & ARK Capital Consulting</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     * { margin:0; padding:0; box-sizing:border-box; }
-    :root { --primary:#0f172a; --secondary:#64748b; --accent:#0ea5e9; --success:#10b981; --danger:#ef4444; --border:#e2e8f0; --light:#f8fafc; --lighter:#f1f5f9; }
-    body { font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif; background:linear-gradient(135deg,#0f172a,#1e293b); color:var(--primary); min-height:100vh; padding:2rem 1rem; line-height:1.6; }
+    :root {
+      --navy:#1e3a5f; --navy-dark:#152d4a; --navy-light:#2a4d7a;
+      --gold:#d4a853;
+      --bg:#f8fafc; --card:#ffffff; --text:#1e293b; --muted:#64748b;
+      --success:#22c55e; --warning:#f59e0b; --danger:#ef4444;
+      --border:#e2e8f0; --input-bg:#f8fafc;
+      --radius-md:8px; --radius-lg:12px;
+      --shadow:0 4px 6px -1px rgba(0,0,0,0.07);
+    }
+    body { font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:2rem 1rem; line-height:1.6; }
     .wrap { max-width:760px; margin:0 auto; }
-    .card { background:#fff; border-radius:18px; box-shadow:0 20px 40px rgba(0,0,0,.25); overflow:hidden; margin-bottom:1.5rem; }
-    .hdr { background:linear-gradient(135deg,#0ea5e9,#0284c7); color:#fff; padding:2rem; }
-    .hdr h1 { font-size:24px; font-weight:800; }
-    .hdr p { opacity:.9; font-size:14px; margin-top:.25rem; }
+    .card { background:var(--card); border-radius:var(--radius-lg); box-shadow:var(--shadow); border:1px solid var(--border); overflow:hidden; margin-bottom:1.5rem; }
+    .hdr { background:linear-gradient(135deg,var(--navy),var(--navy-dark)); color:#fff; padding:2rem; }
+    .hdr h1 { font-size:22px; font-weight:700; letter-spacing:-0.01em; }
+    .hdr p { opacity:.8; font-size:13px; margin-top:.3rem; font-weight:400; }
     .body { padding:2rem; }
-    .step { font-size:11px; font-weight:800; color:var(--accent); text-transform:uppercase; letter-spacing:.6px; margin-bottom:.5rem; }
-    h2 { font-size:19px; font-weight:700; margin-bottom:1rem; }
-    .ncnda { max-height:320px; overflow-y:auto; border:1px solid var(--border); border-radius:12px; padding:1.25rem; background:var(--lighter); font-size:13px; white-space:pre-wrap; margin-bottom:1rem; }
-    .signed-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,.12); color:#065f46; border:1px solid rgba(16,185,129,.3); padding:6px 12px; border-radius:8px; font-size:12px; font-weight:700; margin-bottom:1rem; }
-    label { display:block; font-weight:600; font-size:13px; margin-bottom:.4rem; }
-    input { width:100%; padding:11px 14px; border:1px solid var(--border); border-radius:10px; font-size:14px; font-family:inherit; margin-bottom:1rem; }
+    .step { font-size:11px; font-weight:700; color:var(--gold); text-transform:uppercase; letter-spacing:.7px; margin-bottom:.5rem; }
+    h2 { font-size:18px; font-weight:700; color:var(--text); margin-bottom:1rem; }
+    .ncnda { max-height:320px; overflow-y:auto; border:1px solid var(--navy-light); border-radius:var(--radius-lg); padding:1.25rem; background:var(--input-bg); font-size:13px; white-space:pre-wrap; margin-bottom:1rem; color:var(--text); }
+    .ncnda::-webkit-scrollbar { width:6px; } .ncnda::-webkit-scrollbar-track { background:transparent; } .ncnda::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:3px; }
+    .signed-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(34,197,94,.1); color:#15803d; border:1px solid rgba(34,197,94,.3); padding:6px 12px; border-radius:var(--radius-md); font-size:12px; font-weight:600; margin-bottom:1rem; }
+    label { display:block; font-weight:600; font-size:13px; margin-bottom:.4rem; color:var(--text); }
+    input[type="text"],input[type="email"] { width:100%; padding:10px 13px; border:1px solid var(--border); border-radius:var(--radius-md); font-size:14px; font-family:inherit; margin-bottom:1rem; background:var(--card); color:var(--text); transition:border-color .15s; }
+    input[type="text"]:focus,input[type="email"]:focus { outline:none; border-color:var(--navy); box-shadow:0 0 0 3px rgba(30,58,95,.1); }
     .row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
     .chk { display:flex; gap:10px; align-items:flex-start; margin-bottom:1.25rem; }
-    .chk input { width:18px; height:18px; margin-top:2px; }
-    .chk label { font-weight:400; color:var(--secondary); }
-    .btn { padding:13px 24px; border:none; border-radius:10px; font-weight:700; cursor:pointer; font-size:14px; width:100%; }
-    .btn-primary { background:var(--primary); color:#fff; } .btn-primary:disabled { opacity:.5; cursor:not-allowed; }
-    .btn-accent { background:var(--accent); color:#fff; }
-    .drop { border:2px dashed #cbd5e1; border-radius:14px; padding:2.5rem; text-align:center; background:var(--lighter); cursor:pointer; }
-    .drop .ico { font-size:40px; } .drop .t { font-weight:700; margin:.5rem 0 .25rem; } .drop .s { font-size:13px; color:var(--secondary); }
-    .file { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--lighter); border-radius:8px; font-size:13px; margin-top:8px; }
-    .muted { color:var(--secondary); font-size:12px; }
+    .chk input { width:16px; height:16px; margin-top:3px; accent-color:var(--navy); flex-shrink:0; }
+    .chk label { font-weight:400; color:var(--muted); font-size:13px; }
+    .btn { padding:12px 24px; border:none; border-radius:var(--radius-md); font-weight:600; cursor:pointer; font-size:14px; width:100%; font-family:inherit; transition:background .15s, opacity .15s; }
+    .btn-primary { background:var(--navy); color:#fff; } .btn-primary:hover { background:var(--navy-light); } .btn-primary:disabled { opacity:.5; cursor:not-allowed; }
+    .btn-accent { background:var(--gold); color:#fff; }
+    .drop { border:2px dashed var(--border); border-radius:var(--radius-lg); padding:2.5rem; text-align:center; background:var(--input-bg); cursor:pointer; transition:border-color .15s, background .15s; }
+    .drop:hover { border-color:var(--navy); background:#f0f4f8; }
+    .drop .ico { font-size:36px; } .drop .t { font-weight:600; margin:.5rem 0 .25rem; color:var(--text); } .drop .s { font-size:13px; color:var(--muted); }
+    .file { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--input-bg); border-radius:var(--radius-md); font-size:13px; margin-top:8px; border:1px solid var(--border); }
+    .muted { color:var(--muted); font-size:12px; }
     .hide { display:none; }
     .err { color:var(--danger); font-size:13px; margin-top:.5rem; }
-    .cert { background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.3); border-radius:12px; padding:1rem; font-size:12px; margin-top:1rem; }
-    .foot { text-align:center; color:rgba(255,255,255,.6); font-size:12px; }
+    .cert { background:rgba(34,197,94,.06); border:1px solid rgba(34,197,94,.25); border-radius:var(--radius-lg); padding:1rem; font-size:12px; margin-top:1rem; color:var(--text); }
+    .foot { text-align:center; color:var(--muted); font-size:12px; margin-top:.5rem; }
   </style>
 </head>
 <body>
@@ -126,16 +138,16 @@
       <p class="muted" style="margin-bottom:1rem;">Drop files below or click to browse. Your uploads are encrypted and visible only to the HGC &amp; ARK team.</p>
       <div class="drop" id="drop"><div class="ico">📥</div><div class="t">Drop files here to upload</div><div class="s">PDF, Excel, Word, images — any deal document</div>
         <input type="file" id="fileInput" multiple class="hide"></div>
-      <div id="up-progress" style="font-size:13px;font-weight:600;color:var(--accent);margin-top:.75rem;"></div>
+      <div id="up-progress" style="font-size:13px;font-weight:600;color:var(--navy);margin-top:.75rem;"></div>
       <div id="up-success" class="hide" style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#065f46;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;margin-top:.75rem;"></div>
       <div id="uploadList" style="margin-top:1rem;">${uploads}</div>
       ${certLine}
       <div class="err hide" id="up-err"></div>`;
     const drop=document.getElementById('drop'), fi=document.getElementById('fileInput');
     drop.onclick=()=>fi.click();
-    drop.ondragover=e=>{e.preventDefault(); drop.style.borderColor='#0ea5e9';};
-    drop.ondragleave=e=>{e.preventDefault(); drop.style.borderColor='#cbd5e1';};
-    drop.ondrop=e=>{e.preventDefault(); drop.style.borderColor='#cbd5e1'; handle(e.dataTransfer.files);};
+    drop.ondragover=e=>{e.preventDefault(); drop.style.borderColor='#1e3a5f';};
+    drop.ondragleave=e=>{e.preventDefault(); drop.style.borderColor='';};
+    drop.ondrop=e=>{e.preventDefault(); drop.style.borderColor=''; handle(e.dataTransfer.files);};
     fi.onchange=()=>handle(fi.files);
   }
 
