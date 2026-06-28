@@ -30,12 +30,18 @@
     document.getElementById('ncBody').innerHTML = '<p style="color:var(--secondary);">Loading…</p>';
     document.getElementById('ncndaModal').classList.add('show');
     try {
-      const r = await fetch('/api/ncnda?dealId=' + encodeURIComponent(dealId));
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+      const r = await fetch('/api/ncnda?dealId=' + encodeURIComponent(dealId), { signal: controller.signal });
+      clearTimeout(timeout);
       if (!r.ok) throw new Error('could not load');
       view = await r.json();
       render();
     } catch (e) {
-      document.getElementById('ncBody').innerHTML = '<p style="color:var(--danger);">Could not load the portal. Try again.</p>';
+      const msg = e.name === 'AbortError'
+        ? 'Loading is taking longer than expected. Please try again.'
+        : 'Could not load the portal. Try again.';
+      document.getElementById('ncBody').innerHTML = `<p style="color:var(--danger);">${msg}</p>`;
     }
   }
   function close() {
@@ -81,6 +87,7 @@
           <div style="display:flex;gap:6px;margin-top:4px;">
             <input id="ncLink" readonly value="${esc(view.portalUrl)}" style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;">
             <button class="btn btn-secondary btn-small" onclick="HGCNcnda.copy()">Copy</button>
+            <button class="btn btn-secondary btn-small" onclick="HGCNcnda.copyAndOpen()">Copy &amp; Open</button>
           </div>
           <div style="font-size:11px;color:var(--secondary);margin-top:4px;">Send this to the client. They must sign the NCNDA before they can upload.</div>
         </div>
@@ -130,6 +137,25 @@
     const el = document.getElementById('ncLink');
     el.select();
     navigator.clipboard.writeText(el.value).then(() => {}, () => { document.execCommand('copy'); });
+    const btn = document.querySelector('[onclick="HGCNcnda.copy()"]');
+    if (btn) {
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = orig; }, 2000);
+    }
+  }
+
+  function copyAndOpen() {
+    const el = document.getElementById('ncLink');
+    el.select();
+    navigator.clipboard.writeText(el.value).then(() => {}, () => { document.execCommand('copy'); });
+    window.open(el.value, '_blank');
+    const btn = document.querySelector('[onclick="HGCNcnda.copyAndOpen()"]');
+    if (btn) {
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = orig; }, 2000);
+    }
   }
 
   async function sign() {
@@ -153,5 +179,12 @@
     }
   }
 
-  window.HGCNcnda = { open, close, sign, copy, cardStatus };
+  function ncndaBadge(deal) {
+    const n = deal.ncnda;
+    if (!n) return '<span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:#e5e7eb;color:#6b7280;">No NCNDA</span>';
+    if (n.status === 'finalized') return '<span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(16,185,129,.15);color:#065f46;">Finalized</span>';
+    return '<span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(245,158,11,.15);color:#92400e;">Pending Signatures</span>';
+  }
+
+  window.HGCNcnda = { open, close, sign, copy, copyAndOpen, cardStatus, ncndaBadge };
 })();

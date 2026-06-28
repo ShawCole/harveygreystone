@@ -7,6 +7,7 @@
 (function () {
   let TEMPLATE = null;
   let currentDealId = null;
+  const expandedSections = new Set();
 
   const STATUSES = ['outstanding', 'requested', 'received', 'reviewed', 'na'];
   const STATUS_LABEL = { outstanding: 'Outstanding', requested: 'Requested', received: 'Received', reviewed: 'Reviewed', na: 'N/A' };
@@ -24,11 +25,19 @@
   async function loadTemplate() {
     try {
       const res = await fetch('/data-room-template.json');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
       TEMPLATE = await res.json();
       const app = document.getElementById('mainApp');
       if (app && app.style.display !== 'none' && typeof renderDeals === 'function') renderDeals();
     } catch (e) {
       console.error('data room template load failed', e);
+      const app = document.getElementById('mainApp');
+      if (app) {
+        const notice = document.createElement('div');
+        notice.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:12px 16px;border-radius:8px;font-size:13px;font-weight:600;margin:1rem;';
+        notice.textContent = 'Failed to load data room template. Please refresh the page.';
+        app.prepend(notice);
+      }
     }
   }
 
@@ -44,13 +53,16 @@
 
   function band(capital) {
     const c = Number(capital) || 0;
+    if (c === 0) return 'zero';
     if (c >= 25000000) return 'large';
     if (c >= 5000000) return 'mid';
     return 'small';
   }
   function inScope(deal, sectionId) {
     if (deal.intl && sectionId === '06') return true;
-    return BAND_SECTIONS[band(deal.capital)].includes(sectionId);
+    const b = band(deal.capital);
+    if (b === 'zero') return false;
+    return BAND_SECTIONS[b].includes(sectionId);
   }
   function isRequired(deal, section, doc) {
     if (deal.intl && section.id === '06') return true; // intl → all of Sec 06 required
@@ -106,11 +118,14 @@
     const c = completeness(deal);
     const b = band(deal.capital);
 
+    const bandNote = b === 'zero'
+      ? '<div style="font-weight:600;font-size:13px;color:var(--danger);">Set deal capital to see required documents</div>'
+      : `<div style="font-weight:700;font-size:15px;">${BAND_LABEL[b]}</div>`;
     document.getElementById('drControls').innerHTML = `
       <div><div style="font-size:11px;color:var(--secondary);text-transform:uppercase;letter-spacing:.5px;">Readiness</div>
         <div style="font-size:22px;font-weight:800;">${c.reqDone}/${c.req} <span style="font-size:13px;color:var(--secondary);font-weight:600;">required · ${c.pct}%</span></div></div>
       <div><div style="font-size:11px;color:var(--secondary);text-transform:uppercase;letter-spacing:.5px;">Deal Size Band</div>
-        <div style="font-weight:700;font-size:15px;">${BAND_LABEL[b]}</div></div>
+        ${bandNote}</div>
       <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;cursor:pointer;margin-left:auto;">
         <input type="checkbox" ${deal.intl ? 'checked' : ''} onchange="HGCDataRoom.toggleIntl(this.checked)" style="width:16px;height:16px;cursor:pointer;">
         International / cross-border</label>`;
@@ -122,17 +137,21 @@
         if (isRequired(deal, sec, doc)) { sReq++; if (isSatisfied(docState(deal, docId(sec, si, di)))) sDone++; }
       }));
       const scoped = inScope(deal, sec.id);
+      const secIdx = TEMPLATE.sections.indexOf(sec);
+      const collapsed = !expandedSections.has(secIdx);
       html += `<div style="margin-bottom:1.25rem;opacity:${scoped ? 1 : 0.6};">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:2px solid var(--border);">
-          <div style="font-weight:800;font-size:14px;">${sec.id} · ${sec.name} ${scoped ? '' : '<span style="font-size:11px;color:var(--secondary);font-weight:600;">(optional at this deal size)</span>'}</div>
+        <div data-act="toggle-section" data-sec="${secIdx}" style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:2px solid var(--border);cursor:pointer;user-select:none;">
+          <div style="font-weight:800;font-size:14px;"><span style="display:inline-block;width:16px;font-size:12px;">${collapsed ? '▸' : '▾'}</span>${sec.id} · ${sec.name} ${scoped ? '' : '<span style="font-size:11px;color:var(--secondary);font-weight:600;">(optional at this deal size)</span>'}</div>
           <div style="font-size:12px;color:var(--secondary);font-weight:600;">${sDone}/${sReq} req</div>
         </div>`;
-      sec.subfolders.forEach((sf, si) => {
-        html += `<div style="margin:0.75rem 0 0.35rem;font-size:11px;font-weight:700;color:var(--secondary);text-transform:uppercase;letter-spacing:.6px;">${sf.name}</div>`;
-        sf.documents.forEach((doc, di) => {
-          html += docRow(deal, docId(sec, si, di), doc, isRequired(deal, sec, doc), docState(deal, docId(sec, si, di)));
+      if (!collapsed) {
+        sec.subfolders.forEach((sf, si) => {
+          html += `<div style="margin:0.75rem 0 0.35rem;font-size:11px;font-weight:700;color:var(--secondary);text-transform:uppercase;letter-spacing:.6px;">${sf.name}</div>`;
+          sf.documents.forEach((doc, di) => {
+            html += docRow(deal, docId(sec, si, di), doc, isRequired(deal, sec, doc), docState(deal, docId(sec, si, di)));
+          });
         });
-      });
+      }
       html += `</div>`;
     });
     document.getElementById('drBody').innerHTML = html;
@@ -172,6 +191,7 @@
       if (act === 'download') { e.preventDefault(); download(el.dataset.path); }
       else if (act === 'remove') { e.preventDefault(); removeFile(el.dataset.id); }
       else if (act === 'upload') { e.preventDefault(); upload(el.dataset.id); }
+      else if (act === 'toggle-section') { e.preventDefault(); const idx = Number(el.dataset.sec); if (expandedSections.has(idx)) expandedSections.delete(idx); else expandedSections.add(idx); render(); }
     });
     body.addEventListener('change', (e) => {
       const el = e.target.closest('select[data-act="status"]');
@@ -205,6 +225,8 @@
     input.onchange = async () => {
       const f = input.files[0];
       if (!f) return;
+      const btn = document.querySelector(`button[data-act="upload"][data-id="${CSS.escape(id)}"]`);
+      if (btn) { btn.disabled = true; btn.textContent = 'Uploading…'; }
       try {
         const r = await fetch('/api/upload-url', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -226,6 +248,7 @@
         render();
       } catch (e) {
         alert('Upload error: ' + e.message);
+        if (btn) { btn.disabled = false; btn.textContent = '⬆ Upload'; }
       }
     };
     input.click();
@@ -247,7 +270,13 @@
     if (!deal || !deal.dataRoom || !deal.dataRoom[id] || !deal.dataRoom[id].file) return;
     if (!confirm('Remove this file from the data room?')) return;
     const path = deal.dataRoom[id].file.path;
-    try { await fetch('/api/file', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path }) }); } catch (e) { /* best effort */ }
+    try {
+      const r = await fetch('/api/file', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path }) });
+      if (!r.ok) throw new Error('Server returned ' + r.status);
+    } catch (e) {
+      alert('Could not delete file: ' + e.message);
+      return;
+    }
     delete deal.dataRoom[id].file;
     saveData();
     render();

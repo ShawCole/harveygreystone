@@ -68,9 +68,20 @@
           <span>${esc(dealName(e.dealId))}</span>
           <span><span style="color:${STATUS_COLOR[e.status] || '#94a3b8'};font-weight:700;">${STATUS_LABEL[e.status] || e.status}</span>${e.amount ? ' · ' + esc(e.amount) : ''}</span>
         </div>`).join('') : '<div style="font-size:12px;color:var(--secondary);">No deal engagements yet.</div>';
-      const matches = matchingDeals(inv).slice(0, 3);
-      const matchHtml = matches.length ? `<div style="margin-top:8px;font-size:11px;color:var(--secondary);">💡 Fits check size: ${matches.map((d) => esc(d.name)).join(', ')}</div>` : '';
-      const meta = [TYPE_LABEL[inv.type] || inv.type, inv.instrument && inv.instrument !== 'both' ? inv.instrument : '', (inv.checkMin || inv.checkMax) ? `${esc(inv.checkMin || '?')}–${esc(inv.checkMax || '?')}` : ''].filter(Boolean).join(' · ');
+      const matches = matchingDeals(inv);
+      const matchId = 'match-' + inv.id;
+      let matchHtml = '';
+      if (matches.length) {
+        const visible = matches.slice(0, 5).map((d) => esc(d.name)).join(', ');
+        if (matches.length <= 5) {
+          matchHtml = `<div style="margin-top:8px;font-size:11px;color:var(--secondary);">💡 Fits check size: ${visible}</div>`;
+        } else {
+          const rest = matches.slice(5).map((d) => esc(d.name)).join(', ');
+          matchHtml = `<div style="margin-top:8px;font-size:11px;color:var(--secondary);">💡 Fits check size: ${visible}<span id="${matchId}" style="display:none;">, ${rest}</span> <a href="#" onclick="event.preventDefault();var s=document.getElementById('${matchId}');var a=this;if(s.style.display==='none'){s.style.display='inline';a.textContent='Show less';}else{s.style.display='none';a.textContent='Show ${matches.length - 5} more';}" style="font-weight:600;">Show ${matches.length - 5} more</a></div>`;
+        }
+      }
+      const checkSize = inv.checkMin && inv.checkMax ? `${esc(inv.checkMin)}–${esc(inv.checkMax)}` : inv.checkMin ? `From ${esc(inv.checkMin)}` : inv.checkMax ? `Up to ${esc(inv.checkMax)}` : '';
+      const meta = [TYPE_LABEL[inv.type] || inv.type, inv.instrument && inv.instrument !== 'both' ? inv.instrument : '', checkSize].filter(Boolean).join(' · ');
       return `<div style="background:#fff;border-radius:12px;padding:1.25rem;box-shadow:var(--shadow-sm);border:1px solid var(--border);">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
           <div><div style="font-weight:700;font-size:15px;">${esc(inv.name)}</div>
@@ -112,7 +123,11 @@
     const name = $('invName').value.trim();
     if (!name) { alert('⚠️ Enter a name'); return; }
     const idVal = $('invId').value;
-    const splitList = (v) => v.split(',').map((s) => s.trim()).filter(Boolean);
+    const splitList = (v) => {
+      const items = v.split(',').map((s) => s.trim()).filter(Boolean);
+      const seen = new Set();
+      return items.filter((s) => { const k = s.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
+    };
     const data = {
       name, firm: $('invFirm').value.trim(), type: $('invType').value,
       email: $('invEmail').value.trim(), phone: $('invPhone').value.trim(),
@@ -153,7 +168,12 @@
   function saveEngagement() {
     const inv = list().find((i) => i.id === Number($('engInvId').value)); if (!inv) return;
     if (!inv.engagements) inv.engagements = [];
-    const rec = { dealId: Number($('engDeal').value), status: $('engStatus').value, amount: $('engAmount').value.trim(), notes: $('engNotes').value.trim(), updatedAt: new Date().toISOString() };
+    const amountRaw = $('engAmount').value.trim();
+    if (amountRaw) {
+      const parsed = parseCapital(amountRaw);
+      if (!parsed || parsed <= 0) { alert('Engagement amount must be a positive number.'); return; }
+    }
+    const rec = { dealId: Number($('engDeal').value), status: $('engStatus').value, amount: amountRaw, notes: $('engNotes').value.trim(), updatedAt: new Date().toISOString() };
     const idx = $('engIdx').value;
     if (idx !== '') inv.engagements[Number(idx)] = rec; else inv.engagements.push(rec);
     saveData(); closeEngagement(); render();
