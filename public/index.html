@@ -34,6 +34,13 @@
   --danger-light: rgba(239, 68, 68, 0.12);
   --info: #3b82f6;
   --info-light: rgba(59, 130, 246, 0.12);
+  /* Legacy compat aliases */
+  --primary: var(--navy);
+  --secondary: var(--gray-500);
+  --accent: var(--gold);
+  --border: var(--gray-200);
+  --lighter: var(--gray-50);
+  --shadow-sm-legacy: 0 1px 2px rgba(0,0,0,0.05);
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
   --text-xs: 0.75rem;
@@ -78,6 +85,7 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 
 /* Auth screens */
 .auth-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--navy-dark) 0%, var(--charcoal) 100%); }
+.auth-overlay.hidden { display: none; }
 .auth-card { background: var(--white); border-radius: var(--radius-lg); padding: var(--sp-10); width: 100%; max-width: 440px; box-shadow: var(--shadow-xl); }
 .auth-logo { font-size: var(--text-xl); font-weight: 700; color: var(--navy); margin-bottom: var(--sp-2); letter-spacing: -0.02em; }
 .auth-subtitle { font-size: var(--text-sm); color: var(--gray-500); margin-bottom: var(--sp-8); }
@@ -90,13 +98,14 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 
 /* Layout */
 .app-layout { display: flex; min-height: 100vh; }
+.app-layout.hidden { display: none; }
 .sidebar { width: var(--sidebar-width); background: var(--navy-dark); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; transition: width var(--duration) var(--ease); overflow: hidden; }
 .sidebar.collapsed { width: var(--sidebar-collapsed); }
 .sidebar-brand { padding: var(--sp-6) var(--sp-5); border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: var(--sp-3); }
 .sidebar-brand-icon { width: 32px; height: 32px; background: var(--gold); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--navy-dark); font-size: var(--text-sm); flex-shrink: 0; }
 .sidebar-brand-text { font-size: var(--text-sm); font-weight: 600; color: var(--white); white-space: nowrap; overflow: hidden; }
 .sidebar-brand-sub { font-size: var(--text-xs); color: var(--gray-400); font-weight: 400; }
-.sidebar.collapsed .sidebar-brand-text, .sidebar.collapsed .sidebar-brand-sub, .sidebar.collapsed .nav-label, .sidebar.collapsed .sidebar-footer-info { display: none; }
+.sidebar.collapsed .sidebar-brand-text, .sidebar.collapsed .sidebar-brand-sub, .sidebar.collapsed .nav-label, .sidebar.collapsed .sidebar-footer-info, .sidebar.collapsed .nav-section-label, .sidebar.collapsed .nav-badge { display: none; }
 .sidebar-nav { flex: 1; padding: var(--sp-4) 0; overflow-y: auto; }
 .nav-section-label { font-size: 11px; font-weight: 600; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.06em; padding: var(--sp-4) var(--sp-5) var(--sp-2); }
 .nav-item { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-5); margin: var(--sp-1) var(--sp-2); border-radius: var(--radius-md); color: var(--gray-300); cursor: pointer; transition: all var(--duration) var(--ease); font-size: var(--text-sm); font-weight: 500; white-space: nowrap; }
@@ -130,7 +139,7 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 .card-footer { padding: var(--sp-4) var(--sp-6); border-top: 1px solid var(--gray-100); background: var(--gray-50); }
 
 /* Metrics */
-.metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--sp-5); }
+.metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--sp-5); margin-bottom: var(--sp-6); }
 .metric-card { background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: var(--sp-6); box-shadow: var(--shadow-sm); }
 .metric-label { font-size: var(--text-xs); font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: var(--sp-2); }
 .metric-value { font-size: var(--text-2xl); font-weight: 700; color: var(--gray-900); letter-spacing: -0.02em; line-height: var(--leading-tight); }
@@ -145,7 +154,7 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 .btn-primary:hover:not(:disabled) { background: var(--navy-light); }
 .btn-secondary { background: var(--white); color: var(--gray-700); border: 1px solid var(--gray-300); }
 .btn-secondary:hover:not(:disabled) { background: var(--gray-50); border-color: var(--gray-400); }
-.btn-gold { background: var(--gold); color: var(--navy-dark); }
+.btn-gold { background: var(--gold); color: var(--navy-dark); font-weight: 600; }
 .btn-gold:hover:not(:disabled) { background: var(--gold-light); }
 .btn-danger { background: var(--danger-light); color: var(--danger); }
 .btn-danger:hover:not(:disabled) { background: var(--danger); color: var(--white); }
@@ -154,6 +163,8 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 .btn-sm { padding: var(--sp-1) var(--sp-3); font-size: var(--text-xs); }
 .btn-lg { padding: var(--sp-3) var(--sp-6); font-size: var(--text-base); }
 .btn-icon { width: 36px; height: 36px; padding: 0; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; }
+.btn-success { background: var(--success-light); color: #15803d; }
+.btn-success:hover:not(:disabled) { background: var(--success); color: var(--white); }
 
 /* Forms */
 .form-group { margin-bottom: var(--sp-5); }
@@ -179,11 +190,13 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 .badge-danger { background: var(--danger-light); color: var(--danger); }
 .badge-info { background: var(--info-light); color: var(--info); }
 .badge-neutral { background: var(--gray-100); color: var(--gray-600); }
+.badge-investor { background: var(--info-light); color: var(--info); }
+.badge-lender { background: var(--warning-light); color: #b45309; }
+.badge-family-office { background: #fae8ff; color: #a21caf; }
 
 /* Tables */
 .data-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
-.data-table th { text-align: left; padding: var(--sp-3) var(--sp-4); font-size: var(--text-xs); font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid var(--gray-200); background: var(--gray-50); white-space: nowrap; user-select: none; cursor: pointer; }
-.data-table th:hover { color: var(--gray-700); }
+.data-table th { text-align: left; padding: var(--sp-3) var(--sp-4); font-size: var(--text-xs); font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid var(--gray-200); background: var(--gray-50); white-space: nowrap; user-select: none; }
 .data-table td { padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--gray-100); color: var(--gray-700); vertical-align: middle; }
 .data-table tr:hover td { background: var(--gray-50); }
 .data-table tr.active td { background: var(--gold-muted); }
@@ -271,14 +284,14 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 .filter-btn.active { background: var(--navy); color: var(--white); border-color: var(--navy); }
 
 /* Deal list */
-.deal-list-item { display: grid; grid-template-columns: 1fr 140px 100px 80px 100px 60px; align-items: center; padding: var(--sp-4) var(--sp-5); border-bottom: 1px solid var(--gray-100); cursor: pointer; transition: background var(--duration) var(--ease); }
+.deal-list-item { display: grid; grid-template-columns: 1fr 140px 100px 80px 120px 60px; align-items: center; padding: var(--sp-4) var(--sp-5); border-bottom: 1px solid var(--gray-100); cursor: pointer; transition: background var(--duration) var(--ease); }
 .deal-list-item:hover { background: var(--gray-50); }
 .deal-list-item.active { background: var(--gold-muted); }
 .deal-list-name { font-weight: 500; color: var(--gray-800); }
 .deal-list-sub { font-size: var(--text-xs); color: var(--gray-500); margin-top: 2px; }
 
 /* Deal detail */
-.deal-detail { background: var(--white); border-left: 1px solid var(--gray-200); height: calc(100vh - var(--header-height)); overflow-y: auto; position: sticky; top: var(--header-height); }
+.deal-detail { background: var(--white); border-left: 1px solid var(--gray-200); height: calc(100vh - var(--header-height) - 28px); overflow-y: auto; position: sticky; top: calc(var(--header-height) + 28px); }
 .deal-detail-header { padding: var(--sp-6); border-bottom: 1px solid var(--gray-200); }
 .deal-detail-title { font-size: var(--text-xl); font-weight: 700; color: var(--gray-900); margin-bottom: var(--sp-1); }
 .deal-detail-subtitle { font-size: var(--text-sm); color: var(--gray-500); }
@@ -298,6 +311,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 .dr-doc-name { color: var(--gray-700); }
 .dr-doc-name .required { color: var(--danger); font-weight: 700; margin-left: 2px; }
 .dr-doc-actions { display: flex; align-items: center; gap: var(--sp-2); justify-content: flex-end; }
+.dr-subfolder-label { font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.06em; padding: var(--sp-3) var(--sp-4) var(--sp-1) var(--sp-6); }
 
 /* Kanban */
 .kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-5); align-items: flex-start; }
@@ -325,7 +339,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 .dropdown-divider { height: 1px; background: var(--gray-100); margin: var(--sp-1) 0; }
 
 /* Charts */
-.charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-5); }
+.charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-5); margin-bottom: var(--sp-6); }
 
 /* Section headers */
 .section-header { font-size: var(--text-lg); font-weight: 600; color: var(--gray-800); margin-bottom: var(--sp-5); padding-bottom: var(--sp-3); border-bottom: 1px solid var(--gray-200); }
@@ -333,6 +347,20 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 /* Detail tabs */
 .detail-tab-content { display: none; }
 .detail-tab-content.active { display: block; }
+
+/* Deal split layout */
+.deals-split { display: grid; grid-template-columns: 1fr; transition: all 0.3s var(--ease); }
+.deals-split.has-detail { grid-template-columns: 1fr 460px; }
+
+/* UW result panel */
+.uw-panel { background: linear-gradient(135deg, #0f172a, #1e293b); border-radius: var(--radius-lg); padding: var(--sp-6); color: white; }
+.uw-bar-track { height: 8px; background: rgba(255,255,255,0.15); border-radius: 5px; overflow: hidden; }
+.uw-bar-fill { height: 100%; transition: width 0.6s; }
+.uw-tile { background: rgba(255,255,255,0.08); border-radius: 10px; padding: var(--sp-3); }
+.uw-tile-label { font-size: 10px; opacity: 0.7; text-transform: uppercase; }
+.uw-tile-value { font-size: 13px; font-weight: 700; margin-top: 4px; line-height: 1.3; }
+.uw-flags-green { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); border-radius: 10px; padding: var(--sp-3); }
+.uw-flags-red { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: var(--sp-3); }
 
 /* Utilities */
 .flex { display: flex; }
@@ -366,6 +394,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 @media (max-width: 1024px) {
   .charts-grid { grid-template-columns: 1fr; }
   .kanban { grid-template-columns: repeat(2, 1fr); }
+  .deals-split.has-detail { grid-template-columns: 1fr; }
   .deal-list-item { grid-template-columns: 1fr 120px 80px 60px; }
   .form-row { grid-template-columns: 1fr; }
 }
@@ -387,608 +416,366 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 </head>
 <body>
 
-<!-- NDA SCREEN -->
-<div id="ndaScreen" class="auth-screen">
-  <div class="auth-container">
-    <div class="auth-content">
-      <div class="auth-header">
-        <h1>HGC & ARK Capital Consulting</h1>
-        <p>Professional deal tracking and management system</p>
-      </div>
-      
-      <div class="nda-scroll">
-        <h3>Confidentiality & Non-Disclosure Agreement</h3>
-        <p><strong>By accessing this platform, you acknowledge and agree to be bound by the following terms:</strong></p>
-        
-        <h3>1. Confidentiality & Data Protection</h3>
-        <p>All documents, financial information, deal structures, projections, contact information, and materials contained herein are strictly confidential and proprietary. You agree not to disclose, share, or transfer any information to unauthorized third parties without express written consent.</p>
-        
-        <h3>2. Permitted Use</h3>
-        <p>This platform and all contents are provided solely for evaluating potential business opportunities and managing capital-raising activities. Unauthorized use, including competitive analysis, reverse engineering, or public disclosure, is strictly prohibited.</p>
-        
-        <h3>3. Security Obligations</h3>
-        <p>You shall not: (a) copy, reproduce, or distribute materials; (b) attempt to derive competitive advantage; (c) discuss with unauthorized parties; (d) use for unauthorized purposes; (e) modify or create derivative works.</p>
-        
-        <h3>4. Term & Duration</h3>
-        <p>Confidentiality obligations survive termination of access and continue for five (5) years or as required by law. Upon termination, you agree to return or permanently destroy all copies of confidential materials.</p>
-      </div>
-      
-      <div class="checkbox-group">
-        <input type="checkbox" id="ndaCheckbox" onchange="updateNDAButton()">
-        <label for="ndaCheckbox">I acknowledge and agree to all terms of this Non-Disclosure Agreement</label>
-      </div>
-      
-      <button class="btn btn-primary" id="ndaBtn" onclick="acceptNDA()" disabled style="width: 100%; padding: 13px;">
-        Accept & Continue
-      </button>
+<!-- ===== NDA SCREEN ===== -->
+<div id="ndaScreen" class="auth-overlay">
+  <div class="auth-card">
+    <div class="auth-logo">HGC &amp; ARK Capital Consulting</div>
+    <div class="auth-subtitle">Professional deal tracking and management system</div>
+    <div class="nda-text">
+      <h4>Confidentiality &amp; Non-Disclosure Agreement</h4>
+      <p><strong>By accessing this platform, you acknowledge and agree to be bound by the following terms:</strong></p>
+      <h4>1. Confidentiality &amp; Data Protection</h4>
+      <p>All documents, financial information, deal structures, projections, contact information, and materials contained herein are strictly confidential and proprietary. You agree not to disclose, share, or transfer any information to unauthorized third parties without express written consent.</p>
+      <h4>2. Permitted Use</h4>
+      <p>This platform and all contents are provided solely for evaluating potential business opportunities and managing capital-raising activities. Unauthorized use, including competitive analysis, reverse engineering, or public disclosure, is strictly prohibited.</p>
+      <h4>3. Security Obligations</h4>
+      <p>You shall not: (a) copy, reproduce, or distribute materials; (b) attempt to derive competitive advantage; (c) discuss with unauthorized parties; (d) use for unauthorized purposes; (e) modify or create derivative works.</p>
+      <h4>4. Term &amp; Duration</h4>
+      <p>Confidentiality obligations survive termination of access and continue for five (5) years or as required by law. Upon termination, you agree to return or permanently destroy all copies of confidential materials.</p>
     </div>
-    
-    <div class="auth-graphic">
-      <h2>🚀</h2>
-      <h2 style="font-size: 28px; margin: 1rem 0;">Professional Platform</h2>
-      <p style="font-size: 15px;">Advanced deal management with pipeline tracking, financial analytics, and comprehensive reporting.</p>
+    <label class="auth-checkbox">
+      <input type="checkbox" id="ndaCheckbox" onchange="updateNDAButton()">
+      <span>I acknowledge and agree to all terms of this Non-Disclosure Agreement</span>
+    </label>
+    <button class="btn btn-primary btn-lg w-full" id="ndaBtn" onclick="acceptNDA()" disabled>
+      Accept &amp; Continue
+    </button>
+  </div>
+</div>
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div id="loginScreen" class="auth-overlay hidden">
+  <div class="auth-card">
+    <div class="auth-logo">Secure Login</div>
+    <div class="auth-subtitle">Access your confidential platform</div>
+    <div class="form-group">
+      <label class="form-label">Master Password</label>
+      <div class="password-wrapper">
+        <input type="password" id="passwordInput" class="form-input" placeholder="Enter password" onkeypress="if(event.key==='Enter') login()">
+        <button type="button" class="password-toggle" onclick="const i=document.getElementById('passwordInput');const show=i.type==='password';i.type=show?'text':'password';this.textContent=show?'Hide':'Show';">Show</button>
+      </div>
+    </div>
+    <div class="flex gap-3">
+      <button class="btn btn-secondary btn-lg" onclick="backToNDA()" style="flex:1">Back</button>
+      <button class="btn btn-primary btn-lg" onclick="login()" style="flex:1">Sign In</button>
     </div>
   </div>
 </div>
 
-<!-- LOGIN SCREEN -->
-<div id="loginScreen" class="auth-screen" style="display: none;">
-  <div class="auth-container">
-    <div class="auth-content">
-      <div class="auth-header">
-        <h1>Secure Login</h1>
-        <p>Access your confidential platform</p>
-      </div>
-      
-      <div class="form-group">
-        <label>Master Password</label>
-        <div style="position:relative;">
-          <input type="password" id="passwordInput" placeholder="Enter password" onkeypress="if(event.key==='Enter') login()" style="padding-right:48px;">
-          <button type="button" onclick="const i=document.getElementById('passwordInput');const show=i.type==='password';i.type=show?'text':'password';this.textContent=show?'Hide':'Show';" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--accent);cursor:pointer;font-size:13px;font-weight:600;padding:4px 8px;">Show</button>
-        </div>
-      </div>
-      
-      <div style="display: flex; gap: 12px;">
-        <button class="btn btn-secondary" style="flex: 1;" onclick="backToNDA()">Back</button>
-        <button class="btn btn-primary" style="flex: 1;" onclick="login()">Login</button>
+<!-- ===== MAIN APPLICATION ===== -->
+<div id="mainApp" class="app-layout hidden">
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-collapse-btn" onclick="toggleSidebar()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    </div>
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">HG</div>
+      <div>
+        <div class="sidebar-brand-text">Harvey Greystone</div>
+        <div class="sidebar-brand-sub">Capital Platform</div>
       </div>
     </div>
-    
-    <div class="auth-graphic">
-      <h2>🔐</h2>
-      <h2 style="font-size: 28px; margin: 1rem 0;">Secure Access</h2>
-      <p style="font-size: 15px;">Enterprise-grade security with password protection and session management.</p>
+    <div class="sidebar-nav">
+      <!-- Overview -->
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span class="nav-label">Dashboard</span>
+      </div>
+      <!-- Deal Flow -->
+      <div class="nav-section-label">Deal Flow</div>
+      <div class="nav-item" data-tab="deals" onclick="switchTab('deals')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        <span class="nav-label">Deals</span>
+        <span class="nav-badge" id="navDealsCount">0</span>
+      </div>
+      <div class="nav-item" data-tab="dataroom" onclick="switchTab('dataroom')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+        <span class="nav-label">Data Room</span>
+      </div>
+      <div class="nav-item" data-tab="underwriting" onclick="switchTab('underwriting')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>
+        <span class="nav-label">Underwriting</span>
+      </div>
+      <!-- Relationships -->
+      <div class="nav-section-label">Relationships</div>
+      <div class="nav-item" data-tab="investors" onclick="switchTab('investors')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="nav-label">Investors</span>
+      </div>
+      <div class="nav-item" data-tab="contacts" onclick="switchTab('contacts')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        <span class="nav-label">Contacts</span>
+      </div>
+      <!-- Operations -->
+      <div class="nav-section-label">Operations</div>
+      <div class="nav-item" data-tab="tasks" onclick="switchTab('tasks')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        <span class="nav-label">Tasks</span>
+        <span class="nav-badge" id="navTasksCount" class="hidden">0</span>
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-avatar">HG</div>
+      <div class="sidebar-footer-info">
+        <div class="sidebar-footer-name">HGC Team</div>
+        <div class="sidebar-footer-role" id="saveIndicator">
+          <span class="dot"></span> All saved
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="confidential-banner">CONFIDENTIAL: All information is strictly protected under NDA. Unauthorized access or disclosure is prohibited.</div>
+    <div class="content-header">
+      <div class="content-header-left">
+        <div class="breadcrumb">
+          <span>HGC</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="breadcrumb-current" id="breadcrumbTitle">Dashboard</span>
+        </div>
+      </div>
+      <div class="content-header-right">
+        <div class="dropdown">
+          <button class="btn btn-secondary btn-sm" onclick="toggleExportMenu()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export
+          </button>
+          <div class="dropdown-menu" id="exportMenu">
+            <div class="dropdown-item" onclick="exportToJSON()">JSON</div>
+            <div class="dropdown-item" onclick="exportToCSV()">CSV</div>
+            <div class="dropdown-item" onclick="exportToPDF()">PDF Report</div>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-item" onclick="exportBackup()">Full Backup</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="refreshFromDB()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+          Sync
+        </button>
+        <button class="btn btn-danger btn-sm" onclick="logout()">Sign Out</button>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <!-- DASHBOARD -->
+      <section id="view-dashboard">
+        <!-- rendered by renderDashboard() -->
+      </section>
+
+      <!-- DEALS -->
+      <section id="view-deals" class="hidden">
+        <!-- rendered by renderDeals() -->
+      </section>
+
+      <!-- DATA ROOM (standalone page) -->
+      <section id="view-dataroom" class="hidden">
+        <!-- rendered by renderDataRoomPage() -->
+      </section>
+
+      <!-- UNDERWRITING -->
+      <section id="view-underwriting" class="hidden">
+        <!-- rendered by renderUnderwriting() -->
+      </section>
+
+      <!-- INVESTORS -->
+      <section id="view-investors" class="hidden">
+        <!-- rendered by HGCInvestors.render() -->
+      </section>
+
+      <!-- CONTACTS -->
+      <section id="view-contacts" class="hidden">
+        <!-- rendered by renderContacts() -->
+      </section>
+
+      <!-- TASKS -->
+      <section id="view-tasks" class="hidden">
+        <!-- rendered by renderTasks() -->
+      </section>
     </div>
   </div>
 </div>
 
-<!-- MAIN APPLICATION -->
-<div id="mainApp" class="app-container" style="display: none;">
-  <div class="app-header">
-    <div class="header-left">
-      <h1>HGC & ARK Capital Consulting</h1>
-      <p>Deal tracking • Financial analytics • Pipeline management</p>
-    </div>
-    <div class="header-right">
-      <div id="saveIndicator" style="font-size:12px; color:var(--success); font-weight:600; opacity:0; transition:opacity 0.3s;"></div>
-      <button class="btn btn-secondary btn-small" onclick="refreshFromDB()">🔄 Sync</button>
-      <div class="security-badge">🔒 Secure Session</div>
-      <div style="position: relative;">
-        <button class="btn btn-primary btn-small" onclick="toggleExportMenu()">💾 Export</button>
-        <div class="export-menu" id="exportMenu">
-          <div class="export-item" onclick="exportToJSON()">📄 JSON</div>
-          <div class="export-item" onclick="exportToCSV()">📊 CSV</div>
-          <div class="export-item" onclick="exportToPDF()">📋 PDF</div>
-          <div class="export-item" onclick="exportBackup()">💾 Backup</div>
-        </div>
-      </div>
-      <button class="btn btn-danger btn-small" onclick="logout()">Logout</button>
-    </div>
-  </div>
-  
-  <div class="confidential-banner">
-    <span>🔐</span>
-    <span><strong>CONFIDENTIAL:</strong> All information is strictly protected under NDA. Unauthorized access or disclosure is prohibited.</span>
-  </div>
-  
-  <div class="nav-tabs">
-    <button class="nav-tab active" onclick="switchTab('dashboard')">📊 Dashboard</button>
-    <button class="nav-tab" onclick="switchTab('underwriting')">🔍 Underwriting</button>
-    <button class="nav-tab" onclick="switchTab('pipeline')">📈 Pipeline</button>
-    <button class="nav-tab" onclick="switchTab('deals')">💰 Deals</button>
-    <button class="nav-tab" onclick="switchTab('analytics')">📉 Analytics</button>
-    <button class="nav-tab" onclick="switchTab('investors')">🏦 Investors</button>
-    <button class="nav-tab" onclick="switchTab('contacts')">👥 Contacts</button>
-    <button class="nav-tab" onclick="switchTab('tasks')">✓ Tasks</button>
-  </div>
-  
-  <div class="content">
-    <!-- DASHBOARD -->
-    <div id="dashboard" class="content-section active">
-      <h2 style="margin-bottom: 1.5rem; font-size: 24px; font-weight: 700;">Executive Dashboard</h2>
-      
-      <div class="dashboard-grid">
-        <div class="metric-card">
-          <div class="metric-label">Total Pipeline</div>
-          <div class="metric-value" id="metricCapital">$0</div>
-          <div class="metric-change">All deals</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Active Deals</div>
-          <div class="metric-value" id="metricDeals">0</div>
-          <div class="metric-change">In progress</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Est. Revenue</div>
-          <div class="metric-value" id="metricFees">$0</div>
-          <div class="metric-change">Commission value</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Win Rate</div>
-          <div class="metric-value" id="metricWinRate">0%</div>
-          <div class="metric-change">Closed deals</div>
-        </div>
-      </div>
-      
-      <div class="charts-grid">
-        <div class="chart-card">
-          <div class="chart-title">Deal Status Distribution</div>
-          <canvas id="statusChart" style="max-width: 100%;"></canvas>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">Pipeline by Urgency</div>
-          <canvas id="urgencyChart" style="max-width: 100%;"></canvas>
-        </div>
-      </div>
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
 
-      <div class="chart-card" style="margin-top:1.5rem;">
-        <div class="chart-title">Data Room Readiness — Diligence Completeness</div>
-        <div id="dashboardReadiness"></div>
-      </div>
+<!-- ===== MODALS ===== -->
 
-      <div class="chart-card" style="margin-top:1.5rem;">
-        <div class="chart-title">Deal Ratings — Underwriter Scores</div>
-        <div id="dashboardRatings"></div>
-      </div>
-    </div>
-    
-    <!-- UNDERWRITING -->
-    <div id="underwriting" class="content-section">
-      <h2 style="margin-bottom: 0.5rem; font-size: 24px; font-weight: 700;">Underwriting Station</h2>
-      <p style="color: var(--secondary); margin-bottom: 1.5rem; font-size: 14px;">Drop any deal's documents to get an instant underwriter read — risk, ratings, flags, valuation — <strong>before</strong> committing it to your pipeline. First-pass screening only; a licensed broker reviews before any decision.</p>
-
-      <div id="uwDropZone" style="border: 2px dashed #cbd5e1; border-radius: 14px; padding: 2.5rem; text-align: center; background: var(--lighter); cursor: pointer; transition: all 0.2s; margin-bottom: 1rem;">
-        <div style="font-size: 36px; margin-bottom: 0.5rem;">📥</div>
-        <div style="font-weight: 700; color: var(--primary); margin-bottom: 0.25rem; font-size: 16px;">Drop documents to audit</div>
-        <div style="font-size: 13px; color: var(--secondary);">PDFs scanned instantly · any language · reads like an underwriter</div>
-        <input type="file" id="uwFileInput" accept=".pdf" multiple style="display:none" onchange="handleUwFiles(event.target.files)">
-      </div>
-      <div class="document-list" id="uwFileList" style="margin-bottom: 1rem;"></div>
-      <textarea id="uwDocText" rows="3" class="deal-field-input" placeholder="Extracted text appears here — or paste document content directly to audit" style="margin-bottom:1rem;"></textarea>
-      <div style="display:flex; gap:12px; margin-bottom:1.5rem;">
-        <button class="btn btn-secondary" onclick="clearUw()">Clear</button>
-        <button class="btn btn-primary" id="uwAnalyzeBtn" onclick="runUwAnalysis()" style="flex:1;">🔍 Run Underwriting Analysis</button>
-      </div>
-
-      <div id="uwResultPanel" style="display:none;"></div>
-
-      <div id="uwActions" style="display:none; gap:12px; margin:1.5rem 0;">
-        <button class="btn btn-success" onclick="pushUwToDeal()" style="width:100%;">✓ Add This to My Deals Pipeline</button>
-      </div>
-
-      <div class="pipeline-card" style="margin-top:2rem;">
-        <div class="pipeline-title">Audit Log — Everything You've Screened</div>
-        <div id="uwAuditLog"></div>
-      </div>
-    </div>
-
-    <!-- PIPELINE -->
-    <div id="pipeline" class="content-section">
-      <h2 style="margin-bottom: 1.5rem; font-size: 24px; font-weight: 700;">Sales Pipeline</h2>
-      
-      <div id="pipelineContainer"></div>
-    </div>
-    
-    <!-- DEALS -->
-    <div id="deals" class="content-section">
-      <div class="toolbar">
-        <div class="toolbar-left">
-          <h2 style="margin: 0; font-weight: 700;">All Deals</h2>
-          <input type="text" class="search-box" id="dealSearch" placeholder="Search deals..." onkeyup="renderDeals()">
-        </div>
-        <div class="toolbar-right">
-          <button class="btn btn-primary" onclick="openAddDealModal()">+ New Deal</button>
-        </div>
-      </div>
-      
-      <div class="filter-group" style="padding: 1rem 2rem 0 2rem;">
-        <button class="filter-btn active" onclick="filterDeals('all')">All</button>
-        <button class="filter-btn" onclick="filterDeals('lead')">Lead</button>
-        <button class="filter-btn" onclick="filterDeals('proposal')">Proposal</button>
-        <button class="filter-btn" onclick="filterDeals('negotiation')">Negotiation</button>
-        <button class="filter-btn" onclick="filterDeals('closed')">Closed</button>
-      </div>
-      
-      <div id="dealsContainer" class="deals-container" style="padding: 1.5rem 2rem;"></div>
-    </div>
-    
-    <!-- ANALYTICS -->
-    <div id="analytics" class="content-section">
-      <h2 style="margin-bottom: 2rem; font-size: 24px; font-weight: 700;">Financial Analytics</h2>
-      
-      <div class="pipeline-card">
-        <div class="pipeline-title">Key Metrics</div>
-        <table class="stats-table">
-          <thead>
-            <tr>
-              <th>Metric</th>
-              <th>Value</th>
-              <th>Details</th>
-            </tr>
-          </thead>
-          <tbody id="metricsTable"></tbody>
-        </table>
-      </div>
-      
-      <div class="pipeline-card">
-        <div class="pipeline-title">Deal Performance</div>
-        <table class="stats-table">
-          <thead>
-            <tr>
-              <th>Deal</th>
-              <th>Capital</th>
-              <th>Fee %</th>
-              <th>Est. Revenue</th>
-              <th>Status</th>
-              <th>Probability</th>
-            </tr>
-          </thead>
-          <tbody id="performanceTable"></tbody>
-        </table>
-      </div>
-    </div>
-    
-    <!-- SCREENING -->
-    <div id="screening" class="content-section">
-      <h2 style="margin-bottom: 0.5rem; font-size: 24px; font-weight: 700;">Deal Screening &amp; Pre-Underwriting</h2>
-      <p style="color: var(--secondary); margin-bottom: 1.5rem; font-size: 14px;">First-pass analysis only. A licensed broker must complete formal underwriting before any decision.</p>
-
-      <div class="confidential-banner" style="border-radius: 10px; margin-bottom: 1.5rem; background: linear-gradient(90deg, #fed7aa 0%, #fdba74 100%); color: #7c2d12; border-color: #fb923c;">
-        <span>⚠️</span>
-        <span><strong>SCREENING AID — NOT VERIFIED UNDERWRITING.</strong> This tool extracts and checks what the documents claim. It does not verify that figures are real or that the business exists as described. Treat every output as a list of things to confirm, not facts.</span>
-      </div>
-
-      <div class="pipeline-card">
-        <div class="pipeline-title">Intake Form</div>
-        <p style="font-size: 13px; color: var(--secondary); margin-bottom: 1.5rem;">Have the prospect complete this. Fields adapt to any deal type — leave non-applicable fields blank.</p>
-
-        <div class="deal-row">
-          <div class="deal-field">
-            <label class="deal-field-label">Attach to Deal</label>
-            <select id="scrDealLink" class="deal-field-input"><option value="">— New / Unlinked —</option></select>
-          </div>
-          <div class="deal-field">
-            <label class="deal-field-label">Deal Type</label>
-            <select id="scrType" class="deal-field-input">
-              <option value="operating">Operating Business</option>
-              <option value="realestate">Real Estate / Project Finance</option>
-              <option value="earlystage">Early-Stage / Pre-Revenue</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-        </div>
-
-        <div style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.6px; margin: 1.5rem 0 1rem 0;">The Ask</div>
-        <div class="deal-row">
-          <div class="deal-field"><label class="deal-field-label">Amount Sought</label><input id="scrAmount" class="deal-field-input" placeholder="$50M"></div>
-          <div class="deal-field"><label class="deal-field-label">Instrument</label><input id="scrInstrument" class="deal-field-input" placeholder="Equity / Debt / SAFE / Convertible"></div>
-        </div>
-        <div class="deal-row">
-          <div class="deal-field"><label class="deal-field-label">Pre-Money Valuation</label><input id="scrValuation" class="deal-field-input" placeholder="$200M"></div>
-          <div class="deal-field"><label class="deal-field-label">Use of Funds</label><input id="scrUseFunds" class="deal-field-input" placeholder="e.g. expansion, debt refi"></div>
-        </div>
-
-        <div style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.6px; margin: 1.5rem 0 1rem 0;">Financials</div>
-        <div class="deal-row">
-          <div class="deal-field"><label class="deal-field-label">Revenue (TTM)</label><input id="scrRevenue" class="deal-field-input" placeholder="$30M"></div>
-          <div class="deal-field"><label class="deal-field-label">Revenue (Prior Year)</label><input id="scrRevenuePrior" class="deal-field-input" placeholder="$22M"></div>
-        </div>
-        <div class="deal-row">
-          <div class="deal-field"><label class="deal-field-label">EBITDA / Net Income</label><input id="scrEbitda" class="deal-field-input" placeholder="$6M"></div>
-          <div class="deal-field"><label class="deal-field-label">Gross Margin %</label><input id="scrMargin" class="deal-field-input" placeholder="45%"></div>
-        </div>
-        <div class="deal-row">
-          <div class="deal-field"><label class="deal-field-label">Existing Debt</label><input id="scrDebt" class="deal-field-input" placeholder="$10M"></div>
-          <div class="deal-field"><label class="deal-field-label">Monthly Burn (if pre-profit)</label><input id="scrBurn" class="deal-field-input" placeholder="$400k"></div>
-        </div>
-        <div class="deal-row">
-          <div class="deal-field"><label class="deal-field-label">Financials Quality</label>
-            <select id="scrFinQuality" class="deal-field-input">
-              <option value="">— Select —</option>
-              <option>Audited</option>
-              <option>Reviewed</option>
-              <option>Management-prepared</option>
-              <option>None provided</option>
-            </select>
-          </div>
-          <div class="deal-field"><label class="deal-field-label">Projections Provided?</label>
-            <select id="scrProjections" class="deal-field-input"><option value="">— Select —</option><option>Yes</option><option>No</option></select>
-          </div>
-        </div>
-
-        <div style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.6px; margin: 1.5rem 0 1rem 0;">The Business</div>
-        <div class="deal-row">
-          <div class="deal-field"><label class="deal-field-label">Years in Business</label><input id="scrYears" class="deal-field-input" placeholder="7"></div>
-          <div class="deal-field"><label class="deal-field-label">Employees</label><input id="scrEmployees" class="deal-field-input" placeholder="45"></div>
-        </div>
-        <div class="deal-field deal-row-full" style="margin-bottom: 1rem;"><label class="deal-field-label">What does the business do?</label><textarea id="scrDescription" class="deal-field-input" rows="2" placeholder="Plain-language description of the business, customers, and how it makes money"></textarea></div>
-        <div class="deal-field deal-row-full" style="margin-bottom: 1rem;"><label class="deal-field-label">Revenue Model / Key Customers</label><textarea id="scrModel" class="deal-field-input" rows="2" placeholder="Recurring? Concentration? Top customers as % of revenue?"></textarea></div>
-
-        <div style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.6px; margin: 1.5rem 0 1rem 0;">Real Estate / Project (if applicable)</div>
-        <div class="deal-row">
-          <div class="deal-field"><label class="deal-field-label">Asset / Project Value</label><input id="scrAssetValue" class="deal-field-input" placeholder="$80M"></div>
-          <div class="deal-field"><label class="deal-field-label">LTV / Loan-to-Cost</label><input id="scrLTV" class="deal-field-input" placeholder="65%"></div>
-        </div>
-        <div class="deal-row">
-          <div class="deal-field"><label class="deal-field-label">NOI / Cap Rate</label><input id="scrNOI" class="deal-field-input" placeholder="$5M / 6%"></div>
-          <div class="deal-field"><label class="deal-field-label">Collateral</label><input id="scrCollateral" class="deal-field-input" placeholder="First-lien on property"></div>
-        </div>
-
-        <div class="deal-field deal-row-full" style="margin: 1rem 0;"><label class="deal-field-label">Document Text (auto-filled from PDFs, or paste manually)</label><textarea id="scrDocs" class="deal-field-input" rows="6" placeholder="Drop a PDF below and its text appears here automatically — or paste any document content directly."></textarea></div>
-
-        <div id="scrDropZone" style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 2rem; text-align: center; background: var(--lighter); cursor: pointer; transition: all 0.2s;">
-          <div style="font-size: 32px; margin-bottom: 0.5rem;">📥</div>
-          <div style="font-weight: 600; color: var(--primary); margin-bottom: 0.25rem;">Drop PDFs here to scan</div>
-          <div style="font-size: 12px; color: var(--secondary);">or click to browse — text is extracted and added automatically</div>
-          <input type="file" id="scrFileInput" accept=".pdf" multiple style="display:none" onchange="handleScrFiles(event.target.files)">
-        </div>
-        <div class="document-list" id="scrFileList" style="margin-top: 1rem;"></div>
-
-        <div style="display: flex; gap: 12px; margin-top: 1.5rem;">
-          <button class="btn btn-secondary" onclick="clearScreening()">Clear Form</button>
-          <button class="btn btn-primary" id="scrAnalyzeBtn" onclick="runScreening()" style="flex: 1;">🔍 Run Screening Analysis</button>
-        </div>
-      </div>
-
-      <div class="pipeline-card" id="scrResultCard" style="display: none;">
-        <div class="pipeline-title">Screening Memo</div>
-        <div id="scrResult" style="font-size: 14px; line-height: 1.7;"></div>
-        <div style="display: flex; gap: 12px; margin-top: 1.5rem;">
-          <button class="btn btn-secondary" onclick="copyMemo()">📋 Copy Memo</button>
-          <button class="btn btn-success" onclick="attachMemoToDeal()">📎 Attach to Deal</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- CONTACTS -->
-    <!-- INVESTORS -->
-    <div id="investors" class="content-section">
-      <div class="toolbar">
-        <div class="toolbar-left">
-          <h2 style="margin: 0; font-weight: 700;">Investors &amp; Lenders</h2>
-          <input type="text" class="search-box" id="investorSearch" placeholder="Search investors..." onkeyup="HGCInvestors.render()">
-        </div>
-        <div class="toolbar-right">
-          <select id="investorTypeFilter" class="filter-btn" onchange="HGCInvestors.render()" style="cursor:pointer;">
-            <option value="all">All types</option>
-            <option value="investor">Investors</option>
-            <option value="lender">Lenders</option>
-            <option value="family-office">Family offices</option>
-          </select>
-          <button class="btn btn-primary" onclick="HGCInvestors.openEdit()">+ New Investor</button>
-        </div>
-      </div>
-      <div id="investorsSummary" style="padding:1rem 2rem 0;"></div>
-      <div id="investorsContainer" class="deals-container" style="padding: 1.5rem 2rem;"></div>
-    </div>
-
-    <div id="contacts" class="content-section">
-      <div class="toolbar">
-        <div class="toolbar-left">
-          <h2 style="margin: 0; font-weight: 700;">Contacts</h2>
-          <input type="text" class="search-box" id="contactSearch" placeholder="Search..." onkeyup="renderContacts()">
-        </div>
-        <div class="toolbar-right">
-          <button class="btn btn-primary" onclick="openAddContactModal()">+ New</button>
-        </div>
-      </div>
-      
-      <div id="contactsContainer" class="deals-container" style="padding: 1.5rem 2rem;"></div>
-    </div>
-    
-    <!-- TASKS -->
-    <div id="tasks" class="content-section">
-      <div class="toolbar">
-        <h2 style="margin: 0; font-weight: 700;">Tasks</h2>
-        <button class="btn btn-primary" onclick="openAddTaskModal()">+ New Task</button>
-      </div>
-      
-      <div id="tasksContainer" class="deals-container" style="padding: 1.5rem 2rem;"></div>
-    </div>
-  </div>
-</div>
-
-<!-- MODALS -->
-<div class="modal-overlay" id="addDealModal">
-  <div class="modal">
+<!-- Add/Edit Deal Modal -->
+<div class="modal-backdrop" id="addDealModal">
+  <div class="modal-panel modal-lg">
     <div class="modal-header">
-      <h2>New Deal</h2>
-      <p>Drop documents to auto-fill and underwrite, or enter manually.</p>
+      <div class="modal-title" id="dealModalTitle">New Deal</div>
+      <button class="modal-close" onclick="closeAddDealModal()">&times;</button>
     </div>
     <div class="modal-body">
+      <div id="dealDropZone" class="upload-zone mb-6">
+        <div class="upload-zone-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <div class="upload-zone-text"><strong>Drop deal documents here</strong> or click to browse</div>
+        <div class="text-xs text-muted mt-2">PDFs are scanned, fields auto-fill, and an underwriting memo is generated</div>
+        <input type="file" id="dealFileInput" accept=".pdf" multiple class="hidden">
+      </div>
+      <div id="dealFileList" class="mb-4"></div>
+      <button class="btn btn-primary w-full mb-6 hidden" id="underwriteBtn" onclick="underwriteDocs()">Re-run Underwriting</button>
 
-      <div id="dealDropZone" style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 1.75rem; text-align: center; background: var(--lighter); cursor: pointer; transition: all 0.2s; margin-bottom: 1rem;">
-        <div style="font-size: 28px; margin-bottom: 0.4rem;">📥</div>
-        <div style="font-weight: 600; color: var(--primary); margin-bottom: 0.2rem;">Drop deal documents here</div>
-        <div style="font-size: 12px; color: var(--secondary);">PDFs are scanned, fields auto-fill, and an underwriting memo is generated</div>
-        <input type="file" id="dealFileInput" accept=".pdf" multiple style="display:none" onchange="handleDealFiles(event.target.files)">
-      </div>
-      <div class="document-list" id="dealFileList" style="margin-bottom: 1rem;"></div>
-      <button class="btn btn-primary" id="underwriteBtn" onclick="underwriteDocs()" style="width:100%; margin-bottom: 1.5rem; display:none;">🔍 Underwrite Documentation</button>
-
-      <div style="font-size: 11px; font-weight: 700; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 1rem;">Deal Details</div>
-      <div class="form-group">
-        <label>Deal Name *</label>
-        <input type="text" id="dealName" placeholder="e.g., Series A">
-      </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-        <div class="form-group"><label>Company</label><input type="text" id="dealCompany" placeholder="Company name"></div>
-        <div class="form-group"><label>Contact Name</label><input type="text" id="dealContact" placeholder="Primary contact"></div>
-      </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-        <div class="form-group"><label>Email</label><input type="email" id="dealEmail" placeholder="contact@company.com"></div>
-        <div class="form-group"><label>Phone</label><input type="tel" id="dealPhone" placeholder="+1..."></div>
-      </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div class="form-row">
         <div class="form-group">
-          <label>Capital Sought *</label>
-          <input type="text" id="dealCapital" placeholder="$50M">
+          <label class="form-label">Deal Name *</label>
+          <input type="text" id="dealName" class="form-input" placeholder="e.g., Series A">
         </div>
         <div class="form-group">
-          <label>Status</label>
-          <select id="dealStatus">
+          <label class="form-label">Company</label>
+          <input type="text" id="dealCompany" class="form-input" placeholder="Company name">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Contact Name</label>
+          <input type="text" id="dealContact" class="form-input" placeholder="Primary contact">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" id="dealEmail" class="form-input" placeholder="contact@company.com">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input type="tel" id="dealPhone" class="form-input" placeholder="+1...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Capital Sought *</label>
+          <input type="text" id="dealCapital" class="form-input" placeholder="$50M">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select id="dealStatus" class="form-input">
             <option value="lead">Lead</option>
             <option value="proposal">Proposal</option>
             <option value="negotiation">Negotiation</option>
             <option value="closed">Closed</option>
           </select>
         </div>
-      </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-        <div class="form-group"><label>Revenue (TTM)</label><input type="text" id="dealRevenue" placeholder="$30M"></div>
-        <div class="form-group"><label>Years in Business</label><input type="text" id="dealYears" placeholder="7"></div>
-      </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
         <div class="form-group">
-          <label>Fee %</label>
-          <input type="number" id="dealFee" step="0.1" value="5" min="0">
-        </div>
-        <div class="form-group">
-          <label>Equity %</label>
-          <input type="number" id="dealEquity" step="0.5" value="0" min="0">
+          <label class="form-label">Revenue (TTM)</label>
+          <input type="text" id="dealRevenue" class="form-input" placeholder="$30M">
         </div>
       </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div class="form-row">
         <div class="form-group">
-          <label>Win Probability %</label>
-          <input type="number" id="dealProbability" step="5" value="50" min="0" max="100">
+          <label class="form-label">Years in Business</label>
+          <input type="text" id="dealYears" class="form-input" placeholder="7">
         </div>
         <div class="form-group">
-          <label>Deal Score (1-100)</label>
-          <input type="number" id="dealScore" min="1" max="100" placeholder="auto-scored">
+          <label class="form-label">Fee %</label>
+          <input type="number" id="dealFee" class="form-input" step="0.1" value="5" min="0">
         </div>
       </div>
-      <div id="scoreBar" style="display:none; margin-bottom:1.5rem;">
-        <div style="height:10px; background:var(--lighter); border-radius:6px; overflow:hidden;">
-          <div id="scoreFill" style="height:100%; width:0%; transition:width 0.5s; border-radius:6px;"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Equity %</label>
+          <input type="number" id="dealEquity" class="form-input" step="0.5" value="0" min="0">
         </div>
-        <div id="scoreLabel" style="font-size:12px; color:var(--secondary); margin-top:4px; font-weight:600;"></div>
+        <div class="form-group">
+          <label class="form-label">Win Probability %</label>
+          <input type="number" id="dealProbability" class="form-input" step="5" value="50" min="0" max="100">
+        </div>
       </div>
-      <div id="aiAnalysisPanel" style="display:none; background:linear-gradient(135deg,#0f172a,#1e293b); border-radius:14px; padding:1.5rem; margin-bottom:1.5rem; color:white;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-          <div style="font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; opacity:0.7;">AI Underwriter Read</div>
-          <div id="aiDealType" style="font-size:11px; font-weight:700; padding:5px 12px; border-radius:20px; background:rgba(255,255,255,0.15);"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Deal Score (1-100)</label>
+          <input type="number" id="dealScore" class="form-input" min="1" max="100" placeholder="auto-scored">
         </div>
-        <div id="aiLangNote" style="font-size:11px; opacity:0.6; margin-bottom:1rem; display:none;"></div>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.25rem;">
+        <div></div>
+      </div>
+      <div id="scoreBar" class="mb-4 hidden">
+        <div class="progress progress-lg">
+          <div class="progress-fill" id="scoreFill"></div>
+        </div>
+        <div id="scoreLabel" class="text-xs font-semibold mt-2"></div>
+      </div>
+      <div id="aiAnalysisPanel" class="uw-panel mb-6 hidden">
+        <div class="flex justify-between items-center mb-4">
+          <div class="text-xs font-bold" style="text-transform:uppercase;letter-spacing:0.5px;opacity:0.7;">AI Underwriter Read</div>
+          <span id="aiDealType" class="badge badge-neutral"></span>
+        </div>
+        <div id="aiLangNote" class="text-xs hidden mb-4" style="opacity:0.6;"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;" class="mb-4">
           <div>
-            <div style="font-size:11px; opacity:0.7; margin-bottom:4px;">Banker Fit (Debt)</div>
-            <div style="height:8px; background:rgba(255,255,255,0.15); border-radius:5px; overflow:hidden;"><div id="bankerBar" style="height:100%; width:0%; background:#0ea5e9; transition:width 0.6s;"></div></div>
-            <div id="bankerVal" style="font-size:18px; font-weight:800; margin-top:4px;"></div>
+            <div class="text-xs" style="opacity:0.7;margin-bottom:4px;">Banker Fit (Debt)</div>
+            <div class="uw-bar-track"><div id="bankerBar" class="uw-bar-fill" style="width:0%;background:#0ea5e9;"></div></div>
+            <div id="bankerVal" class="font-bold mt-2" style="font-size:18px;"></div>
           </div>
           <div>
-            <div style="font-size:11px; opacity:0.7; margin-bottom:4px;">Investor Fit (Equity)</div>
-            <div style="height:8px; background:rgba(255,255,255,0.15); border-radius:5px; overflow:hidden;"><div id="investorBar" style="height:100%; width:0%; background:#10b981; transition:width 0.6s;"></div></div>
-            <div id="investorVal" style="font-size:18px; font-weight:800; margin-top:4px;"></div>
+            <div class="text-xs" style="opacity:0.7;margin-bottom:4px;">Investor Fit (Equity)</div>
+            <div class="uw-bar-track"><div id="investorBar" class="uw-bar-fill" style="width:0%;background:#10b981;"></div></div>
+            <div id="investorVal" class="font-bold mt-2" style="font-size:18px;"></div>
           </div>
           <div>
-            <div style="font-size:11px; opacity:0.7; margin-bottom:4px;">Risk Level</div>
-            <div style="height:8px; background:rgba(255,255,255,0.15); border-radius:5px; overflow:hidden;"><div id="riskBar" style="height:100%; width:0%; background:#ef4444; transition:width 0.6s;"></div></div>
-            <div id="riskVal" style="font-size:18px; font-weight:800; margin-top:4px;"></div>
+            <div class="text-xs" style="opacity:0.7;margin-bottom:4px;">Risk Level</div>
+            <div class="uw-bar-track"><div id="riskBar" class="uw-bar-fill" style="width:0%;background:#ef4444;"></div></div>
+            <div id="riskVal" class="font-bold mt-2" style="font-size:18px;"></div>
           </div>
           <div>
-            <div style="font-size:11px; opacity:0.7; margin-bottom:4px;">Profitability</div>
-            <div style="height:8px; background:rgba(255,255,255,0.15); border-radius:5px; overflow:hidden;"><div id="profitBar" style="height:100%; width:0%; background:#f59e0b; transition:width 0.6s;"></div></div>
-            <div id="profitVal" style="font-size:18px; font-weight:800; margin-top:4px;"></div>
+            <div class="text-xs" style="opacity:0.7;margin-bottom:4px;">Profitability</div>
+            <div class="uw-bar-track"><div id="profitBar" class="uw-bar-fill" style="width:0%;background:#f59e0b;"></div></div>
+            <div id="profitVal" class="font-bold mt-2" style="font-size:18px;"></div>
           </div>
         </div>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.75rem; margin-bottom:1.25rem;">
-          <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:0.75rem;">
-            <div style="font-size:10px; opacity:0.7; text-transform:uppercase;">Est. Valuation</div>
-            <div id="aiValuation" style="font-size:13px; font-weight:700; margin-top:4px; line-height:1.3;"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;" class="mb-4">
+          <div class="uw-tile"><div class="uw-tile-label">Est. Valuation</div><div class="uw-tile-value" id="aiValuation"></div></div>
+          <div class="uw-tile"><div class="uw-tile-label">ROI / Return</div><div class="uw-tile-value" id="aiRoi"></div></div>
+          <div class="uw-tile"><div class="uw-tile-label">LOI / Terms</div><div class="uw-tile-value" id="aiLoi"></div></div>
+          <div class="uw-tile"><div class="uw-tile-label">DSCR</div><div class="uw-tile-value" id="aiDscr"></div></div>
+          <div class="uw-tile"><div class="uw-tile-label">Leverage</div><div class="uw-tile-value" id="aiLeverage"></div></div>
+          <div class="uw-tile"><div class="uw-tile-label">Margins</div><div class="uw-tile-value" id="aiMargins"></div></div>
+        </div>
+        <div class="uw-tile mb-4">
+          <div class="uw-tile-label">Plausibility Read</div>
+          <div id="aiConsistency" class="text-sm mt-2" style="line-height:1.4;"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;" class="mb-4">
+          <div class="uw-flags-green">
+            <div class="text-xs font-bold mb-2" style="color:#6ee7b7;">Green Flags</div>
+            <ul id="aiGreenFlags" class="text-xs" style="line-height:1.6;padding-left:1rem;margin:0;"></ul>
           </div>
-          <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:0.75rem;">
-            <div style="font-size:10px; opacity:0.7; text-transform:uppercase;">ROI / Return</div>
-            <div id="aiRoi" style="font-size:13px; font-weight:700; margin-top:4px; line-height:1.3;"></div>
-          </div>
-          <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:0.75rem;">
-            <div style="font-size:10px; opacity:0.7; text-transform:uppercase;">LOI / Terms</div>
-            <div id="aiLoi" style="font-size:13px; font-weight:700; margin-top:4px; line-height:1.3;"></div>
-          </div>
-          <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:0.75rem;">
-            <div style="font-size:10px; opacity:0.7; text-transform:uppercase;">DSCR</div>
-            <div id="aiDscr" style="font-size:13px; font-weight:700; margin-top:4px; line-height:1.3;"></div>
-          </div>
-          <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:0.75rem;">
-            <div style="font-size:10px; opacity:0.7; text-transform:uppercase;">Leverage</div>
-            <div id="aiLeverage" style="font-size:13px; font-weight:700; margin-top:4px; line-height:1.3;"></div>
-          </div>
-          <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:0.75rem;">
-            <div style="font-size:10px; opacity:0.7; text-transform:uppercase;">Margins</div>
-            <div id="aiMargins" style="font-size:13px; font-weight:700; margin-top:4px; line-height:1.3;"></div>
+          <div class="uw-flags-red">
+            <div class="text-xs font-bold mb-2" style="color:#fca5a5;">Red Flags</div>
+            <ul id="aiRedFlags" class="text-xs" style="line-height:1.6;padding-left:1rem;margin:0;"></ul>
           </div>
         </div>
-
-        <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:0.85rem; margin-bottom:1.25rem;">
-          <div style="font-size:10px; opacity:0.7; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Plausibility Read</div>
-          <div id="aiConsistency" style="font-size:12px; line-height:1.4;"></div>
-        </div>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.25rem;">
-          <div style="background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); border-radius:10px; padding:0.85rem;">
-            <div style="font-size:11px; font-weight:700; color:#6ee7b7; margin-bottom:6px;">🟢 Green Flags</div>
-            <ul id="aiGreenFlags" style="font-size:12px; line-height:1.6; padding-left:1rem; margin:0;"></ul>
-          </div>
-          <div style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); border-radius:10px; padding:0.85rem;">
-            <div style="font-size:11px; font-weight:700; color:#fca5a5; margin-bottom:6px;">🔴 Red Flags</div>
-            <ul id="aiRedFlags" style="font-size:12px; line-height:1.6; padding-left:1rem; margin:0;"></ul>
-          </div>
-        </div>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
-          <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:0.85rem;">
-            <div style="font-size:10px; opacity:0.7; text-transform:uppercase; letter-spacing:0.5px;">Short-Term Capacity</div>
-            <div id="aiShortTerm" style="font-size:12px; font-weight:600; margin-top:4px; line-height:1.4;"></div>
-          </div>
-          <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:0.85rem;">
-            <div style="font-size:10px; opacity:0.7; text-transform:uppercase; letter-spacing:0.5px;">Long-Term Capacity</div>
-            <div id="aiLongTerm" style="font-size:12px; font-weight:600; margin-top:4px; line-height:1.4;"></div>
-          </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="uw-tile"><div class="uw-tile-label">Short-Term Capacity</div><div class="uw-tile-value" id="aiShortTerm"></div></div>
+          <div class="uw-tile"><div class="uw-tile-label">Long-Term Capacity</div><div class="uw-tile-value" id="aiLongTerm"></div></div>
         </div>
       </div>
-
       <div class="form-group">
-        <label>Executive Summary</label>
-        <div id="dealExecSummary" style="background:var(--lighter); border:1px solid var(--border); border-radius:10px; padding:1rem; font-size:13px; line-height:1.6; min-height:40px; color:var(--secondary);">Auto-generated when you scan documents.</div>
+        <label class="form-label">Executive Summary</label>
+        <div id="dealExecSummary" class="card-body text-sm text-muted">Auto-generated when you scan documents.</div>
       </div>
       <div class="form-group">
-        <label>Business Description</label>
-        <textarea id="dealDescription" placeholder="What the business does, model, customers..."></textarea>
+        <label class="form-label">Business Description</label>
+        <textarea id="dealDescription" class="form-input" rows="2" placeholder="What the business does, model, customers..."></textarea>
       </div>
       <div class="form-group">
-        <label>Extracted Document Text</label>
-        <textarea id="dealDocText" rows="4" placeholder="Auto-filled from scanned PDFs, or paste manually" style="font-size:12px;"></textarea>
+        <label class="form-label">Extracted Document Text</label>
+        <textarea id="dealDocText" class="form-input" rows="4" placeholder="Auto-filled from scanned PDFs, or paste manually"></textarea>
       </div>
       <div class="form-group">
-        <label>Underwriting Memo</label>
-        <div id="dealMemo" style="background:var(--lighter); border:1px solid var(--border); border-radius:10px; padding:1rem; font-size:13px; line-height:1.7; min-height:60px; color:var(--secondary);">Drop documents and click "Underwrite Documentation" to generate.</div>
-        <p style="font-size:11px; color:var(--secondary); margin-top:0.5rem; font-style:italic;">First-pass screening only. Not verified underwriting. A licensed broker must complete formal review before any decision.</p>
+        <label class="form-label">Underwriting Memo</label>
+        <div id="dealMemo" class="card-body text-sm text-muted">Drop documents and click "Underwrite Documentation" to generate.</div>
+        <div class="form-hint" style="font-style:italic;">First-pass screening only. Not verified underwriting. A licensed broker must complete formal review before any decision.</div>
       </div>
       <div class="form-group">
-        <label>Notes</label>
-        <textarea id="dealNotes" placeholder="Any relevant details..."></textarea>
+        <label class="form-label">Notes</label>
+        <textarea id="dealNotes" class="form-input" rows="3" placeholder="Any relevant details..."></textarea>
       </div>
     </div>
     <div class="modal-footer">
@@ -998,34 +785,36 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   </div>
 </div>
 
-<div class="modal-overlay" id="addContactModal">
-  <div class="modal">
+<!-- Add Contact Modal -->
+<div class="modal-backdrop" id="addContactModal">
+  <div class="modal-panel modal-md">
     <div class="modal-header">
-      <h2>Add Contact</h2>
+      <div class="modal-title">Add Contact</div>
+      <button class="modal-close" onclick="closeAddContactModal()">&times;</button>
     </div>
     <div class="modal-body">
       <div class="form-group">
-        <label>Name *</label>
-        <input type="text" id="contactName" placeholder="Full name">
+        <label class="form-label">Name *</label>
+        <input type="text" id="contactName" class="form-input" placeholder="Full name">
       </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div class="form-row">
         <div class="form-group">
-          <label>Company</label>
-          <input type="text" id="contactCompany">
+          <label class="form-label">Company</label>
+          <input type="text" id="contactCompany" class="form-input">
         </div>
         <div class="form-group">
-          <label>Role</label>
-          <input type="text" id="contactRole" placeholder="e.g., CFO">
+          <label class="form-label">Role</label>
+          <input type="text" id="contactRole" class="form-input" placeholder="e.g., CFO">
         </div>
       </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div class="form-row">
         <div class="form-group">
-          <label>Email</label>
-          <input type="email" id="contactEmail">
+          <label class="form-label">Email</label>
+          <input type="email" id="contactEmail" class="form-input">
         </div>
         <div class="form-group">
-          <label>Phone</label>
-          <input type="tel" id="contactPhone">
+          <label class="form-label">Phone</label>
+          <input type="tel" id="contactPhone" class="form-input">
         </div>
       </div>
     </div>
@@ -1036,24 +825,26 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   </div>
 </div>
 
-<div class="modal-overlay" id="addTaskModal">
-  <div class="modal">
+<!-- Add Task Modal -->
+<div class="modal-backdrop" id="addTaskModal">
+  <div class="modal-panel modal-md">
     <div class="modal-header">
-      <h2>Add Task</h2>
+      <div class="modal-title">Add Task</div>
+      <button class="modal-close" onclick="closeAddTaskModal()">&times;</button>
     </div>
     <div class="modal-body">
       <div class="form-group">
-        <label>Task *</label>
-        <input type="text" id="taskTitle" placeholder="e.g., Follow up">
+        <label class="form-label">Task *</label>
+        <input type="text" id="taskTitle" class="form-input" placeholder="e.g., Follow up">
       </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div class="form-row">
         <div class="form-group">
-          <label>Due Date</label>
-          <input type="date" id="taskDue">
+          <label class="form-label">Due Date</label>
+          <input type="date" id="taskDue" class="form-input">
         </div>
         <div class="form-group">
-          <label>Priority</label>
-          <select id="taskPriority">
+          <label class="form-label">Priority</label>
+          <select id="taskPriority" class="form-input">
             <option value="high">High</option>
             <option value="medium" selected>Medium</option>
             <option value="low">Low</option>
@@ -1061,13 +852,164 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         </div>
       </div>
       <div class="form-group">
-        <label>Related Deal</label>
-        <input type="text" id="taskDeal">
+        <label class="form-label">Related Deal</label>
+        <input type="text" id="taskDeal" class="form-input">
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeAddTaskModal()">Cancel</button>
       <button class="btn btn-primary" onclick="addTask()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- DATA ROOM MODAL -->
+<div class="modal-backdrop" id="dataRoomModal">
+  <div class="modal-panel modal-lg">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="drDealName">Data Room</div>
+        <div class="text-xs text-muted">Capital raise document checklist &amp; intake tracker</div>
+      </div>
+      <button class="modal-close" onclick="HGCDataRoom.close()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div id="drControls" class="card mb-4"></div>
+      <div id="drBody"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENT PORTAL & NCNDA MODAL -->
+<div class="modal-backdrop" id="ncndaModal">
+  <div class="modal-panel modal-lg">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="ncDealName">Client Portal &amp; NCNDA</div>
+        <div class="text-xs text-muted">Share a signing + upload link with the client</div>
+      </div>
+      <button class="modal-close" onclick="HGCNcnda.close()">&times;</button>
+    </div>
+    <div class="modal-body" id="ncBody"></div>
+  </div>
+</div>
+
+<!-- INVESTOR EDIT MODAL -->
+<div class="modal-backdrop" id="investorModal">
+  <div class="modal-panel modal-md">
+    <div class="modal-header">
+      <div class="modal-title" id="invModalTitle">New Investor</div>
+      <button class="modal-close" onclick="HGCInvestors.closeEdit()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="invId">
+      <div class="form-group">
+        <label class="form-label">Name *</label>
+        <input type="text" id="invName" class="form-input" placeholder="Person or firm contact">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Firm</label>
+          <input type="text" id="invFirm" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select id="invType" class="form-input">
+            <option value="investor">Investor</option>
+            <option value="lender">Lender</option>
+            <option value="family-office">Family office</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" id="invEmail" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input type="tel" id="invPhone" class="form-input">
+        </div>
+      </div>
+      <div class="form-row-3">
+        <div class="form-group">
+          <label class="form-label">Instrument</label>
+          <select id="invInstrument" class="form-input">
+            <option value="both">Debt &amp; Equity</option>
+            <option value="debt">Debt</option>
+            <option value="equity">Equity</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Check min</label>
+          <input type="text" id="invCheckMin" class="form-input" placeholder="$1M">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Check max</label>
+          <input type="text" id="invCheckMax" class="form-input" placeholder="$50M">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sectors (comma-separated)</label>
+        <input type="text" id="invSectors" class="form-input" placeholder="real estate, energy, tech">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Geographies</label>
+        <input type="text" id="invGeos" class="form-input" placeholder="US, LATAM">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea id="invNotes" class="form-input" rows="3"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" id="invDeleteBtn" onclick="HGCInvestors.remove()" style="margin-right:auto;">Delete</button>
+      <button class="btn btn-secondary" onclick="HGCInvestors.closeEdit()">Cancel</button>
+      <button class="btn btn-primary" onclick="HGCInvestors.save()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ENGAGEMENT MODAL -->
+<div class="modal-backdrop" id="engagementModal">
+  <div class="modal-panel modal-sm">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Deal Engagement</div>
+        <div class="text-sm text-muted" id="engInvName"></div>
+      </div>
+      <button class="modal-close" onclick="HGCInvestors.closeEngagement()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="engInvId"><input type="hidden" id="engIdx">
+      <div class="form-group">
+        <label class="form-label">Deal *</label>
+        <select id="engDeal" class="form-input"></select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select id="engStatus" class="form-input">
+            <option value="contacted">Contacted</option>
+            <option value="interested">Interested</option>
+            <option value="passed">Passed</option>
+            <option value="committed">Committed</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Amount</label>
+          <input type="text" id="engAmount" class="form-input" placeholder="$5M">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea id="engNotes" class="form-input" rows="3"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" onclick="HGCInvestors.removeEngagement()" style="margin-right:auto;">Remove</button>
+      <button class="btn btn-secondary" onclick="HGCInvestors.closeEngagement()">Cancel</button>
+      <button class="btn btn-primary" onclick="HGCInvestors.saveEngagement()">Save</button>
     </div>
   </div>
 </div>
@@ -1081,7 +1023,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   </script>
 <script>
   const STORAGE_KEY = 'hgc_data';
-  
+
   let deals = [
     {id: 1, name: "Voozaa", capital: 5000000, status: "lead", reference: "", client: "", fee: 5, equity: 0, rank: 1, files: [], notes: "", probability: 60, createdDate: new Date().toISOString()},
     {id: 2, name: "Walmart Deal", capital: 15000000, status: "lead", reference: "", client: "Walmart", fee: 4, equity: 0, rank: 2, files: [], notes: "", probability: 75, createdDate: new Date().toISOString()},
@@ -1099,7 +1041,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     {id: 15, name: "Gold Deals (Multiple)", capital: 0, status: "lead", reference: "Corey", client: "", fee: 5, equity: 0, rank: 15, files: [], notes: "", probability: 20, createdDate: new Date().toISOString()},
     {id: 16, name: "Oil Deals (Multiple)", capital: 0, status: "lead", reference: "Corey", client: "", fee: 4, equity: 0, rank: 16, files: [], notes: "", probability: 25, createdDate: new Date().toISOString()}
   ];
-  
+
   let tasks = [];
   let contacts = [];
   let investors = [];
@@ -1108,10 +1050,25 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   let nextContactId = 1;
   let nextInvestorId = 1;
   let currentFilter = 'all';
-  
+  let selectedDealId = null;
+  let dealsViewMode = 'list'; // 'list' or 'kanban'
+
   let saveTimer = null;
   let dbReady = false;
 
+  // ===== TOAST =====
+  function showToast(message, type, duration) {
+    type = type || 'success';
+    duration = duration || 3000;
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => { toast.remove(); }, duration);
+  }
+
+  // ===== DATA =====
   async function loadData() {
     try {
       const res = await fetch('/api/deals');
@@ -1122,14 +1079,12 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         contacts = data.contacts || contacts;
         investors = data.investors || investors;
         dbReady = true;
-        // recompute next IDs so we don't collide
         nextDealId = (deals.reduce((m, d) => Math.max(m, d.id), 0) || 16) + 1;
         nextTaskId = (tasks.reduce((m, t) => Math.max(m, t.id), 0) || 0) + 1;
         nextContactId = (contacts.reduce((m, c) => Math.max(m, c.id), 0) || 0) + 1;
         nextInvestorId = (investors.reduce((m, i) => Math.max(m, i.id), 0) || 0) + 1;
       }
     } catch (err) {
-      // fall back to local cache if server unreachable
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const data = JSON.parse(saved);
@@ -1142,9 +1097,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   }
 
   async function saveData() {
-    // keep a local cache as backup
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ deals, tasks, contacts, investors }));
-    // debounce server writes so rapid edits don't spam
     clearTimeout(saveTimer);
     saveTimer = setTimeout(async () => {
       try {
@@ -1153,43 +1106,45 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ deals, tasks, contacts, investors })
         });
+        window._lastSaveTime = Date.now();
         const ind = document.getElementById('saveIndicator');
-        if (ind) { window._lastSaveTime = Date.now(); ind.textContent = '✓ Saved just now'; ind.style.opacity = '1'; }
+        if (ind) ind.innerHTML = '<span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--success);display:inline-block;"></span> Saved just now';
       } catch (err) {
         const ind = document.getElementById('saveIndicator');
-        if (ind) { ind.textContent = '⚠️ Saved locally only — sync failed'; ind.style.opacity = '1'; }
+        if (ind) ind.innerHTML = '<span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--warning);display:inline-block;"></span> Saved locally only';
       }
     }, 600);
   }
-  
-  // Keep save indicator updated with relative time
+
   setInterval(() => {
     if (!window._lastSaveTime) return;
     const ind = document.getElementById('saveIndicator');
-    if (!ind || ind.style.opacity === '0') return;
+    if (!ind) return;
     const secs = Math.floor((Date.now() - window._lastSaveTime) / 1000);
-    if (secs < 5) ind.textContent = '✓ Saved just now';
-    else if (secs < 60) ind.textContent = '✓ Last saved ' + secs + 's ago';
-    else if (secs < 3600) ind.textContent = '✓ Last saved ' + Math.floor(secs / 60) + 'm ago';
-    else ind.textContent = '✓ Last saved ' + Math.floor(secs / 3600) + 'h ago';
+    let text = 'Saved just now';
+    if (secs >= 3600) text = 'Last saved ' + Math.floor(secs / 3600) + 'h ago';
+    else if (secs >= 60) text = 'Last saved ' + Math.floor(secs / 60) + 'm ago';
+    else if (secs >= 5) text = 'Last saved ' + secs + 's ago';
+    ind.innerHTML = '<span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--success);display:inline-block;"></span> ' + text;
   }, 10000);
 
-  // AUTH
+  // ===== AUTH =====
   function updateNDAButton() {
     document.getElementById('ndaBtn').disabled = !document.getElementById('ndaCheckbox').checked;
   }
-  
+
   function acceptNDA() {
-    document.getElementById('ndaScreen').style.display = 'none';
-    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('ndaScreen').classList.add('hidden');
+    document.getElementById('loginScreen').classList.remove('hidden');
+    document.getElementById('passwordInput').focus();
   }
-  
+
   function backToNDA() {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('ndaScreen').style.display = 'flex';
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('ndaScreen').classList.remove('hidden');
     document.getElementById('passwordInput').value = '';
   }
-  
+
   async function login() {
     const pw = document.getElementById('passwordInput').value;
     try {
@@ -1198,97 +1153,126 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: pw })
       });
-      if (!res.ok) { alert('❌ Incorrect password'); return; }
+      if (!res.ok) { showToast('Incorrect password', 'error'); return; }
     } catch (err) {
-      alert('⚠️ Could not reach the server. Check your connection and try again.');
+      showToast('Could not reach the server. Check your connection.', 'error');
       return;
     }
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'grid';
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('mainApp').classList.remove('hidden');
     await loadData();
-    updateMetrics();
+    updateNavBadges();
     renderDashboard();
-    renderDeals();
   }
-  
+
   async function refreshFromDB() {
     await loadData();
-    updateMetrics();
-    renderDashboard();
-    renderDeals();
-    const ind = document.getElementById('saveIndicator');
-    if (ind) { window._lastSaveTime = Date.now(); ind.textContent = '✓ Synced just now'; ind.style.opacity = '1'; }
+    updateNavBadges();
+    const tab = document.querySelector('.nav-item.active')?.dataset.tab || 'dashboard';
+    switchTab(tab);
+    showToast('Synced from server', 'success');
   }
 
   function logout() {
-    if (confirm('Logout?')) {
-      document.getElementById('mainApp').style.display = 'none';
-      document.getElementById('ndaScreen').style.display = 'flex';
-      document.getElementById('ndaCheckbox').checked = false;
-      updateNDAButton();
+    if (confirm('Sign out?')) {
+      document.getElementById('mainApp').classList.add('hidden');
+      document.getElementById('loginScreen').classList.remove('hidden');
     }
   }
-  
+
+  // ===== NAVIGATION =====
   function switchTab(tab) {
-    document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
-    document.getElementById(tab).classList.add('active');
-    event.target.classList.add('active');
-    
-    if (tab === 'deals') renderDeals();
-    if (tab === 'underwriting') renderUnderwriting();
-    if (tab === 'pipeline') renderPipeline();
-    if (tab === 'analytics') renderAnalytics();
-    if (tab === 'contacts') renderContacts();
-    if (tab === 'tasks') renderTasks();
-    if (tab === 'investors') HGCInvestors.render();
+    // Hide all views
+    document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
+    // Show target
+    const target = document.getElementById('view-' + tab);
+    if (target) target.classList.remove('hidden');
+    // Update nav active
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    const navItem = document.querySelector(`.nav-item[data-tab="${tab}"]`);
+    if (navItem) navItem.classList.add('active');
+    // Update breadcrumb
+    const titles = { dashboard: 'Dashboard', deals: 'Deals', dataroom: 'Data Room', underwriting: 'Underwriting', investors: 'Investors', contacts: 'Contacts', tasks: 'Tasks' };
+    document.getElementById('breadcrumbTitle').textContent = titles[tab] || tab;
+    // Render
     if (tab === 'dashboard') renderDashboard();
+    else if (tab === 'deals') renderDeals();
+    else if (tab === 'dataroom') renderDataRoomPage();
+    else if (tab === 'underwriting') renderUnderwriting();
+    else if (tab === 'investors') { if (window.HGCInvestors) HGCInvestors.render(); }
+    else if (tab === 'contacts') renderContacts();
+    else if (tab === 'tasks') renderTasks();
   }
-  
+
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('collapsed');
+  }
+
+  function updateNavBadges() {
+    const dc = document.getElementById('navDealsCount');
+    if (dc) dc.textContent = deals.length;
+    const tc = document.getElementById('navTasksCount');
+    if (tc) { tc.textContent = tasks.filter(t => !t.completed).length; tc.classList.toggle('hidden', tasks.length === 0); }
+  }
+
+  // ===== UTILITIES =====
   function formatCurrency(num) {
     if (num >= 1000000000) return '$' + (num / 1000000000).toFixed(1) + 'B';
     if (num >= 1000000) return '$' + (num / 1000000).toFixed(0) + 'M';
     if (num >= 1000) return '$' + (num / 1000).toFixed(0) + 'k';
     return '$' + num.toFixed(0);
   }
-  
+
   function parseCapital(str) {
     if (!str) return 0;
+    str = String(str);
     if (str.includes('B')) return parseFloat(str) * 1000000000;
     if (str.includes('M')) return parseFloat(str) * 1000000;
     if (str.includes('k')) return parseFloat(str) * 1000;
     return parseFloat(str) || 0;
   }
-  
-  function updateMetrics() {
-    const totalCapital = deals.reduce((sum, d) => sum + d.capital, 0);
-    const totalFees = deals.reduce((sum, d) => sum + (d.capital * d.fee / 100), 0);
-    const closedDeals = deals.filter(d => d.status === 'closed').length;
-    const closedCapital = deals.filter(d => d.status === 'closed').reduce((sum, d) => sum + d.capital, 0);
-    const winRate = deals.length > 0 ? (closedDeals / deals.length * 100).toFixed(0) : 0;
-    
-    document.getElementById('metricCapital').textContent = formatCurrency(totalCapital);
-    document.getElementById('metricDeals').textContent = deals.length;
-    document.getElementById('metricFees').textContent = formatCurrency(totalFees);
-    document.getElementById('metricWinRate').textContent = winRate + '%';
+
+  function escHtml(s) {
+    return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
-  
-  // EXPORT
+
+  function statusBadgeClass(status) {
+    const map = { lead: 'badge-lead', proposal: 'badge-proposal', negotiation: 'badge-negotiation', closed: 'badge-closed' };
+    return map[status] || 'badge-neutral';
+  }
+
+  function statusLabel(status) {
+    const map = { lead: 'Lead', proposal: 'Proposal', negotiation: 'Negotiation', closed: 'Closed' };
+    return map[status] || status;
+  }
+
+  function progressColorClass(pct) {
+    if (pct >= 75) return 'green';
+    if (pct >= 40) return 'amber';
+    return 'red';
+  }
+
+  // ===== EXPORT =====
   function toggleExportMenu() {
     document.getElementById('exportMenu').classList.toggle('show');
   }
-  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.dropdown')) {
+      document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+    }
+  });
+
   function exportToJSON() {
-    const data = { deals, tasks, contacts, exportDate: new Date().toISOString() };
+    const data = { deals, tasks, contacts, investors, exportDate: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = `export_${Date.now()}.json`;
-    a.click();
+    a.href = url; a.download = `export_${Date.now()}.json`; a.click();
     document.getElementById('exportMenu').classList.remove('show');
+    showToast('JSON exported');
   }
-  
+
   function exportToCSV() {
     let csv = 'Deal,Capital,Fee %,Status,Probability,Est. Revenue\n';
     deals.forEach(d => {
@@ -1297,63 +1281,452 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = `deals_${Date.now()}.csv`;
-    a.click();
+    a.href = url; a.download = `deals_${Date.now()}.csv`; a.click();
     document.getElementById('exportMenu').classList.remove('show');
+    showToast('CSV exported');
   }
-  
+
   function exportToPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     let y = 20;
-    
     doc.setFontSize(20);
-    doc.text('Capital Management Report', 20, y);
-    y += 12;
+    doc.text('Capital Management Report', 20, y); y += 12;
     doc.setFontSize(10);
-    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, y);
-    y += 10;
-    
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, y); y += 10;
     const totalCapital = deals.reduce((sum, d) => sum + d.capital, 0);
     const totalFees = deals.reduce((sum, d) => sum + (d.capital * d.fee / 100), 0);
-    
-    doc.text(`Total Pipeline: ${formatCurrency(totalCapital)}`, 20, y);
-    y += 6;
-    doc.text(`Est. Revenue: ${formatCurrency(totalFees)}`, 20, y);
-    y += 10;
-    
+    doc.text(`Total Pipeline: ${formatCurrency(totalCapital)}`, 20, y); y += 6;
+    doc.text(`Est. Revenue: ${formatCurrency(totalFees)}`, 20, y); y += 10;
     doc.setFontSize(12);
-    doc.text('Deals', 20, y);
-    y += 8;
+    doc.text('Deals', 20, y); y += 8;
     doc.setFontSize(9);
-    
     deals.forEach(d => {
-      if (y > 270) {
-        doc.addPage();
-        y = 20;
-      }
-      doc.text(`${d.name}: ${formatCurrency(d.capital)} | ${d.status} | ${d.probability}%`, 20, y);
-      y += 6;
+      if (y > 270) { doc.addPage(); y = 20; }
+      doc.text(`${d.name}: ${formatCurrency(d.capital)} | ${d.status} | ${d.probability}%`, 20, y); y += 6;
     });
-    
     doc.save(`report_${Date.now()}.pdf`);
     document.getElementById('exportMenu').classList.remove('show');
+    showToast('PDF exported');
   }
-  
+
   function exportBackup() {
-    const backup = { deals, tasks, contacts, backupDate: new Date().toISOString() };
+    const backup = { deals, tasks, contacts, investors, backupDate: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = `backup_${Date.now()}.json`;
-    a.click();
-    alert('✓ Backup created');
+    a.href = url; a.download = `backup_${Date.now()}.json`; a.click();
     document.getElementById('exportMenu').classList.remove('show');
+    showToast('Backup created');
   }
-  
-  // DEALS
+
+  // ===== DASHBOARD =====
+  function renderDashboard() {
+    const el = document.getElementById('view-dashboard');
+    if (!el) return;
+
+    const totalCapital = deals.reduce((sum, d) => sum + d.capital, 0);
+    const totalFees = deals.reduce((sum, d) => sum + (d.capital * d.fee / 100), 0);
+    const closedDeals = deals.filter(d => d.status === 'closed').length;
+    const winRate = deals.length > 0 ? (closedDeals / deals.length * 100).toFixed(0) : 0;
+
+    el.innerHTML = `
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-label">Total Pipeline</div>
+          <div class="metric-value">${formatCurrency(totalCapital)}</div>
+          <div class="metric-change">${deals.length} deals</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Active Deals</div>
+          <div class="metric-value">${deals.filter(d => d.status !== 'closed').length}</div>
+          <div class="metric-change">In progress</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Est. Revenue</div>
+          <div class="metric-value">${formatCurrency(totalFees)}</div>
+          <div class="metric-change">Commission value</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Win Rate</div>
+          <div class="metric-value">${winRate}%</div>
+          <div class="metric-change">${closedDeals} closed</div>
+        </div>
+      </div>
+
+      <div class="card mb-6">
+        <div class="card-header"><div class="card-header-title">Data Room Readiness</div></div>
+        <div class="card-body" id="dashboardReadiness"></div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="card">
+          <div class="card-header"><div class="card-header-title">Deal Status Distribution</div></div>
+          <div class="card-body"><canvas id="statusChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-header-title">Pipeline by Stage</div></div>
+          <div class="card-body"><canvas id="urgencyChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-header-title">Deal Ratings &mdash; Underwriter Scores</div></div>
+        <div class="card-body" id="dashboardRatings"></div>
+      </div>
+    `;
+
+    // Portfolio readiness
+    if (window.HGCDataRoom) HGCDataRoom.portfolioReadiness();
+
+    // Ratings table
+    renderDashboardRatings();
+
+    // Charts
+    const statuses = { lead: 0, proposal: 0, negotiation: 0, closed: 0 };
+    deals.forEach(d => statuses[d.status]++);
+
+    const statusCtx = document.getElementById('statusChart');
+    if (statusCtx) {
+      new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Lead', 'Proposal', 'Negotiation', 'Closed'],
+          datasets: [{
+            data: [statuses.lead, statuses.proposal, statuses.negotiation, statuses.closed],
+            backgroundColor: ['#dbeafe', '#fef3c7', '#fae8ff', '#d1fae5'],
+            borderColor: ['#3b82f6', '#f59e0b', '#a21caf', '#22c55e'],
+            borderWidth: 2
+          }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+      });
+    }
+
+    const urgCtx = document.getElementById('urgencyChart');
+    if (urgCtx) {
+      const stageData = [statuses.lead, statuses.proposal, statuses.negotiation, statuses.closed];
+      new Chart(urgCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Lead', 'Proposal', 'Negotiation', 'Closed'],
+          datasets: [{
+            label: 'Deals',
+            data: stageData,
+            backgroundColor: ['#3b82f6', '#f59e0b', '#a21caf', '#22c55e'],
+            borderRadius: 4
+          }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+      });
+    }
+  }
+
+  function renderDashboardRatings() {
+    const ratingsEl = document.getElementById('dashboardRatings');
+    if (!ratingsEl) return;
+    const rated = deals.filter(d => d.score).sort((a, b) => b.score - a.score);
+    if (rated.length === 0) {
+      ratingsEl.innerHTML = '<div class="text-sm text-muted">No scored deals yet. Drop documents into a New Deal to get an underwriter rating.</div>';
+      return;
+    }
+    ratingsEl.innerHTML = '<table class="data-table"><thead><tr><th>Score</th><th>Deal</th><th>Capital</th><th>Type</th><th>Bank</th><th>Invest</th><th>Risk</th></tr></thead><tbody>' +
+      rated.map(d => {
+        const sc = d.score >= 75 ? 'green' : d.score >= 50 ? 'amber' : 'red';
+        return `<tr>
+          <td><span class="badge badge-${sc === 'green' ? 'success' : sc === 'amber' ? 'warning' : 'danger'}">${d.score}</span></td>
+          <td class="font-semibold">${escHtml(d.name)}</td>
+          <td>${formatCurrency(d.capital)}</td>
+          <td>${escHtml(d.dealType || '-')}</td>
+          <td>${d.bankerFit || '-'}</td>
+          <td>${d.investorFit || '-'}</td>
+          <td>${d.riskScore || '-'}</td>
+        </tr>`;
+      }).join('') + '</tbody></table>';
+  }
+
+  // ===== DEALS =====
+  let draggedDealId = null;
+
+  function renderDeals() {
+    const container = document.getElementById('view-deals');
+    if (!container) return;
+    updateNavBadges();
+
+    const search = container.querySelector('#dealSearch')?.value?.toLowerCase() || '';
+
+    let filtered = deals.filter(d => {
+      const matchStatus = currentFilter === 'all' || d.status === currentFilter;
+      const matchSearch = !search || d.name.toLowerCase().includes(search) || (d.notes || '').toLowerCase().includes(search) || (d.client || '').toLowerCase().includes(search);
+      return matchStatus && matchSearch;
+    });
+
+    // Build toolbar (only once or update)
+    let toolbarHtml = `
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input type="text" class="search-input" id="dealSearch" placeholder="Search deals..." value="${escHtml(search)}" onkeyup="renderDeals()">
+          <div class="filter-group">
+            <button class="filter-btn ${currentFilter==='all'?'active':''}" onclick="filterDeals('all')">All</button>
+            <button class="filter-btn ${currentFilter==='lead'?'active':''}" onclick="filterDeals('lead')">Lead</button>
+            <button class="filter-btn ${currentFilter==='proposal'?'active':''}" onclick="filterDeals('proposal')">Proposal</button>
+            <button class="filter-btn ${currentFilter==='negotiation'?'active':''}" onclick="filterDeals('negotiation')">Negotiation</button>
+            <button class="filter-btn ${currentFilter==='closed'?'active':''}" onclick="filterDeals('closed')">Closed</button>
+          </div>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-secondary btn-sm ${dealsViewMode==='list'?'':'btn-ghost'}" onclick="dealsViewMode='list';renderDeals();">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </button>
+          <button class="btn btn-secondary btn-sm ${dealsViewMode==='kanban'?'':'btn-ghost'}" onclick="dealsViewMode='kanban';renderDeals();">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="6" height="18" rx="1"/><rect x="9" y="3" width="6" height="12" rx="1"/><rect x="15" y="3" width="6" height="15" rx="1"/></svg>
+          </button>
+          <button class="btn btn-primary" onclick="openAddDealModal()">+ New Deal</button>
+        </div>
+      </div>
+    `;
+
+    if (dealsViewMode === 'kanban') {
+      container.innerHTML = toolbarHtml + renderKanban(filtered);
+      return;
+    }
+
+    // List view
+    let listHtml = '';
+    if (filtered.length === 0) {
+      listHtml = '<div class="empty-state"><div class="empty-state-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><div class="empty-state-title">No deals found</div><div class="empty-state-text">Try adjusting your search or filters.</div></div>';
+    } else {
+      listHtml = `<div class="card"><div class="deal-list-header" style="display:grid;grid-template-columns:1fr 140px 100px 80px 120px 60px;padding:var(--sp-3) var(--sp-5);border-bottom:2px solid var(--gray-200);font-size:var(--text-xs);font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:0.04em;">
+        <div>Deal</div><div>Capital</div><div>Status</div><div>Prob</div><div>Readiness</div><div></div>
+      </div>`;
+      filtered.forEach(d => {
+        const revenue = d.capital * d.fee / 100;
+        const c = window.HGCDataRoom ? HGCDataRoom.completeness(d) : { pct: 0, reqDone: 0, req: 0 };
+        listHtml += `
+          <div class="deal-list-item ${selectedDealId === d.id ? 'active' : ''}" draggable="true" data-deal-id="${d.id}" onclick="selectDeal(${d.id})" ondragstart="dealDragStart(event, ${d.id})" ondragover="dealDragOver(event)" ondrop="dealDrop(event, ${d.id})" ondragend="dealDragEnd(event)">
+            <div>
+              <div class="deal-list-name">${escHtml(d.name)}</div>
+              <div class="deal-list-sub">#${d.rank}${d.score ? ' · Score ' + d.score : ''} · ${formatCurrency(revenue)} est. rev</div>
+            </div>
+            <div class="font-semibold">${formatCurrency(d.capital)}</div>
+            <div><span class="badge ${statusBadgeClass(d.status)}">${statusLabel(d.status)}</span></div>
+            <div class="text-sm">${d.probability}%</div>
+            <div>
+              <div class="progress"><div class="progress-fill ${progressColorClass(c.pct)}" style="width:${c.pct}%"></div></div>
+              <div class="text-xs text-muted mt-2">${c.reqDone}/${c.req}</div>
+            </div>
+            <div>
+              <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteDeal(${d.id})">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      listHtml += '</div>';
+    }
+
+    // Split layout
+    let detailHtml = '';
+    if (selectedDealId) {
+      const d = deals.find(x => x.id === selectedDealId);
+      if (d) detailHtml = renderDealDetail(d);
+    }
+
+    container.innerHTML = toolbarHtml + `<div class="deals-split ${selectedDealId ? 'has-detail' : ''}">
+      <div>${listHtml}</div>
+      ${detailHtml ? `<div class="deal-detail">${detailHtml}</div>` : ''}
+    </div>`;
+  }
+
+  function selectDeal(id) {
+    selectedDealId = (selectedDealId === id) ? null : id;
+    renderDeals();
+  }
+
+  function renderDealDetail(d) {
+    const revenue = d.capital * d.fee / 100;
+    const expRevenue = revenue * (d.probability / 100);
+    const c = window.HGCDataRoom ? HGCDataRoom.completeness(d) : { pct: 0, reqDone: 0, req: 0 };
+    const ncndaBadge = window.HGCNcnda ? HGCNcnda.ncndaBadge(d) : '';
+    const investorSummary = window.HGCInvestors ? HGCInvestors.dealSummary(d) : '';
+
+    return `
+      <div class="deal-detail-header">
+        <div class="flex justify-between items-center">
+          <div>
+            <div class="deal-detail-title">${escHtml(d.name)}</div>
+            <div class="deal-detail-subtitle">${formatCurrency(d.capital)} · ${statusLabel(d.status)}</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="selectedDealId=null;renderDeals();">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="deal-detail-body">
+        <div class="sub-tabs" id="dealSubTabs">
+          <div class="sub-tab active" onclick="switchDealSubTab('overview')">Overview</div>
+          <div class="sub-tab" onclick="switchDealSubTab('detail-dataroom')">Data Room</div>
+          <div class="sub-tab" onclick="switchDealSubTab('detail-investors')">Investors</div>
+          <div class="sub-tab" onclick="switchDealSubTab('detail-portal')">Portal</div>
+          <div class="sub-tab" onclick="switchDealSubTab('detail-uw')">Underwriting</div>
+        </div>
+
+        <div id="detail-overview" class="detail-tab-content active">
+          ${d.execSummary ? `<div class="card mb-4"><div class="card-body text-sm" style="font-style:italic;color:var(--gray-600);">${escHtml(d.execSummary)}</div></div>` : ''}
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Capital</label>
+              <input type="text" class="form-input" value="${formatCurrency(d.capital)}" onchange="updateDeal(${d.id}, 'capital', this.value)">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select class="form-input" onchange="updateDeal(${d.id}, 'status', this.value)">
+                <option value="lead" ${d.status==='lead'?'selected':''}>Lead</option>
+                <option value="proposal" ${d.status==='proposal'?'selected':''}>Proposal</option>
+                <option value="negotiation" ${d.status==='negotiation'?'selected':''}>Negotiation</option>
+                <option value="closed" ${d.status==='closed'?'selected':''}>Closed</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Fee %</label>
+              <input type="number" class="form-input" value="${d.fee}" step="0.1" onchange="updateDeal(${d.id}, 'fee', this.value)">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Win Probability %</label>
+              <input type="number" class="form-input" value="${d.probability}" step="5" min="0" max="100" onchange="updateDeal(${d.id}, 'probability', this.value)">
+            </div>
+          </div>
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="flex justify-between text-sm mb-2"><span class="text-muted">Revenue (100%)</span><span class="font-semibold">${formatCurrency(revenue)}</span></div>
+              <div class="flex justify-between text-sm"><span class="text-muted">Expected Value</span><span class="font-semibold">${formatCurrency(expRevenue)}</span></div>
+            </div>
+          </div>
+          ${d.score ? `
+            <div class="card mb-4"><div class="card-body">
+              <div class="progress-label"><span>Deal Score</span><span>${d.score}/100</span></div>
+              <div class="progress progress-lg"><div class="progress-fill ${progressColorClass(d.score)}" style="width:${d.score}%"></div></div>
+            </div></div>
+          ` : ''}
+          ${investorSummary}
+          <div class="form-group">
+            <label class="form-label">Notes</label>
+            <textarea class="form-input" rows="3" onchange="updateDeal(${d.id}, 'notes', this.value)">${escHtml(d.notes || '')}</textarea>
+          </div>
+        </div>
+
+        <div id="detail-dataroom" class="detail-tab-content">
+          <div class="progress-label"><span>Readiness</span><span>${c.reqDone}/${c.req} (${c.pct}%)</span></div>
+          <div class="progress progress-lg mb-4"><div class="progress-fill ${progressColorClass(c.pct)}" style="width:${c.pct}%"></div></div>
+          <button class="btn btn-primary btn-sm mb-4" onclick="HGCDataRoom.open(${d.id})">Open Full Data Room</button>
+        </div>
+
+        <div id="detail-investors" class="detail-tab-content">
+          ${investorSummary || '<div class="text-sm text-muted">No investors linked yet.</div>'}
+        </div>
+
+        <div id="detail-portal" class="detail-tab-content">
+          ${ncndaBadge}
+          <button class="btn btn-primary btn-sm mt-4" onclick="HGCNcnda.open(${d.id})">Open Portal &amp; NCNDA</button>
+        </div>
+
+        <div id="detail-uw" class="detail-tab-content">
+          ${d.memo ? `<div class="card"><div class="card-body text-sm" style="line-height:1.7;">${formatMemo(d.memo)}</div></div>` : '<div class="text-sm text-muted">No underwriting memo yet. Add documents to generate one.</div>'}
+        </div>
+      </div>
+    `;
+  }
+
+  function switchDealSubTab(tabId) {
+    document.querySelectorAll('.deal-detail .detail-tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.deal-detail .sub-tab').forEach(el => el.classList.remove('active'));
+    const target = document.getElementById(tabId);
+    if (target) target.classList.add('active');
+    // Find the tab button
+    const prefix = tabId === 'detail-overview' ? 'overview' : tabId.replace('detail-', '');
+    document.querySelectorAll('.deal-detail .sub-tab').forEach(el => {
+      if (el.textContent.toLowerCase().includes(prefix.replace('detail-',''))) el.classList.add('active');
+    });
+    // Activate by onclick matching
+    event.target.classList.add('active');
+  }
+
+  function renderKanban(filtered) {
+    const stages = ['lead', 'proposal', 'negotiation', 'closed'];
+    const titles = { lead: 'Leads', proposal: 'Proposals', negotiation: 'Negotiating', closed: 'Closed' };
+    let html = '<div class="kanban">';
+    stages.forEach(stage => {
+      const dealsInStage = (filtered || deals).filter(d => d.status === stage).sort((a, b) => b.capital - a.capital);
+      const totalCap = dealsInStage.reduce((s, d) => s + d.capital, 0);
+      html += `<div class="kanban-column">
+        <div class="kanban-column-header">
+          <div class="kanban-column-title">${titles[stage]}</div>
+          <div class="kanban-column-count">${dealsInStage.length} &middot; ${formatCurrency(totalCap)}</div>
+        </div>
+        <div class="kanban-column-body">`;
+      dealsInStage.forEach(d => {
+        html += `<div class="kanban-card" draggable="true" ondragstart="dealDragStart(event,${d.id})" ondragover="dealDragOver(event)" ondrop="dealDrop(event,${d.id})" ondragend="dealDragEnd(event)" onclick="selectDeal(${d.id})">
+          <div class="kanban-card-title">${escHtml(d.name)}</div>
+          <div class="kanban-card-meta">${formatCurrency(d.capital)} &middot; ${d.probability}%</div>
+        </div>`;
+      });
+      html += '</div></div>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  // Drag and drop
+  function dealDragStart(e, id) {
+    draggedDealId = id;
+    e.currentTarget.style.opacity = '0.4';
+  }
+  function dealDragOver(e) { e.preventDefault(); }
+  function dealDragEnd(e) { e.currentTarget.style.opacity = '1'; }
+  function dealDrop(e, targetId) {
+    e.preventDefault();
+    if (draggedDealId === null || draggedDealId === targetId) return;
+    const fromIdx = deals.findIndex(d => d.id === draggedDealId);
+    const toIdx = deals.findIndex(d => d.id === targetId);
+    if (fromIdx === -1 || toIdx === -1) return;
+    const [moved] = deals.splice(fromIdx, 1);
+    deals.splice(toIdx, 0, moved);
+    deals.forEach((d, i) => d.rank = i + 1);
+    draggedDealId = null;
+    saveData();
+    renderDeals();
+  }
+
+  function filterDeals(status) {
+    currentFilter = status;
+    renderDeals();
+  }
+
+  function updateDeal(id, field, value) {
+    const deal = deals.find(d => d.id === id);
+    if (deal) {
+      if (field === 'capital') deal[field] = parseCapital(value);
+      else if (['fee', 'probability', 'rank'].includes(field)) deal[field] = parseFloat(value) || 0;
+      else deal[field] = value;
+      saveData();
+      renderDeals();
+    }
+  }
+
+  function deleteDeal(id) {
+    if (confirm('Delete deal?')) {
+      deals = deals.filter(d => d.id !== id);
+      if (selectedDealId === id) selectedDealId = null;
+      saveData();
+      renderDeals();
+      showToast('Deal deleted');
+    }
+  }
+
+  // ===== DEAL MODAL =====
   let dealFiles = [];
   let dealDropReady = false;
 
@@ -1371,10 +1744,10 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     memo.innerHTML = 'Drop documents and click "Underwrite Documentation" to generate.';
     memo.dataset.raw = '';
     const ex = document.getElementById('dealExecSummary');
-    if (ex) { ex.textContent = 'Auto-generated when you scan documents.'; ex.style.color = 'var(--secondary)'; }
-    const sb = document.getElementById('scoreBar'); if (sb) sb.style.display = 'none';
-    const ap = document.getElementById('aiAnalysisPanel'); if (ap) ap.style.display = 'none';
-    document.getElementById('underwriteBtn').style.display = 'none';
+    if (ex) { ex.textContent = 'Auto-generated when you scan documents.'; }
+    document.getElementById('scoreBar').classList.add('hidden');
+    document.getElementById('aiAnalysisPanel').classList.add('hidden');
+    document.getElementById('underwriteBtn').classList.add('hidden');
     setupDealDrop();
   }
 
@@ -1384,12 +1757,11 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     if (!zone) return;
     dealDropReady = true;
     zone.addEventListener('click', () => document.getElementById('dealFileInput').click());
-    zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = '#0ea5e9'; zone.style.background = '#e0f2fe'; });
-    zone.addEventListener('dragleave', e => { e.preventDefault(); zone.style.borderColor = '#cbd5e1'; zone.style.background = '#f1f5f9'; });
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+    zone.addEventListener('dragleave', e => { e.preventDefault(); zone.classList.remove('dragover'); });
     zone.addEventListener('drop', e => {
       e.preventDefault();
-      zone.style.borderColor = '#cbd5e1';
-      zone.style.background = '#f1f5f9';
+      zone.classList.remove('dragover');
       handleDealFiles(e.dataTransfer.files);
     });
   }
@@ -1401,37 +1773,30 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
       renderDealFiles();
       if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
         try {
-          const docsEl = document.getElementById('dealDocText');
-          if (docsEl) docsEl.placeholder = 'Extracting text from PDF "' + file.name + '"...';
           const text = await extractPdfText(file);
-          if (docsEl) docsEl.placeholder = 'Auto-filled from scanned PDFs, or paste manually';
-          if (text.trim().length < 20) {
-            entry.status = 'no-text';
-          } else {
+          if (text.trim().length < 20) { entry.status = 'no-text'; }
+          else {
             const docs = document.getElementById('dealDocText');
             docs.value += (docs.value ? '\n\n' : '') + `--- ${file.name} ---\n` + text;
-            entry.status = 'done';
-            entry.chars = text.length;
+            entry.status = 'done'; entry.chars = text.length;
           }
         } catch (err) { entry.status = 'error'; }
       } else { entry.status = 'not-pdf'; }
       renderDealFiles();
     }
     if (dealFiles.some(f => f.status === 'done')) {
-      document.getElementById('underwriteBtn').style.display = 'block';
-      // Auto-run the AI read as soon as a document is scanned
+      document.getElementById('underwriteBtn').classList.remove('hidden');
       autoReadDocuments();
     }
   }
 
-  // Sends extracted text to the AI, which reads it and fills ALL fields + memo
   async function autoReadDocuments() {
     const docText = document.getElementById('dealDocText').value.trim();
     if (!docText) return;
     const memo = document.getElementById('dealMemo');
     const btn = document.getElementById('underwriteBtn');
-    btn.disabled = true; btn.textContent = '⏳ Reading documents...';
-    memo.innerHTML = '<span style="color:#0ea5e9;">Reading the documents and extracting the deal details...</span>';
+    btn.disabled = true; btn.textContent = 'Reading documents...';
+    memo.innerHTML = '<span class="text-info">Reading the documents and extracting the deal details...</span>';
 
     const prompt = `You are a seasoned underwriter / licensed-broker-level analyst doing a thorough FIRST-PASS workup for a capital-raising firm. This is NOT final verified underwriting — a licensed broker signs off after you — but your analysis should be as deep and rigorous as a real underwriter's. Documents may be in any language; read them natively but OUTPUT EVERYTHING IN ENGLISH.
 
@@ -1456,7 +1821,6 @@ ${docText}`;
       const data = await response.json();
       if (data.error) throw new Error(data.error);
       const out = data.result || '';
-      // Split first line (JSON) from the memo
       const firstNl = out.indexOf('\n');
       const jsonLine = firstNl === -1 ? out : out.slice(0, firstNl);
       const memoText = firstNl === -1 ? '' : out.slice(firstNl + 1).trim();
@@ -1467,9 +1831,9 @@ ${docText}`;
       memo.dataset.raw = memoText || out;
       memo.innerHTML = formatMemo(memoText || out);
     } catch (err) {
-      memo.innerHTML = `<span style="color:#ef4444;">Could not read documents automatically: ${err.message}. The text was still extracted — you can fill fields manually or click Underwrite Documentation to retry.</span>`;
+      memo.innerHTML = `<span class="text-danger">Could not read documents automatically: ${escHtml(err.message)}. The text was still extracted — you can fill fields manually or click Underwrite Documentation to retry.</span>`;
     } finally {
-      btn.disabled = false; btn.textContent = '🔍 Re-run Underwriting';
+      btn.disabled = false; btn.textContent = 'Re-run Underwriting';
     }
   }
 
@@ -1491,26 +1855,24 @@ ${docText}`;
       const bar = document.getElementById('scoreBar');
       const fill = document.getElementById('scoreFill');
       const label = document.getElementById('scoreLabel');
-      bar.style.display = 'block';
+      bar.classList.remove('hidden');
       fill.style.width = score + '%';
-      let color, text;
-      if (score >= 75) { color = '#10b981'; text = 'Strong'; }
-      else if (score >= 50) { color = '#f59e0b'; text = 'Moderate'; }
-      else { color = '#ef4444'; text = 'Weak'; }
-      fill.style.background = color;
+      let colorClass, text;
+      if (score >= 75) { colorClass = 'green'; text = 'Strong'; }
+      else if (score >= 50) { colorClass = 'amber'; text = 'Moderate'; }
+      else { colorClass = 'red'; text = 'Weak'; }
+      fill.className = 'progress-fill ' + colorClass;
       label.textContent = `Deal Score: ${score}/100 — ${text}`;
-      label.style.color = color;
+      label.className = 'text-xs font-semibold mt-2 text-' + (colorClass === 'green' ? 'success' : colorClass === 'amber' ? 'warning' : 'danger');
     }
     if (f.execSummary) {
       const ex = document.getElementById('dealExecSummary');
       ex.textContent = f.execSummary;
-      ex.style.color = 'var(--primary)';
     }
 
-    // Populate AI underwriter analysis panel
     const hasAnalysis = f.bankerFit || f.investorFit || f.valuation || (f.greenFlags && f.greenFlags.length) || (f.redFlags && f.redFlags.length);
     if (hasAnalysis) {
-      document.getElementById('aiAnalysisPanel').style.display = 'block';
+      document.getElementById('aiAnalysisPanel').classList.remove('hidden');
       const bf = Math.max(0, Math.min(100, parseInt(f.bankerFit) || 0));
       const inv = Math.max(0, Math.min(100, parseInt(f.investorFit) || 0));
       const risk = Math.max(0, Math.min(100, parseInt(f.riskScore) || 0));
@@ -1523,29 +1885,29 @@ ${docText}`;
       document.getElementById('investorVal').textContent = inv + '/100';
       document.getElementById('riskVal').textContent = risk + '/100' + (risk >= 66 ? ' High' : risk >= 33 ? ' Med' : ' Low');
       document.getElementById('profitVal').textContent = profit + '/100';
-      document.getElementById('aiValuation').textContent = f.valuation || '—';
-      document.getElementById('aiRoi').textContent = f.roi || '—';
-      document.getElementById('aiLoi').textContent = f.loiStatus || '—';
-      document.getElementById('aiDscr').textContent = f.dscr || '—';
-      document.getElementById('aiLeverage').textContent = f.leverage || '—';
-      document.getElementById('aiMargins').textContent = f.margins || '—';
-      document.getElementById('aiConsistency').textContent = f.consistency || '—';
-      document.getElementById('aiShortTerm').textContent = f.shortTerm || '—';
-      document.getElementById('aiLongTerm').textContent = f.longTerm || '—';
+      document.getElementById('aiValuation').textContent = f.valuation || '\u2014';
+      document.getElementById('aiRoi').textContent = f.roi || '\u2014';
+      document.getElementById('aiLoi').textContent = f.loiStatus || '\u2014';
+      document.getElementById('aiDscr').textContent = f.dscr || '\u2014';
+      document.getElementById('aiLeverage').textContent = f.leverage || '\u2014';
+      document.getElementById('aiMargins').textContent = f.margins || '\u2014';
+      document.getElementById('aiConsistency').textContent = f.consistency || '\u2014';
+      document.getElementById('aiShortTerm').textContent = f.shortTerm || '\u2014';
+      document.getElementById('aiLongTerm').textContent = f.longTerm || '\u2014';
       if (f.dealType) {
         const dt = document.getElementById('aiDealType');
         dt.textContent = f.dealType;
-        dt.style.background = f.dealType.includes('DEBT') || f.dealType.includes('BANK') ? 'rgba(14,165,233,0.3)' : f.dealType.includes('EQUITY') || f.dealType.includes('FUND') ? 'rgba(16,185,129,0.3)' : 'rgba(245,158,11,0.3)';
+        dt.className = 'badge ' + (f.dealType.includes('DEBT') || f.dealType.includes('BANK') ? 'badge-info' : f.dealType.includes('EQUITY') || f.dealType.includes('FUND') ? 'badge-success' : 'badge-warning');
       }
       if (f.sourceLanguage && f.sourceLanguage.toLowerCase() !== 'english') {
         const ln = document.getElementById('aiLangNote');
-        ln.style.display = 'block';
-        ln.textContent = `📄 Original documents in ${f.sourceLanguage} — translated and analyzed in English.`;
+        ln.classList.remove('hidden');
+        ln.textContent = `Original documents in ${f.sourceLanguage} — translated and analyzed in English.`;
       }
       const greens = document.getElementById('aiGreenFlags');
       const reds = document.getElementById('aiRedFlags');
-      greens.innerHTML = (f.greenFlags || []).map(g => `<li>${g}</li>`).join('') || '<li style="opacity:0.5;">None noted</li>';
-      reds.innerHTML = (f.redFlags || []).map(r => `<li>${r}</li>`).join('') || '<li style="opacity:0.5;">None noted</li>';
+      greens.innerHTML = (f.greenFlags || []).map(g => `<li>${escHtml(g)}</li>`).join('') || '<li class="text-muted">None noted</li>';
+      reds.innerHTML = (f.redFlags || []).map(r => `<li>${escHtml(r)}</li>`).join('') || '<li class="text-muted">None noted</li>';
     }
   }
 
@@ -1562,36 +1924,26 @@ ${docText}`;
     return full;
   }
 
-  // Pattern-based auto-fill (runs locally, no API needed)
-  function autoFillFromText(text) {
-    const set = (id, val) => { const el = document.getElementById(id); if (el && !el.value && val) el.value = val; };
-    const emailMatch = text.match(/[\w.+-]+@[\w-]+\.[\w.-]+/);
-    if (emailMatch) set('dealEmail', emailMatch[0]);
-    const phoneMatch = text.match(/(\+?\d[\d\s().-]{8,}\d)/);
-    if (phoneMatch) set('dealPhone', phoneMatch[0].trim());
-    const revMatch = text.match(/revenue[:\s]*(?:of\s*)?(\$?\s?[\d,.]+\s?(?:million|billion|m|b|k)?)/i);
-    if (revMatch) set('dealRevenue', revMatch[1].trim());
-    const askMatch = text.match(/(?:seeking|raising|raise|ask|capital|funding)[:\s]*(?:of\s*)?(\$\s?[\d,.]+\s?(?:million|billion|m|b|k)?)/i);
-    if (askMatch) set('dealCapital', askMatch[1].trim());
-    const yearsMatch = text.match(/(?:founded|established|since)[:\s]*(\d{4})/i);
-    if (yearsMatch) { const yrs = new Date().getFullYear() - parseInt(yearsMatch[1]); if (yrs > 0 && yrs < 200) set('dealYears', String(yrs)); }
-  }
-
   function renderDealFiles() {
     const list = document.getElementById('dealFileList');
     if (!list) return;
     if (dealFiles.length === 0) { list.innerHTML = ''; return; }
-    const statusLabel = {
-      reading: '<span style="color:#0ea5e9;font-size:11px;">⏳ reading...</span>',
-      done: '<span style="color:#10b981;font-size:11px;">✓ scanned</span>',
-      'no-text': '<span style="color:#f59e0b;font-size:11px;">⚠️ scanned image — paste text</span>',
-      'not-pdf': '<span style="color:#f59e0b;font-size:11px;">not a PDF</span>',
-      error: '<span style="color:#ef4444;font-size:11px;">✕ could not read</span>'
+    const statusBadge = {
+      reading: '<span class="badge badge-info">reading...</span>',
+      done: '<span class="badge badge-success">scanned</span>',
+      'no-text': '<span class="badge badge-warning">scanned image</span>',
+      'not-pdf': '<span class="badge badge-warning">not a PDF</span>',
+      error: '<span class="badge badge-danger">error</span>'
     };
     list.innerHTML = dealFiles.map(f => `
-      <div class="document-item">
-        <div class="document-name"><div class="document-icon">📄</div>${f.name} ${f.chars ? `<span style="color:#94a3b8;font-size:11px;">(${(f.chars/1000).toFixed(1)}k chars)</span>` : ''}</div>
-        <div style="display:flex;align-items:center;gap:8px;">${statusLabel[f.status] || ''}<button class="doc-btn" style="color:#ef4444;" onclick="removeDealFile(${f.id})">×</button></div>
+      <div class="flex items-center justify-between gap-3" style="padding:var(--sp-2) 0;border-bottom:1px solid var(--gray-100);">
+        <div class="flex items-center gap-2 text-sm">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          ${escHtml(f.name)} ${f.chars ? '<span class="text-xs text-muted">(' + (f.chars/1000).toFixed(1) + 'k chars)</span>' : ''}
+        </div>
+        <div class="flex items-center gap-2">${statusBadge[f.status] || ''}
+          <button class="btn btn-ghost btn-sm" onclick="removeDealFile(${f.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </div>
       </div>
     `).join('');
   }
@@ -1603,33 +1955,29 @@ ${docText}`;
 
   async function underwriteDocs() {
     const docText = document.getElementById('dealDocText').value.trim();
-    if (!docText) { alert('⚠️ No document text yet. Drop a PDF or paste text first.'); return; }
+    if (!docText) { showToast('No document text yet. Drop a PDF or paste text first.', 'warning'); return; }
     autoReadDocuments();
   }
 
   function formatMemo(text) {
     return text
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/^([A-Z][A-Z\s/&()-]{4,})$/gm, '<div style="font-weight:700;color:#0f172a;margin:1rem 0 0.4rem 0;font-size:13px;text-transform:uppercase;">$1</div>')
-      .replace(/(ADVANCE TO UNDERWRITING)/g, '<span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:5px;font-weight:700;">$1</span>')
-      .replace(/(NEEDS MORE INFO)/g, '<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:5px;font-weight:700;">$1</span>')
-      .replace(/(LIKELY PASS)/g, '<span style="background:#fecaca;color:#991b1b;padding:2px 8px;border-radius:5px;font-weight:700;">$1</span>')
+      .replace(/^([A-Z][A-Z\s/&()-]{4,})$/gm, '<div style="font-weight:700;color:var(--gray-900);margin:1rem 0 0.4rem 0;font-size:13px;text-transform:uppercase;">$1</div>')
+      .replace(/(ADVANCE TO UNDERWRITING)/g, '<span class="badge badge-success">$1</span>')
+      .replace(/(NEEDS MORE INFO)/g, '<span class="badge badge-warning">$1</span>')
+      .replace(/(LIKELY PASS)/g, '<span class="badge badge-danger">$1</span>')
       .replace(/\n/g, '<br>');
   }
-  
+
   function closeAddDealModal() {
     document.getElementById('addDealModal').classList.remove('show');
   }
-  
+
   function addDeal() {
     const name = document.getElementById('dealName').value.trim();
     const capital = parseCapital(document.getElementById('dealCapital').value);
-    
-    if (!name) {
-      alert('⚠️ Enter deal name');
-      return;
-    }
-    
+    if (!name) { showToast('Enter deal name', 'warning'); return; }
+
     const memoText = document.getElementById('dealMemo').dataset.raw || '';
     deals.push({
       id: nextDealId++,
@@ -1662,321 +2010,111 @@ ${docText}`;
       notes: (document.getElementById('dealNotes').value || '') + (memoText ? '\n\n=== UNDERWRITING MEMO ===\n' + memoText : ''),
       createdDate: new Date().toISOString()
     });
-    
+
     saveData();
-    updateMetrics();
+    updateNavBadges();
     renderDeals();
     closeAddDealModal();
+    showToast('Deal created');
   }
-  
-  function deleteDeal(id) {
-    if (confirm('Delete deal?')) {
-      deals = deals.filter(d => d.id !== id);
-      saveData();
-      updateMetrics();
-      renderDeals();
-    }
-  }
-  
-  function updateDeal(id, field, value) {
-    const deal = deals.find(d => d.id === id);
-    if (deal) {
-      if (field === 'capital') deal[field] = parseCapital(value);
-      else if (['fee', 'probability', 'rank'].includes(field)) deal[field] = parseFloat(value) || 0;
-      else deal[field] = value;
-      saveData();
-      updateMetrics();
-      renderDashboard();
-    }
-  }
-  
-  function filterDeals(status) {
-    currentFilter = status;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    event.target.classList.add('active');
-    renderDeals();
-  }
-  
+
   function addDocument(dealId) {
     const name = prompt('Document name:');
     if (name) {
       const deal = deals.find(d => d.id === dealId);
-      if (deal) {
-        deal.files.push({id: Date.now(), name});
-        saveData();
-        renderDeals();
-      }
+      if (deal) { deal.files.push({id: Date.now(), name}); saveData(); renderDeals(); }
     }
   }
-  
+
   function deleteDocument(dealId, fileId) {
     const deal = deals.find(d => d.id === dealId);
-    if (deal) {
-      deal.files = deal.files.filter(f => f.id !== fileId);
-      saveData();
-      renderDeals();
-    }
-  }
-  
-  function renderDashboard() {
-    if (window.HGCDataRoom) HGCDataRoom.portfolioReadiness();
-    const statuses = { lead: 0, proposal: 0, negotiation: 0, closed: 0 };
-    const urgencies = { urgent: 0, high: 0, medium: 0 };
-    deals.forEach(d => {
-      statuses[d.status]++;
-      urgencies['high']++;
-    });
-
-    // Dashboard deal ratings
-    const ratingsEl = document.getElementById('dashboardRatings');
-    if (ratingsEl) {
-      const rated = deals.filter(d => d.score).sort((a, b) => b.score - a.score);
-      if (rated.length === 0) {
-        ratingsEl.innerHTML = '<div style="color:var(--secondary); font-size:13px; padding:1rem 0;">No scored deals yet. Drop documents into a New Deal to get an underwriter rating.</div>';
-      } else {
-        ratingsEl.innerHTML = rated.map(d => {
-          const sc = d.score >= 75 ? '#10b981' : d.score >= 50 ? '#f59e0b' : '#ef4444';
-          return `
-            <div style="display:flex; align-items:center; gap:1rem; padding:0.85rem 0; border-bottom:1px solid var(--border);">
-              <div style="width:48px; height:48px; border-radius:10px; background:${sc}; color:white; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:18px; flex-shrink:0;">${d.score}</div>
-              <div style="flex:1; min-width:0;">
-                <div style="font-weight:700; font-size:14px;">${d.name}</div>
-                <div style="font-size:12px; color:var(--secondary);">${formatCurrency(d.capital)}${d.dealType ? ' · ' + d.dealType : ''}${d.valuation ? ' · Val: ' + d.valuation : ''}</div>
-              </div>
-              <div style="display:flex; gap:1rem; text-align:center; flex-shrink:0;">
-                ${d.bankerFit ? `<div><div style="font-size:10px; color:var(--secondary); text-transform:uppercase;">Bank</div><div style="font-weight:700; color:#0284c7;">${d.bankerFit}</div></div>` : ''}
-                ${d.investorFit ? `<div><div style="font-size:10px; color:var(--secondary); text-transform:uppercase;">Invest</div><div style="font-weight:700; color:#10b981;">${d.investorFit}</div></div>` : ''}
-                ${d.riskScore ? `<div><div style="font-size:10px; color:var(--secondary); text-transform:uppercase;">Risk</div><div style="font-weight:700; color:#ef4444;">${d.riskScore}</div></div>` : ''}
-              </div>
-            </div>
-          `;
-        }).join('');
-      }
-    }
-
-    const statusCtx = document.getElementById('statusChart');
-    if (statusCtx && statusCtx.chart) statusCtx.chart.destroy();
-    statusCtx.chart = new Chart(statusCtx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Lead', 'Proposal', 'Negotiation', 'Closed'],
-        datasets: [{
-          data: [statuses.lead, statuses.proposal, statuses.negotiation, statuses.closed],
-          backgroundColor: ['#dbeafe', '#fef3c7', '#fecaca', '#d1fae5'],
-          borderColor: ['#0284c7', '#f59e0b', '#dc2626', '#10b981'],
-          borderWidth: 2
-        }]
-      }
-    });
-  }
-  
-  function renderPipeline() {
-    const container = document.getElementById('pipelineContainer');
-    const statuses = ['lead', 'proposal', 'negotiation', 'closed'];
-    const titles = { lead: 'Leads', proposal: 'Proposals', negotiation: 'Negotiating', closed: 'Closed' };
-    
-    let html = '';
-    statuses.forEach(status => {
-      const dealsInStatus = deals.filter(d => d.status === status).sort((a, b) => b.capital - a.capital);
-      const totalCapital = dealsInStatus.reduce((sum, d) => sum + d.capital, 0);
-      const avgProb = dealsInStatus.length > 0 ? (dealsInStatus.reduce((sum, d) => sum + d.probability, 0) / dealsInStatus.length).toFixed(0) : 0;
-      
-      html += `
-        <div class="pipeline-card">
-          <div class="pipeline-title">${titles[status]} (${dealsInStatus.length} deals | ${formatCurrency(totalCapital)} | ${avgProb}% avg)</div>
-          ${dealsInStatus.map(d => `
-            <div class="pipeline-item">
-              <span><strong>${d.name}</strong> • ${formatCurrency(d.capital)}</span>
-              <span>${d.probability}%</span>
-            </div>
-          `).join('')}
-        </div>
-      `;
-    });
-    
-    container.innerHTML = html;
-  }
-  
-  function renderAnalytics() {
-    const totalCapital = deals.reduce((sum, d) => sum + d.capital, 0);
-    const totalFees = deals.reduce((sum, d) => sum + (d.capital * d.fee / 100), 0);
-    const avgCapital = deals.length > 0 ? totalCapital / deals.length : 0;
-    const closedCount = deals.filter(d => d.status === 'closed').length;
-    const closedCapital = deals.filter(d => d.status === 'closed').reduce((sum, d) => sum + d.capital, 0);
-    const closedFees = deals.filter(d => d.status === 'closed').reduce((sum, d) => sum + (d.capital * d.fee / 100), 0);
-    const weightedProbability = deals.length > 0 ? (deals.reduce((sum, d) => sum + (d.capital * d.probability / 100), 0) / totalCapital * 100).toFixed(0) : 0;
-    
-    let metricsHtml = `
-      <tr><td>Total Pipeline</td><td>${formatCurrency(totalCapital)}</td><td>All active & closed</td></tr>
-      <tr><td>Est. Revenue</td><td>${formatCurrency(totalFees)}</td><td>At current terms</td></tr>
-      <tr><td>Avg Deal Size</td><td>${formatCurrency(avgCapital)}</td><td>Across all deals</td></tr>
-      <tr><td>Closed Value</td><td>${formatCurrency(closedCapital)}</td><td>${closedCount} deals closed</td></tr>
-      <tr><td>Realized Revenue</td><td>${formatCurrency(closedFees)}</td><td>From closed deals</td></tr>
-      <tr><td>Weighted Probability</td><td>${weightedProbability}%</td><td>All deals weighted</td></tr>
-    `;
-    document.getElementById('metricsTable').innerHTML = metricsHtml;
-    
-    let perfHtml = '';
-    [...deals].sort((a, b) => b.capital - a.capital).slice(0, 10).forEach(d => {
-      const revenue = d.capital * d.fee / 100;
-      perfHtml += `
-        <tr>
-          <td>${d.name}</td>
-          <td>${formatCurrency(d.capital)}</td>
-          <td>${d.fee}%</td>
-          <td>${formatCurrency(revenue)}</td>
-          <td>${d.status}</td>
-          <td>${d.probability}%</td>
-        </tr>
-      `;
-    });
-    document.getElementById('performanceTable').innerHTML = perfHtml;
-  }
-  
-  // Drag-and-drop urgency reorder
-  let draggedDealId = null;
-  function dealDragStart(e, id) {
-    draggedDealId = id;
-    e.currentTarget.style.opacity = '0.4';
-  }
-  function dealDragOver(e) {
-    e.preventDefault();
-    const card = e.currentTarget;
-    card.style.borderColor = 'var(--accent)';
-  }
-  function dealDragEnd(e) {
-    e.currentTarget.style.opacity = '1';
-    document.querySelectorAll('.deal-card').forEach(c => c.style.borderColor = '');
-  }
-  function dealDrop(e, targetId) {
-    e.preventDefault();
-    if (draggedDealId === null || draggedDealId === targetId) return;
-    const fromIdx = deals.findIndex(d => d.id === draggedDealId);
-    const toIdx = deals.findIndex(d => d.id === targetId);
-    if (fromIdx === -1 || toIdx === -1) return;
-    const [moved] = deals.splice(fromIdx, 1);
-    deals.splice(toIdx, 0, moved);
-    // Renumber ranks by new order
-    deals.forEach((d, i) => d.rank = i + 1);
-    draggedDealId = null;
-    saveData();
-    renderDeals();
+    if (deal) { deal.files = deal.files.filter(f => f.id !== fileId); saveData(); renderDeals(); }
   }
 
-  function renderDeals() {
-    const container = document.getElementById('dealsContainer');
-    const search = document.getElementById('dealSearch')?.value?.toLowerCase() || '';
-    
-    let filtered = deals.filter(d => {
-      const matchStatus = currentFilter === 'all' || d.status === currentFilter;
-      const matchSearch = !search || d.name.toLowerCase().includes(search) || (d.notes || '').toLowerCase().includes(search) || (d.client || '').toLowerCase().includes(search);
-      return matchStatus && matchSearch;
-    });
-    
-    if (filtered.length === 0) {
-      container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div></div>';
+  // ===== DATA ROOM PAGE =====
+  function renderDataRoomPage() {
+    const el = document.getElementById('view-dataroom');
+    if (!el) return;
+    if (deals.length === 0) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></div><div class="empty-state-title">No deals yet</div><div class="empty-state-text">Create a deal first to manage its data room.</div></div>';
       return;
     }
-    
-    container.innerHTML = filtered.map(d => {
-      const statusLabels = { lead: 'Lead', proposal: 'Proposal', negotiation: 'Negotiating', closed: 'Closed' };
-      const statusClasses = { lead: 'status-lead', proposal: 'status-proposal', negotiation: 'status-negotiation', closed: 'status-closed' };
-      const revenue = d.capital * d.fee / 100;
-      const expRevenue = (d.capital * d.fee / 100) * (d.probability / 100);
-      const scoreColor = d.score >= 75 ? '#10b981' : d.score >= 50 ? '#f59e0b' : '#ef4444';
-      
-      return `
-        <div class="deal-card" draggable="true" data-deal-id="${d.id}" ondragstart="dealDragStart(event, ${d.id})" ondragover="dealDragOver(event)" ondrop="dealDrop(event, ${d.id})" ondragend="dealDragEnd(event)">
-          <div class="deal-header">
-            <div class="deal-header-content">
-              <div class="deal-rank">⠿ #${d.rank}${d.score ? ` · Score ${d.score}` : ''}</div>
-              <div class="deal-name">${d.name}</div>
-              <div class="deal-amount">${formatCurrency(d.capital)}</div>
-            </div>
-            <button class="deal-delete" onclick="deleteDeal(${d.id})">✕</button>
-          </div>
-          
-          <div class="deal-body">
-            ${d.score ? `<div style="height:6px; background:var(--lighter); border-radius:4px; overflow:hidden; margin-bottom:0.75rem;"><div style="height:100%; width:${d.score}%; background:${scoreColor};"></div></div>` : ''}
-            ${d.execSummary ? `<div style="font-size:12px; color:var(--secondary); font-style:italic; margin-bottom:1rem; line-height:1.5;">${d.execSummary}</div>` : ''}
-            <div class="status-badges">
-              <span class="status-badge ${statusClasses[d.status]}">${statusLabels[d.status]}</span>
-            </div>
-            
-            <div class="deal-row">
-              <div class="deal-field">
-                <label class="deal-field-label">Capital</label>
-                <input type="text" class="deal-field-input" value="${formatCurrency(d.capital)}" onchange="updateDeal(${d.id}, 'capital', this.value)">
-              </div>
-              <div class="deal-field">
-                <label class="deal-field-label">Status</label>
-                <select class="deal-field-input" onchange="updateDeal(${d.id}, 'status', this.value)">
-                  <option value="lead" ${d.status === 'lead' ? 'selected' : ''}>Lead</option>
-                  <option value="proposal" ${d.status === 'proposal' ? 'selected' : ''}>Proposal</option>
-                  <option value="negotiation" ${d.status === 'negotiation' ? 'selected' : ''}>Negotiation</option>
-                  <option value="closed" ${d.status === 'closed' ? 'selected' : ''}>Closed</option>
-                </select>
-              </div>
-            </div>
-            
-            <div class="deal-row">
-              <div class="deal-field">
-                <label class="deal-field-label">Fee %</label>
-                <input type="number" class="deal-field-input" value="${d.fee}" step="0.1" onchange="updateDeal(${d.id}, 'fee', this.value)">
-              </div>
-              <div class="deal-field">
-                <label class="deal-field-label">Win Probability %</label>
-                <input type="number" class="deal-field-input" value="${d.probability}" step="5" min="0" max="100" onchange="updateDeal(${d.id}, 'probability', this.value)">
-              </div>
-            </div>
-            
-            <div class="deal-metrics">
-              <div class="metric-row">
-                <span class="metric-label">Revenue (100%):</span>
-                <span class="metric-value-small">${formatCurrency(revenue)}</span>
-              </div>
-              <div class="metric-row">
-                <span class="metric-label">Expected Value:</span>
-                <span class="metric-value-small">${formatCurrency(expRevenue)}</span>
-              </div>
-            </div>
-            ${window.HGCInvestors ? HGCInvestors.dealSummary(d) : ''}
-
-            <div class="documents-section">
-              <div class="documents-title">Data Room</div>
-              <div id="dr-summary-${d.id}">${window.HGCDataRoom ? HGCDataRoom.cardSummary(d) : '<div style="color:#64748b;font-size:12px;">Loading…</div>'}</div>
-              <button class="add-doc-btn" onclick="HGCDataRoom.open(${d.id})">📁 Open Data Room</button>
-              <div style="margin-top:6px;">${window.HGCNcnda ? HGCNcnda.cardStatus(d) : ''}</div>
-              <button class="add-doc-btn" onclick="HGCNcnda.open(${d.id})">🔏 Client Portal &amp; NCNDA</button>
-            </div>
-          </div>
-        </div>
-      `;
+    const rows = deals.map(d => {
+      const c = window.HGCDataRoom ? HGCDataRoom.completeness(d) : { pct: 0, reqDone: 0, req: 0 };
+      return `<tr style="cursor:pointer;" onclick="HGCDataRoom.open(${d.id})">
+        <td class="font-semibold">${escHtml(d.name)}</td>
+        <td>${formatCurrency(d.capital)}</td>
+        <td>
+          <div class="progress"><div class="progress-fill ${progressColorClass(c.pct)}" style="width:${c.pct}%"></div></div>
+        </td>
+        <td>${c.reqDone}/${c.req} (${c.pct}%)</td>
+        <td><button class="btn btn-primary btn-sm" onclick="event.stopPropagation();HGCDataRoom.open(${d.id})">Open</button></td>
+      </tr>`;
     }).join('');
+
+    el.innerHTML = `
+      <div class="section-header">Data Room Overview</div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Deal</th><th>Capital</th><th>Readiness</th><th>Docs</th><th></th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    `;
   }
-  
-  // UNDERWRITING STATION
+
+  // ===== UNDERWRITING STATION =====
   let uwFiles = [];
   let uwAudits = [];
   let uwDropReady = false;
   let lastUwAnalysis = null;
 
   function renderUnderwriting() {
+    const el = document.getElementById('view-underwriting');
+    if (!el) return;
+
+    el.innerHTML = `
+      <div class="section-header">Underwriting Station</div>
+      <p class="text-sm text-muted mb-6">Drop any deal's documents to get an instant underwriter read — risk, ratings, flags, valuation — <strong>before</strong> committing it to your pipeline.</p>
+
+      <div id="uwDropZone" class="upload-zone mb-4">
+        <div class="upload-zone-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <div class="upload-zone-text"><strong>Drop documents to audit</strong></div>
+        <div class="text-xs text-muted mt-2">PDFs scanned instantly &middot; any language &middot; reads like an underwriter</div>
+        <input type="file" id="uwFileInput" accept=".pdf" multiple class="hidden" onchange="handleUwFiles(event.target.files)">
+      </div>
+      <div id="uwFileList" class="mb-4"></div>
+      <textarea id="uwDocText" rows="3" class="form-input mb-4" placeholder="Extracted text appears here — or paste document content directly to audit"></textarea>
+      <div class="flex gap-3 mb-6">
+        <button class="btn btn-secondary" onclick="clearUw()">Clear</button>
+        <button class="btn btn-primary" id="uwAnalyzeBtn" onclick="runUwAnalysis()" style="flex:1;">Run Underwriting Analysis</button>
+      </div>
+      <div id="uwResultPanel" class="hidden"></div>
+      <div id="uwActions" class="hidden mb-6">
+        <button class="btn btn-gold btn-lg w-full" onclick="pushUwToDeal()">Add This to My Deals Pipeline</button>
+      </div>
+      <div class="card mt-6">
+        <div class="card-header"><div class="card-header-title">Audit Log &mdash; Everything You've Screened</div></div>
+        <div class="card-body" id="uwAuditLog"></div>
+      </div>
+    `;
     setupUwDrop();
     renderUwAuditLog();
   }
 
   function setupUwDrop() {
-    if (uwDropReady) return;
+    uwDropReady = false;
     const zone = document.getElementById('uwDropZone');
     if (!zone) return;
     uwDropReady = true;
     zone.addEventListener('click', () => document.getElementById('uwFileInput').click());
-    zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = '#0ea5e9'; zone.style.background = '#e0f2fe'; });
-    zone.addEventListener('dragleave', e => { e.preventDefault(); zone.style.borderColor = '#cbd5e1'; zone.style.background = '#f1f5f9'; });
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+    zone.addEventListener('dragleave', e => { e.preventDefault(); zone.classList.remove('dragover'); });
     zone.addEventListener('drop', e => {
       e.preventDefault();
-      zone.style.borderColor = '#cbd5e1'; zone.style.background = '#f1f5f9';
+      zone.classList.remove('dragover');
       handleUwFiles(e.dataTransfer.files);
     });
   }
@@ -1985,13 +2123,10 @@ ${docText}`;
     for (const file of fileList) {
       const entry = { id: Date.now() + Math.random(), name: file.name, status: 'reading' };
       uwFiles.push(entry);
-      renderUwFiles();
+      renderUwFileList();
       if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
         try {
-          const docs = document.getElementById('uwDocText');
-          docs.placeholder = 'Extracting text from PDF "' + file.name + '"...';
           const text = await extractPdfText(file);
-          docs.placeholder = 'Extracted text appears here — or paste document content directly to audit';
           if (text.trim().length < 20) { entry.status = 'no-text'; }
           else {
             const docs = document.getElementById('uwDocText');
@@ -2000,36 +2135,38 @@ ${docText}`;
           }
         } catch (err) { entry.status = 'error'; }
       } else { entry.status = 'not-pdf'; }
-      renderUwFiles();
+      renderUwFileList();
     }
-    // Auto-run as soon as something readable is in
     if (uwFiles.some(f => f.status === 'done')) runUwAnalysis();
   }
 
-  function renderUwFiles() {
+  function renderUwFileList() {
     const list = document.getElementById('uwFileList');
     if (!list) return;
     if (uwFiles.length === 0) { list.innerHTML = ''; return; }
-    const lbl = { reading:'<span style="color:#0ea5e9;font-size:11px;">⏳ reading...</span>', done:'<span style="color:#10b981;font-size:11px;">✓ scanned</span>', 'no-text':'<span style="color:#f59e0b;font-size:11px;">⚠️ scanned image</span>', 'not-pdf':'<span style="color:#f59e0b;font-size:11px;">not a PDF</span>', error:'<span style="color:#ef4444;font-size:11px;">✕ error</span>' };
-    list.innerHTML = uwFiles.map(f => `<div class="document-item"><div class="document-name"><div class="document-icon">📄</div>${f.name}</div>${lbl[f.status]||''}</div>`).join('');
+    const lbl = { reading:'badge-info', done:'badge-success', 'no-text':'badge-warning', 'not-pdf':'badge-warning', error:'badge-danger' };
+    const txt = { reading:'reading...', done:'scanned', 'no-text':'scanned image', 'not-pdf':'not a PDF', error:'error' };
+    list.innerHTML = uwFiles.map(f => `<div class="flex items-center justify-between gap-3 text-sm" style="padding:var(--sp-2) 0;border-bottom:1px solid var(--gray-100);">
+      <span>${escHtml(f.name)}</span><span class="badge ${lbl[f.status]||'badge-neutral'}">${txt[f.status]||f.status}</span>
+    </div>`).join('');
   }
 
   function clearUw() {
     uwFiles = []; lastUwAnalysis = null;
-    document.getElementById('uwDocText').value = '';
-    document.getElementById('uwResultPanel').style.display = 'none';
-    document.getElementById('uwActions').style.display = 'none';
-    renderUwFiles();
+    const docText = document.getElementById('uwDocText'); if (docText) docText.value = '';
+    const panel = document.getElementById('uwResultPanel'); if (panel) { panel.classList.add('hidden'); panel.innerHTML = ''; }
+    const actions = document.getElementById('uwActions'); if (actions) actions.classList.add('hidden');
+    renderUwFileList();
   }
 
   async function runUwAnalysis() {
     const docText = document.getElementById('uwDocText').value.trim();
-    if (!docText) { alert('⚠️ Drop a PDF or paste document text first.'); return; }
+    if (!docText) { showToast('Drop a PDF or paste document text first.', 'warning'); return; }
     const btn = document.getElementById('uwAnalyzeBtn');
     const panel = document.getElementById('uwResultPanel');
-    btn.disabled = true; btn.textContent = '⏳ Reading & underwriting...';
-    panel.style.display = 'block';
-    panel.innerHTML = '<div style="color:#0ea5e9; padding:1rem;">Reading documents and running underwriter analysis...</div>';
+    btn.disabled = true; btn.textContent = 'Reading & underwriting...';
+    panel.classList.remove('hidden');
+    panel.innerHTML = '<div class="text-info" style="padding:1rem;">Reading documents and running underwriter analysis...</div>';
 
     const prompt = `You are a seasoned underwriter / licensed-broker-level analyst doing a thorough FIRST-PASS workup. NOT final verified underwriting — a licensed broker signs off after. Documents may be in any language; read natively but OUTPUT IN ENGLISH.
 
@@ -2054,50 +2191,50 @@ ${docText}`;
       f.memo = memoText; f.docText = docText;
       lastUwAnalysis = f;
       panel.innerHTML = renderUwResult(f);
-      document.getElementById('uwActions').style.display = 'flex';
+      document.getElementById('uwActions').classList.remove('hidden');
     } catch (err) {
-      panel.innerHTML = `<div style="color:#ef4444; padding:1rem;">Analysis failed: ${err.message}. This needs the API key + billing active on the deployed site.</div>`;
+      panel.innerHTML = `<div class="text-danger" style="padding:1rem;">Analysis failed: ${escHtml(err.message)}.</div>`;
     } finally {
-      btn.disabled = false; btn.textContent = '🔍 Run Underwriting Analysis';
+      btn.disabled = false; btn.textContent = 'Run Underwriting Analysis';
     }
   }
 
   function renderUwResult(f) {
     const bf = parseInt(f.bankerFit)||0, inv = parseInt(f.investorFit)||0, risk = parseInt(f.riskScore)||0, profit = parseInt(f.profitabilityScore)||0, score = parseInt(f.score)||0;
-    const sc = score>=75?'#10b981':score>=50?'#f59e0b':'#ef4444';
-    const bar = (val,color) => `<div style="height:8px;background:rgba(255,255,255,0.15);border-radius:5px;overflow:hidden;"><div style="height:100%;width:${val}%;background:${color};"></div></div>`;
-    const tile = (label,val) => `<div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:0.75rem;"><div style="font-size:10px;opacity:0.7;text-transform:uppercase;">${label}</div><div style="font-size:13px;font-weight:700;margin-top:4px;line-height:1.3;">${val||'—'}</div></div>`;
+    const sc = score>=75?'green':score>=50?'amber':'red';
+    const bar = (val,color) => `<div class="uw-bar-track"><div class="uw-bar-fill" style="width:${val}%;background:${color};"></div></div>`;
+    const tile = (label,val) => `<div class="uw-tile"><div class="uw-tile-label">${label}</div><div class="uw-tile-value">${val||'\u2014'}</div></div>`;
     return `
-      <div style="background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:14px;padding:1.5rem;color:white;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+      <div class="uw-panel mb-4">
+        <div class="flex justify-between items-center mb-4">
           <div>
-            <div style="font-size:11px;opacity:0.6;text-transform:uppercase;letter-spacing:0.5px;">${f.company||f.name||'Unnamed'}</div>
+            <div class="text-xs" style="opacity:0.6;text-transform:uppercase;letter-spacing:0.5px;">${escHtml(f.company||f.name||'Unnamed')}</div>
             <div style="font-size:20px;font-weight:800;">Deal Score: ${score}/100</div>
           </div>
-          <div style="width:64px;height:64px;border-radius:14px;background:${sc};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:24px;">${score}</div>
+          <div class="avatar avatar-lg" style="background:${score>=75?'var(--success)':score>=50?'var(--warning)':'var(--danger)'};color:white;font-size:18px;">${score}</div>
         </div>
-        ${f.sourceLanguage && f.sourceLanguage.toLowerCase()!=='english' ? `<div style="font-size:11px;opacity:0.6;margin-bottom:1rem;">📄 Original in ${f.sourceLanguage} — translated to English.</div>`:''}
-        <div style="font-size:13px;line-height:1.6;margin-bottom:1.25rem;opacity:0.95;">${f.execSummary||''}</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;">
-          <div><div style="font-size:11px;opacity:0.7;margin-bottom:4px;">Banker Fit ${bf}/100</div>${bar(bf,'#0ea5e9')}</div>
-          <div><div style="font-size:11px;opacity:0.7;margin-bottom:4px;">Investor Fit ${inv}/100</div>${bar(inv,'#10b981')}</div>
-          <div><div style="font-size:11px;opacity:0.7;margin-bottom:4px;">Risk ${risk}/100 ${risk>=66?'(High)':risk>=33?'(Med)':'(Low)'}</div>${bar(risk,'#ef4444')}</div>
-          <div><div style="font-size:11px;opacity:0.7;margin-bottom:4px;">Profitability ${profit}/100</div>${bar(profit,'#f59e0b')}</div>
+        ${f.sourceLanguage && f.sourceLanguage.toLowerCase()!=='english' ? `<div class="text-xs mb-4" style="opacity:0.6;">Original in ${escHtml(f.sourceLanguage)} — translated to English.</div>`:''}
+        <div class="text-sm mb-4" style="line-height:1.6;opacity:0.95;">${escHtml(f.execSummary||'')}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;" class="mb-4">
+          <div><div class="text-xs" style="opacity:0.7;margin-bottom:4px;">Banker Fit ${bf}/100</div>${bar(bf,'#0ea5e9')}</div>
+          <div><div class="text-xs" style="opacity:0.7;margin-bottom:4px;">Investor Fit ${inv}/100</div>${bar(inv,'#10b981')}</div>
+          <div><div class="text-xs" style="opacity:0.7;margin-bottom:4px;">Risk ${risk}/100 ${risk>=66?'(High)':risk>=33?'(Med)':'(Low)'}</div>${bar(risk,'#ef4444')}</div>
+          <div><div class="text-xs" style="opacity:0.7;margin-bottom:4px;">Profitability ${profit}/100</div>${bar(profit,'#f59e0b')}</div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-bottom:1.25rem;">
-          ${tile('Valuation',f.valuation)}${tile('ROI',f.roi)}${tile('Deal Type',f.dealType)}
-          ${tile('LOI/Terms',f.loiStatus)}${tile('DSCR',f.dscr)}${tile('Margins',f.margins)}
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;" class="mb-4">
+          ${tile('Valuation',escHtml(f.valuation))}${tile('ROI',escHtml(f.roi))}${tile('Deal Type',escHtml(f.dealType))}
+          ${tile('LOI/Terms',escHtml(f.loiStatus))}${tile('DSCR',escHtml(f.dscr))}${tile('Margins',escHtml(f.margins))}
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;">
-          <div style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);border-radius:10px;padding:0.85rem;"><div style="font-size:11px;font-weight:700;color:#6ee7b7;margin-bottom:6px;">🟢 Green Flags</div><ul style="font-size:12px;line-height:1.6;padding-left:1rem;margin:0;">${(f.greenFlags||[]).map(g=>`<li>${g}</li>`).join('')||'<li style="opacity:0.5;">None</li>'}</ul></div>
-          <div style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:0.85rem;"><div style="font-size:11px;font-weight:700;color:#fca5a5;margin-bottom:6px;">🔴 Red Flags</div><ul style="font-size:12px;line-height:1.6;padding-left:1rem;margin:0;">${(f.redFlags||[]).map(r=>`<li>${r}</li>`).join('')||'<li style="opacity:0.5;">None</li>'}</ul></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;" class="mb-4">
+          <div class="uw-flags-green"><div class="text-xs font-bold mb-2" style="color:#6ee7b7;">Green Flags</div><ul class="text-xs" style="line-height:1.6;padding-left:1rem;margin:0;">${(f.greenFlags||[]).map(g=>`<li>${escHtml(g)}</li>`).join('')||'<li class="text-muted">None</li>'}</ul></div>
+          <div class="uw-flags-red"><div class="text-xs font-bold mb-2" style="color:#fca5a5;">Red Flags</div><ul class="text-xs" style="line-height:1.6;padding-left:1rem;margin:0;">${(f.redFlags||[]).map(r=>`<li>${escHtml(r)}</li>`).join('')||'<li class="text-muted">None</li>'}</ul></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-          ${tile('Short-Term Capacity',f.shortTerm)}${tile('Long-Term Capacity',f.longTerm)}
+          ${tile('Short-Term Capacity',escHtml(f.shortTerm))}${tile('Long-Term Capacity',escHtml(f.longTerm))}
         </div>
       </div>
-      <div style="background:var(--lighter);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-top:1rem;font-size:13px;line-height:1.7;">${formatMemo(f.memo||'')}</div>
-      <p style="font-size:11px;color:var(--secondary);font-style:italic;margin-top:0.75rem;">First-pass screening only. Not verified underwriting. A licensed broker must complete formal review before any decision.</p>
+      <div class="card"><div class="card-body text-sm" style="line-height:1.7;">${formatMemo(f.memo||'')}</div></div>
+      <div class="form-hint mt-2" style="font-style:italic;">First-pass screening only. A licensed broker must complete formal review before any decision.</div>
     `;
   }
 
@@ -2108,9 +2245,7 @@ ${docText}`;
       id: nextDealId++,
       name: f.name || f.company || 'Audited Deal',
       capital: parseCapital(f.capital || '0'),
-      status: 'lead',
-      fee: 5,
-      probability: 50,
+      status: 'lead', fee: 5, probability: 50,
       rank: deals.length + 1,
       reference: '', company: f.company||'', contact: f.contact||'', email: f.email||'', phone: f.phone||'',
       revenue: f.revenue||'', years: f.years||'', description: f.description||'', client: f.contact||'',
@@ -2122,253 +2257,150 @@ ${docText}`;
       memo: f.memo||'', notes: f.memo ? '=== UNDERWRITING MEMO ===\n'+f.memo : '',
       createdDate: new Date().toISOString()
     });
-    saveData(); updateMetrics(); renderDeals();
-    alert('✓ Added "'+(f.name||f.company||'deal')+'" to your pipeline.');
-    switchTabTo('deals');
-  }
-
-  function switchTabTo(tab) {
-    document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
-    document.getElementById(tab).classList.add('active');
-    if (tab === 'deals') renderDeals();
+    saveData(); updateNavBadges();
+    showToast('Added "' + (f.name || f.company || 'deal') + '" to pipeline');
+    switchTab('deals');
   }
 
   function renderUwAuditLog() {
     const log = document.getElementById('uwAuditLog');
     if (!log) return;
     const audited = deals.filter(d => d.score).sort((a,b)=>new Date(b.createdDate)-new Date(a.createdDate));
-    if (audited.length === 0) { log.innerHTML = '<div style="color:var(--secondary);font-size:13px;padding:0.5rem 0;">Nothing audited yet. Drop documents above to start.</div>'; return; }
-    log.innerHTML = audited.map(d => {
-      const sc = d.score>=75?'#10b981':d.score>=50?'#f59e0b':'#ef4444';
-      return `<div style="display:flex;align-items:center;gap:1rem;padding:0.75rem 0;border-bottom:1px solid var(--border);">
-        <div style="width:40px;height:40px;border-radius:9px;background:${sc};color:white;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;">${d.score}</div>
-        <div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:13px;">${d.name}</div><div style="font-size:11px;color:var(--secondary);">${formatCurrency(d.capital)}${d.dealType?' · '+d.dealType:''}${d.riskScore?' · Risk '+d.riskScore:''}</div></div>
-      </div>`;
-    }).join('');
+    if (audited.length === 0) { log.innerHTML = '<div class="text-sm text-muted">Nothing audited yet. Drop documents above to start.</div>'; return; }
+    log.innerHTML = '<table class="data-table"><thead><tr><th>Score</th><th>Deal</th><th>Capital</th><th>Type</th><th>Risk</th></tr></thead><tbody>' +
+      audited.map(d => `<tr>
+        <td><span class="badge badge-${d.score>=75?'success':d.score>=50?'warning':'danger'}">${d.score}</span></td>
+        <td class="font-semibold">${escHtml(d.name)}</td>
+        <td>${formatCurrency(d.capital)}</td>
+        <td>${escHtml(d.dealType||'-')}</td>
+        <td>${d.riskScore||'-'}</td>
+      </tr>`).join('') + '</tbody></table>';
   }
 
-  // CONTACTS
-  function openAddContactModal() {
-    document.getElementById('addContactModal').classList.add('show');
-  }
-  
-  function closeAddContactModal() {
-    document.getElementById('addContactModal').classList.remove('show');
-  }
-  
+  // ===== CONTACTS =====
+  function openAddContactModal() { document.getElementById('addContactModal').classList.add('show'); }
+  function closeAddContactModal() { document.getElementById('addContactModal').classList.remove('show'); }
+
   function addContact() {
     const name = document.getElementById('contactName').value.trim();
-    if (!name) {
-      alert('⚠️ Enter name');
-      return;
-    }
-    
+    if (!name) { showToast('Enter name', 'warning'); return; }
     contacts.push({
-      id: nextContactId++,
-      name,
+      id: nextContactId++, name,
       company: document.getElementById('contactCompany').value,
       role: document.getElementById('contactRole').value,
       email: document.getElementById('contactEmail').value,
       phone: document.getElementById('contactPhone').value
     });
-    
-    saveData();
-    renderContacts();
-    closeAddContactModal();
+    saveData(); renderContacts(); closeAddContactModal();
+    showToast('Contact added');
   }
-  
+
   function deleteContact(id) {
     contacts = contacts.filter(c => c.id !== id);
-    saveData();
-    renderContacts();
+    saveData(); renderContacts();
   }
-  
+
   function renderContacts() {
-    const container = document.getElementById('contactsContainer');
-    const search = document.getElementById('contactSearch')?.value?.toLowerCase() || '';
-    
+    const container = document.getElementById('view-contacts');
+    if (!container) return;
+    const search = container.querySelector('#contactSearch')?.value?.toLowerCase() || '';
+
     let filtered = contacts.filter(c =>
-      !search || c.name.toLowerCase().includes(search) || c.email.toLowerCase().includes(search)
+      !search || (c.name||'').toLowerCase().includes(search) || (c.email||'').toLowerCase().includes(search) || (c.company||'').toLowerCase().includes(search)
     );
-    
-    if (filtered.length === 0) {
-      container.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div></div>';
-      return;
-    }
-    
-    container.innerHTML = filtered.map(c => `
-      <div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: var(--shadow-sm);">
-        <div style="font-weight: 700; margin-bottom: 0.5rem;">${c.name}</div>
-        <div style="font-size: 13px; color: var(--secondary); margin-bottom: 0.5rem;"><strong>Company:</strong> ${c.company || '-'}</div>
-        <div style="font-size: 13px; color: var(--secondary); margin-bottom: 0.5rem;"><strong>Role:</strong> ${c.role || '-'}</div>
-        <div style="font-size: 13px; color: var(--secondary); margin-bottom: 0.5rem;"><strong>Email:</strong> ${c.email || '-'}</div>
-        <div style="font-size: 13px; color: var(--secondary); margin-bottom: 1rem;"><strong>Phone:</strong> ${c.phone || '-'}</div>
-        <button class="btn btn-danger btn-small" style="width: 100%;" onclick="deleteContact(${c.id})">Delete</button>
+
+    let html = `
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input type="text" class="search-input" id="contactSearch" placeholder="Search contacts..." value="${escHtml(search)}" onkeyup="renderContacts()">
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-primary" onclick="openAddContactModal()">+ New Contact</button>
+        </div>
       </div>
-    `).join('');
+    `;
+
+    if (filtered.length === 0) {
+      html += '<div class="empty-state"><div class="empty-state-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div><div class="empty-state-title">No contacts yet</div><div class="empty-state-text">Add your first contact.</div></div>';
+    } else {
+      html += '<div class="card"><table class="data-table"><thead><tr><th>Name</th><th>Company</th><th>Role</th><th>Email</th><th>Phone</th><th></th></tr></thead><tbody>';
+      filtered.forEach(c => {
+        html += `<tr>
+          <td class="font-semibold">${escHtml(c.name)}</td>
+          <td>${escHtml(c.company || '-')}</td>
+          <td>${escHtml(c.role || '-')}</td>
+          <td>${escHtml(c.email || '-')}</td>
+          <td>${escHtml(c.phone || '-')}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="deleteContact(${c.id})">Delete</button></td>
+        </tr>`;
+      });
+      html += '</tbody></table></div>';
+    }
+    container.innerHTML = html;
   }
-  
-  // TASKS
-  function openAddTaskModal() {
-    document.getElementById('addTaskModal').classList.add('show');
-  }
-  
-  function closeAddTaskModal() {
-    document.getElementById('addTaskModal').classList.remove('show');
-  }
-  
+
+  // ===== TASKS =====
+  function openAddTaskModal() { document.getElementById('addTaskModal').classList.add('show'); }
+  function closeAddTaskModal() { document.getElementById('addTaskModal').classList.remove('show'); }
+
   function addTask() {
     const title = document.getElementById('taskTitle').value.trim();
-    if (!title) {
-      alert('⚠️ Enter task');
-      return;
-    }
-    
+    if (!title) { showToast('Enter task', 'warning'); return; }
     tasks.push({
-      id: nextTaskId++,
-      title,
+      id: nextTaskId++, title,
       due: document.getElementById('taskDue').value,
       priority: document.getElementById('taskPriority').value,
       deal: document.getElementById('taskDeal').value,
       completed: false
     });
-    
-    saveData();
-    updateMetrics();
-    renderTasks();
-    closeAddTaskModal();
+    saveData(); updateNavBadges(); renderTasks(); closeAddTaskModal();
+    showToast('Task added');
   }
-  
+
   function toggleTask(id) {
     const task = tasks.find(t => t.id === id);
-    if (task) {
-      task.completed = !task.completed;
-      saveData();
-      updateMetrics();
-      renderTasks();
-    }
+    if (task) { task.completed = !task.completed; saveData(); updateNavBadges(); renderTasks(); }
   }
-  
+
   function deleteTask(id) {
     tasks = tasks.filter(t => t.id !== id);
-    saveData();
-    updateMetrics();
-    renderTasks();
+    saveData(); updateNavBadges(); renderTasks();
   }
-  
+
   function renderTasks() {
-    const container = document.getElementById('tasksContainer');
-    if (tasks.length === 0) {
-      container.innerHTML = '<div class="empty-state"><div class="empty-icon">✓</div></div>';
-      return;
-    }
-    
-    container.innerHTML = tasks.sort((a, b) => a.completed - b.completed).map(t => `
-      <div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: var(--shadow-sm); opacity: ${t.completed ? 0.6 : 1};">
-        <div style="display: flex; gap: 12px; margin-bottom: 1rem;">
-          <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleTask(${t.id})" style="cursor: pointer;">
-          <div style="flex: 1;">
-            <div style="font-weight: 700; text-decoration: ${t.completed ? 'line-through' : 'none'};">${t.title}</div>
-          </div>
-        </div>
-        <div style="font-size: 12px; color: var(--secondary); margin-bottom: 1rem;">
-          ${t.due ? `📅 ${t.due} | ` : ''}Priority: <strong>${t.priority}</strong>${t.deal ? ` | Deal: ${t.deal}` : ''}
-        </div>
-        <button class="btn btn-danger btn-small" style="width: 100%;" onclick="deleteTask(${t.id})">Delete</button>
+    const container = document.getElementById('view-tasks');
+    if (!container) return;
+
+    let html = `
+      <div class="toolbar">
+        <div class="toolbar-left"><span class="section-header" style="border:none;margin:0;padding:0;">Tasks</span></div>
+        <div class="toolbar-right"><button class="btn btn-primary" onclick="openAddTaskModal()">+ New Task</button></div>
       </div>
-    `).join('');
+    `;
+
+    if (tasks.length === 0) {
+      html += '<div class="empty-state"><div class="empty-state-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div><div class="empty-state-title">No tasks yet</div><div class="empty-state-text">Add your first task.</div></div>';
+    } else {
+      html += '<div class="card"><table class="data-table"><thead><tr><th></th><th>Task</th><th>Due</th><th>Priority</th><th>Deal</th><th></th></tr></thead><tbody>';
+      tasks.sort((a, b) => a.completed - b.completed).forEach(t => {
+        const prioClass = t.priority === 'high' ? 'badge-danger' : t.priority === 'medium' ? 'badge-warning' : 'badge-neutral';
+        html += `<tr style="${t.completed ? 'opacity:0.5;' : ''}">
+          <td><input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleTask(${t.id})" style="cursor:pointer;width:16px;height:16px;"></td>
+          <td class="font-semibold" style="${t.completed ? 'text-decoration:line-through;' : ''}">${escHtml(t.title)}</td>
+          <td>${t.due || '-'}</td>
+          <td><span class="badge ${prioClass}">${t.priority}</span></td>
+          <td>${escHtml(t.deal || '-')}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="deleteTask(${t.id})">Delete</button></td>
+        </tr>`;
+      });
+      html += '</tbody></table></div>';
+    }
+    container.innerHTML = html;
   }
 </script>
-
-<!-- DATA ROOM MODAL -->
-<div class="modal-overlay" id="dataRoomModal">
-  <div class="modal" style="max-width: 900px;">
-    <div class="modal-header" style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem;">
-      <div>
-        <h2 id="drDealName">Data Room</h2>
-        <p id="drDealMeta">Capital raise document checklist &amp; intake tracker</p>
-      </div>
-      <button class="btn btn-secondary btn-small" onclick="HGCDataRoom.close()">Close</button>
-    </div>
-    <div id="drControls" style="display:flex; gap:1.5rem; align-items:center; flex-wrap:wrap; padding:1rem; background:var(--lighter); border-radius:12px; margin-bottom:1rem;"></div>
-    <div class="modal-body" id="drBody" style="max-height:60vh; overflow-y:auto;"></div>
-  </div>
-</div>
-
-<!-- CLIENT PORTAL & NCNDA MODAL -->
-<div class="modal-overlay" id="ncndaModal">
-  <div class="modal" style="max-width: 760px;">
-    <div class="modal-header" style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem;">
-      <div>
-        <h2 id="ncDealName">Client Portal &amp; NCNDA</h2>
-        <p>Share a signing + upload link with the client. They sign your NCNDA before they can upload.</p>
-      </div>
-      <button class="btn btn-secondary btn-small" onclick="HGCNcnda.close()">Close</button>
-    </div>
-    <div class="modal-body" id="ncBody" style="max-height:65vh; overflow-y:auto;"></div>
-  </div>
-</div>
-
-<!-- INVESTOR EDIT MODAL -->
-<div class="modal-overlay" id="investorModal">
-  <div class="modal">
-    <div class="modal-header"><h2 id="invModalTitle">New Investor</h2></div>
-    <div class="modal-body">
-      <input type="hidden" id="invId">
-      <div class="form-group"><label>Name *</label><input type="text" id="invName" placeholder="Person or firm contact"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-        <div class="form-group"><label>Firm</label><input type="text" id="invFirm"></div>
-        <div class="form-group"><label>Type</label>
-          <select id="invType"><option value="investor">Investor</option><option value="lender">Lender</option><option value="family-office">Family office</option></select></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-        <div class="form-group"><label>Email</label><input type="email" id="invEmail"></div>
-        <div class="form-group"><label>Phone</label><input type="tel" id="invPhone"></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
-        <div class="form-group"><label>Instrument</label>
-          <select id="invInstrument"><option value="both">Debt &amp; Equity</option><option value="debt">Debt</option><option value="equity">Equity</option></select></div>
-        <div class="form-group"><label>Check min</label><input type="text" id="invCheckMin" placeholder="$1M"></div>
-        <div class="form-group"><label>Check max</label><input type="text" id="invCheckMax" placeholder="$50M"></div>
-      </div>
-      <div class="form-group"><label>Sectors (comma-separated)</label><input type="text" id="invSectors" placeholder="real estate, energy, tech"></div>
-      <div class="form-group"><label>Geographies</label><input type="text" id="invGeos" placeholder="US, LATAM"></div>
-      <div class="form-group"><label>Notes</label><textarea id="invNotes"></textarea></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-danger btn-small" id="invDeleteBtn" onclick="HGCInvestors.remove()" style="margin-right:auto;">Delete</button>
-      <button class="btn btn-secondary" onclick="HGCInvestors.closeEdit()">Cancel</button>
-      <button class="btn btn-primary" onclick="HGCInvestors.save()">Save</button>
-    </div>
-  </div>
-</div>
-
-<!-- ENGAGEMENT MODAL (link an investor to a deal) -->
-<div class="modal-overlay" id="engagementModal">
-  <div class="modal" style="max-width:520px;">
-    <div class="modal-header"><h2>Deal engagement</h2><p id="engInvName"></p></div>
-    <div class="modal-body">
-      <input type="hidden" id="engInvId"><input type="hidden" id="engIdx">
-      <div class="form-group"><label>Deal *</label><select id="engDeal"></select></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-        <div class="form-group"><label>Status</label>
-          <select id="engStatus"><option value="contacted">Contacted</option><option value="interested">Interested</option><option value="passed">Passed</option><option value="committed">Committed</option></select></div>
-        <div class="form-group"><label>Amount</label><input type="text" id="engAmount" placeholder="$5M"></div>
-      </div>
-      <div class="form-group"><label>Notes</label><textarea id="engNotes"></textarea></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-danger btn-small" onclick="HGCInvestors.removeEngagement()" style="margin-right:auto;">Remove</button>
-      <button class="btn btn-secondary" onclick="HGCInvestors.closeEngagement()">Cancel</button>
-      <button class="btn btn-primary" onclick="HGCInvestors.saveEngagement()">Save</button>
-    </div>
-  </div>
-</div>
 
 <script src="/dataroom.js"></script>
 <script src="/ncnda.js"></script>
 <script src="/investors.js"></script>
 </body>
 </html>
-

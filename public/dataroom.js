@@ -11,16 +11,14 @@
 
   const STATUSES = ['outstanding', 'requested', 'received', 'reviewed', 'na'];
   const STATUS_LABEL = { outstanding: 'Outstanding', requested: 'Requested', received: 'Received', reviewed: 'Reviewed', na: 'N/A' };
-  const STATUS_COLOR = { outstanding: '#94a3b8', requested: '#f59e0b', received: '#0ea5e9', reviewed: '#10b981', na: '#cbd5e1' };
+  const STATUS_BADGE = { outstanding: 'badge-neutral', requested: 'badge-warning', received: 'badge-info', reviewed: 'badge-success', na: 'badge-neutral' };
 
-  // Which sections count toward "required" at each deal-size band (from the
-  // template's Deal Size Guidance). International deals always pull in Sec 06.
   const BAND_SECTIONS = {
-    small: ['01', '02', '03', '04', '07'],                                    // $1M–$5M
-    mid:   ['01', '02', '03', '04', '05', '06', '07'],                        // $5M–$25M
-    large: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10'],      // $25M–$100M
+    small: ['01', '02', '03', '04', '07'],
+    mid:   ['01', '02', '03', '04', '05', '06', '07'],
+    large: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10'],
   };
-  const BAND_LABEL = { small: '$1M–$5M', mid: '$5M–$25M', large: '$25M–$100M' };
+  const BAND_LABEL = { small: '$1M\u2013$5M', mid: '$5M\u2013$25M', large: '$25M\u2013$100M' };
 
   async function loadTemplate() {
     try {
@@ -28,21 +26,12 @@
       if (!res.ok) throw new Error('HTTP ' + res.status);
       TEMPLATE = await res.json();
       const app = document.getElementById('mainApp');
-      if (app && app.style.display !== 'none' && typeof renderDeals === 'function') renderDeals();
+      if (app && !app.classList.contains('hidden') && typeof renderDeals === 'function') renderDeals();
     } catch (e) {
       console.error('data room template load failed', e);
-      const app = document.getElementById('mainApp');
-      if (app) {
-        const notice = document.createElement('div');
-        notice.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:12px 16px;border-radius:8px;font-size:13px;font-weight:600;margin:1rem;';
-        notice.textContent = 'Failed to load data room template. Please refresh the page.';
-        app.prepend(notice);
-      }
     }
   }
 
-  // Escape user-controlled strings (e.g. uploaded filenames) before they go
-  // into innerHTML, to prevent stored XSS from a malicious filename.
   function esc(s) {
     return String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -65,7 +54,7 @@
     return BAND_SECTIONS[b].includes(sectionId);
   }
   function isRequired(deal, section, doc) {
-    if (deal.intl && section.id === '06') return true; // intl → all of Sec 06 required
+    if (deal.intl && section.id === '06') return true;
     return !!doc.required && inScope(deal, section.id);
   }
   const docState = (deal, id) => (deal.dataRoom && deal.dataRoom[id]) || { status: 'outstanding' };
@@ -88,20 +77,20 @@
   }
 
   function cardSummary(deal) {
-    if (!TEMPLATE) return '<div style="color:#64748b;font-size:12px;">Loading…</div>';
+    if (!TEMPLATE) return '<div class="text-xs text-muted">Loading\u2026</div>';
     const c = completeness(deal);
-    const color = c.pct >= 100 ? '#10b981' : c.pct >= 50 ? '#f59e0b' : '#ef4444';
-    return `<div style="font-size:12px;color:var(--secondary);margin-bottom:6px;">${c.reqDone}/${c.req} required docs · ${c.pct}%</div>
-      <div style="height:6px;background:var(--lighter);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${c.pct}%;background:${color};transition:width .3s;"></div></div>`;
+    const colorClass = c.pct >= 100 ? 'green' : c.pct >= 50 ? 'amber' : 'red';
+    return `<div class="text-xs text-muted mb-2">${c.reqDone}/${c.req} required docs \u00b7 ${c.pct}%</div>
+      <div class="progress"><div class="progress-fill ${colorClass}" style="width:${c.pct}%"></div></div>`;
   }
 
   function open(dealId) {
-    if (!TEMPLATE) { alert('Data room template is still loading — try again in a moment.'); return; }
+    if (!TEMPLATE) { alert('Data room template is still loading \u2014 try again in a moment.'); return; }
     const deal = deals.find((d) => d.id === dealId);
     if (!deal) return;
     if (!deal.dataRoom) deal.dataRoom = {};
     currentDealId = dealId;
-    document.getElementById('drDealName').textContent = `Data Room — ${deal.name}`;
+    document.getElementById('drDealName').textContent = `Data Room \u2014 ${deal.name}`;
     ensureDelegation();
     render();
     document.getElementById('dataRoomModal').classList.add('show');
@@ -119,16 +108,24 @@
     const b = band(deal.capital);
 
     const bandNote = b === 'zero'
-      ? '<div style="font-weight:600;font-size:13px;color:var(--danger);">Set deal capital to see required documents</div>'
-      : `<div style="font-weight:700;font-size:15px;">${BAND_LABEL[b]}</div>`;
+      ? '<div class="text-danger font-semibold text-sm">Set deal capital to see required documents</div>'
+      : `<div class="font-bold">${BAND_LABEL[b]}</div>`;
+
     document.getElementById('drControls').innerHTML = `
-      <div><div style="font-size:11px;color:var(--secondary);text-transform:uppercase;letter-spacing:.5px;">Readiness</div>
-        <div style="font-size:22px;font-weight:800;">${c.reqDone}/${c.req} <span style="font-size:13px;color:var(--secondary);font-weight:600;">required · ${c.pct}%</span></div></div>
-      <div><div style="font-size:11px;color:var(--secondary);text-transform:uppercase;letter-spacing:.5px;">Deal Size Band</div>
-        ${bandNote}</div>
-      <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;cursor:pointer;margin-left:auto;">
-        <input type="checkbox" ${deal.intl ? 'checked' : ''} onchange="HGCDataRoom.toggleIntl(this.checked)" style="width:16px;height:16px;cursor:pointer;">
-        International / cross-border</label>`;
+      <div class="card-body flex gap-5 items-center" style="flex-wrap:wrap;">
+        <div>
+          <div class="text-xs text-muted" style="text-transform:uppercase;letter-spacing:.5px;">Readiness</div>
+          <div class="font-bold" style="font-size:22px;">${c.reqDone}/${c.req} <span class="text-sm text-muted font-semibold">required \u00b7 ${c.pct}%</span></div>
+        </div>
+        <div>
+          <div class="text-xs text-muted" style="text-transform:uppercase;letter-spacing:.5px;">Deal Size Band</div>
+          ${bandNote}
+        </div>
+        <label class="flex items-center gap-2 text-sm font-semibold" style="cursor:pointer;margin-left:auto;">
+          <input type="checkbox" ${deal.intl ? 'checked' : ''} onchange="HGCDataRoom.toggleIntl(this.checked)" style="width:16px;height:16px;cursor:pointer;">
+          International / cross-border
+        </label>
+      </div>`;
 
     let html = '';
     TEMPLATE.sections.forEach((sec) => {
@@ -138,44 +135,51 @@
       }));
       const scoped = inScope(deal, sec.id);
       const secIdx = TEMPLATE.sections.indexOf(sec);
-      const collapsed = !expandedSections.has(secIdx);
-      html += `<div style="margin-bottom:1.25rem;opacity:${scoped ? 1 : 0.6};">
-        <div data-act="toggle-section" data-sec="${secIdx}" style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:2px solid var(--border);cursor:pointer;user-select:none;">
-          <div style="font-weight:800;font-size:14px;"><span style="display:inline-block;width:16px;font-size:12px;">${collapsed ? '▸' : '▾'}</span>${sec.id} · ${sec.name} ${scoped ? '' : '<span style="font-size:11px;color:var(--secondary);font-weight:600;">(optional at this deal size)</span>'}</div>
-          <div style="font-size:12px;color:var(--secondary);font-weight:600;">${sDone}/${sReq} req</div>
-        </div>`;
-      if (!collapsed) {
+      const isOpen = expandedSections.has(secIdx);
+
+      html += `<div class="dr-section ${isOpen ? 'open' : ''}" style="${scoped ? '' : 'opacity:0.6;'}">
+        <div class="dr-section-header" data-act="toggle-section" data-sec="${secIdx}">
+          <div class="dr-section-title">
+            <span class="dr-section-toggle">\u25B8</span>
+            ${sec.id} \u00b7 ${esc(sec.name)}
+            ${scoped ? '' : '<span class="text-xs text-muted font-semibold">(optional at this deal size)</span>'}
+          </div>
+          <span class="text-xs text-muted font-semibold">${sDone}/${sReq} req</span>
+        </div>
+        <div class="dr-section-body">`;
+
+      if (isOpen) {
         sec.subfolders.forEach((sf, si) => {
-          html += `<div style="margin:0.75rem 0 0.35rem;font-size:11px;font-weight:700;color:var(--secondary);text-transform:uppercase;letter-spacing:.6px;">${sf.name}</div>`;
+          html += `<div class="dr-subfolder-label">${esc(sf.name)}</div>`;
           sf.documents.forEach((doc, di) => {
             html += docRow(deal, docId(sec, si, di), doc, isRequired(deal, sec, doc), docState(deal, docId(sec, si, di)));
           });
         });
       }
-      html += `</div>`;
+
+      html += `</div></div>`;
     });
     document.getElementById('drBody').innerHTML = html;
   }
 
-  // Rows carry their docId/path in data-* attributes and are wired via one
-  // delegated listener (see ensureDelegation) — no inline handlers built from
-  // strings, so neither a filename/path nor a docId can break out into markup.
   function docRow(deal, id, doc, req, st) {
     const file = st.file;
     const sel = STATUSES.map((s) => `<option value="${s}" ${st.status === s ? 'selected' : ''}>${STATUS_LABEL[s]}</option>`).join('');
-    const badge = req
-      ? '<span style="font-size:10px;color:#991b1b;background:#fecaca;padding:1px 6px;border-radius:4px;font-weight:700;">REQ</span>'
-      : '<span style="font-size:10px;color:#64748b;background:#e2e8f0;padding:1px 6px;border-radius:4px;font-weight:700;">OPT</span>';
+    const reqBadge = req
+      ? '<span class="badge badge-danger">REQ</span>'
+      : '<span class="badge badge-neutral">OPT</span>';
     const fileLine = file
-      ? `<div style="font-size:11px;color:var(--accent);margin-top:3px;">📄 <a href="#" data-act="download" data-path="${esc(file.path)}">${esc(file.filename)}</a> · <a href="#" style="color:#ef4444;" data-act="remove" data-id="${esc(id)}">remove</a></div>`
+      ? `<div class="text-xs mt-2"><a href="#" class="text-info" data-act="download" data-path="${esc(file.path)}">${esc(file.filename)}</a> \u00b7 <a href="#" class="text-danger" data-act="remove" data-id="${esc(id)}">remove</a></div>`
       : '';
-    return `<div style="display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:8px 10px;border-radius:8px;background:var(--lighter);margin-bottom:6px;">
-      <div style="min-width:0;">
-        <div style="font-size:13px;font-weight:600;">${esc(doc.name)} ${badge}</div>
+    return `<div class="dr-doc-row">
+      <div class="dr-doc-name">
+        ${esc(doc.name)} ${reqBadge}
         ${fileLine}
       </div>
-      <select data-act="status" data-id="${esc(id)}" style="padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-weight:600;border-left:3px solid ${STATUS_COLOR[st.status] || '#94a3b8'};">${sel}</select>
-      <button class="doc-btn" data-act="upload" data-id="${esc(id)}" style="white-space:nowrap;">⬆ Upload</button>
+      <select data-act="status" data-id="${esc(id)}" class="form-input btn-sm" style="border-left:3px solid var(--gray-300);">${sel}</select>
+      <div class="dr-doc-actions">
+        <button class="btn btn-secondary btn-sm" data-act="upload" data-id="${esc(id)}">Upload</button>
+      </div>
     </div>`;
   }
 
@@ -226,7 +230,7 @@
       const f = input.files[0];
       if (!f) return;
       const btn = document.querySelector(`button[data-act="upload"][data-id="${CSS.escape(id)}"]`);
-      if (btn) { btn.disabled = true; btn.textContent = 'Uploading…'; }
+      if (btn) { btn.disabled = true; btn.textContent = 'Uploading\u2026'; }
       try {
         const r = await fetch('/api/upload-url', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -246,9 +250,10 @@
         };
         saveData();
         render();
+        if (typeof showToast === 'function') showToast('File uploaded');
       } catch (e) {
         alert('Upload error: ' + e.message);
-        if (btn) { btn.disabled = false; btn.textContent = '⬆ Upload'; }
+        if (btn) { btn.disabled = false; btn.textContent = 'Upload'; }
       }
     };
     input.click();
@@ -282,7 +287,6 @@
     render();
   }
 
-  // Portfolio-wide diligence readiness, rendered on the dashboard.
   function portfolioReadiness() {
     const el = document.getElementById('dashboardReadiness');
     if (!el || !TEMPLATE) return;
@@ -291,16 +295,17 @@
     const totDone = rated.reduce((s, x) => s + x.c.reqDone, 0);
     const overall = totReq ? Math.round((totDone / totReq) * 100) : 0;
     const sorted = [...rated].sort((a, b) => a.c.pct - b.c.pct);
+
     el.innerHTML =
-      `<div style="margin-bottom:1rem;font-size:13px;color:var(--secondary);">Portfolio readiness: <strong style="color:var(--primary);">${totDone}/${totReq} required docs (${overall}%)</strong> across ${deals.length} deals</div>` +
+      `<div class="text-sm text-muted mb-4">Portfolio readiness: <strong class="font-bold" style="color:var(--gray-900);">${totDone}/${totReq} required docs (${overall}%)</strong> across ${deals.length} deals</div>` +
       sorted.map(({ d, c }) => {
-        const color = c.pct >= 100 ? '#10b981' : c.pct >= 50 ? '#f59e0b' : '#ef4444';
-        return `<div style="display:flex;align-items:center;gap:1rem;padding:.55rem 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="HGCDataRoom.open(${d.id})">
+        const colorClass = c.pct >= 100 ? 'green' : c.pct >= 50 ? 'amber' : 'red';
+        return `<div class="flex items-center gap-4" style="padding:.55rem 0;border-bottom:1px solid var(--gray-100);cursor:pointer;" onclick="HGCDataRoom.open(${d.id})">
           <div style="flex:1;min-width:0;">
-            <div style="font-weight:600;font-size:13px;">${esc(d.name)}</div>
-            <div style="height:6px;background:var(--lighter);border-radius:4px;overflow:hidden;margin-top:4px;"><div style="height:100%;width:${c.pct}%;background:${color};"></div></div>
+            <div class="font-semibold text-sm">${esc(d.name)}</div>
+            <div class="progress mt-2"><div class="progress-fill ${colorClass}" style="width:${c.pct}%"></div></div>
           </div>
-          <div style="font-size:12px;color:var(--secondary);white-space:nowrap;">${c.reqDone}/${c.req} · ${c.pct}%</div>
+          <div class="text-xs text-muted" style="white-space:nowrap;">${c.reqDone}/${c.req} \u00b7 ${c.pct}%</div>
         </div>`;
       }).join('');
   }

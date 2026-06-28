@@ -11,13 +11,13 @@
   }
   const $ = (id) => document.getElementById(id);
   const TYPE_LABEL = { investor: 'Investor', lender: 'Lender', 'family-office': 'Family Office' };
-  const STATUS_COLOR = { contacted: '#94a3b8', interested: '#0ea5e9', passed: '#ef4444', committed: '#10b981' };
+  const TYPE_BADGE = { investor: 'badge-investor', lender: 'badge-lender', 'family-office': 'badge-family-office' };
+  const STATUS_BADGE = { contacted: 'badge-neutral', interested: 'badge-info', passed: 'badge-danger', committed: 'badge-success' };
   const STATUS_LABEL = { contacted: 'Contacted', interested: 'Interested', passed: 'Passed', committed: 'Committed' };
 
   const list = () => (typeof investors !== 'undefined' && Array.isArray(investors)) ? investors : [];
   const dealName = (id) => { const d = deals.find((x) => x.id === id); return d ? d.name : '(deleted deal)'; };
 
-  // --- per-deal rollup (used on deal cards): committed $ + investor count ---
   function dealSummary(deal) {
     let committed = 0, count = 0, interested = 0;
     list().forEach((inv) => (inv.engagements || []).forEach((e) => {
@@ -29,9 +29,11 @@
     if (count === 0) return '';
     const sought = deal.capital || 0;
     const pct = sought ? Math.min(100, Math.round((committed / sought) * 100)) : 0;
-    return `<div class="deal-metrics" style="margin-top:0.75rem;">
-      <div class="metric-row"><span class="metric-label">Capital committed:</span><span class="metric-value-small">${formatCurrency(committed)}${sought ? ' / ' + formatCurrency(sought) + ' (' + pct + '%)' : ''}</span></div>
-      <div class="metric-row"><span class="metric-label">Investors engaged:</span><span class="metric-value-small">${count}${interested ? ' · ' + interested + ' interested' : ''}</span></div>
+    return `<div class="card mt-4">
+      <div class="card-body">
+        <div class="flex justify-between text-sm mb-2"><span class="text-muted">Capital committed</span><span class="font-semibold">${formatCurrency(committed)}${sought ? ' / ' + formatCurrency(sought) + ' (' + pct + '%)' : ''}</span></div>
+        <div class="flex justify-between text-sm"><span class="text-muted">Investors engaged</span><span class="font-semibold">${count}${interested ? ' \u00b7 ' + interested + ' interested' : ''}</span></div>
+      </div>
     </div>`;
   }
 
@@ -39,63 +41,80 @@
     const lo = parseCapital(inv.checkMin || '0');
     const hi = parseCapital(inv.checkMax || '0') || Infinity;
     return deals.filter((d) => (d.capital || 0) > 0 && (d.capital >= lo) && (d.capital <= hi))
-      .filter((d) => !(inv.engagements || []).some((e) => e.dealId === d.id)); // not already engaged
+      .filter((d) => !(inv.engagements || []).some((e) => e.dealId === d.id));
   }
 
   function render() {
-    const cont = $('investorsContainer');
+    const cont = $('view-investors');
     if (!cont) return;
-    const q = ($('investorSearch')?.value || '').toLowerCase();
-    const typeF = $('investorTypeFilter')?.value || 'all';
+    const existingSearch = cont.querySelector('#investorSearch');
+    const q = (existingSearch?.value || '').toLowerCase();
+    const existingFilter = cont.querySelector('#investorTypeFilter');
+    const typeF = existingFilter?.value || 'all';
     const rows = list().filter((i) => (typeF === 'all' || i.type === typeF) &&
       (!q || (i.name || '').toLowerCase().includes(q) || (i.firm || '').toLowerCase().includes(q) || (i.sectors || []).join(' ').toLowerCase().includes(q)));
 
-    // portfolio summary
+    // Portfolio summary
     let totalCommitted = 0, totalEng = 0;
     list().forEach((i) => (i.engagements || []).forEach((e) => { totalEng++; if (e.status === 'committed') totalCommitted += parseCapital(e.amount || '0'); }));
-    const sum = $('investorsSummary');
-    if (sum) sum.innerHTML = list().length ? `<div style="display:flex;gap:2rem;flex-wrap:wrap;font-size:13px;color:var(--secondary);">
-      <div><strong style="color:var(--primary);font-size:18px;">${list().length}</strong> investors</div>
-      <div><strong style="color:var(--primary);font-size:18px;">${formatCurrency(totalCommitted)}</strong> total committed</div>
-      <div><strong style="color:var(--primary);font-size:18px;">${totalEng}</strong> deal engagements</div></div>` : '';
 
-    if (!rows.length) { cont.innerHTML = '<div class="empty-state"><div class="empty-icon">🏦</div><div>No investors yet. Add your first investor or lender.</div></div>'; return; }
-
-    cont.innerHTML = rows.map((inv) => {
-      const engs = (inv.engagements || []);
-      const engHtml = engs.length ? engs.map((e, idx) => `
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:var(--lighter);border-radius:6px;margin-bottom:4px;font-size:12px;cursor:pointer;" onclick="HGCInvestors.openEngagement(${inv.id}, ${idx})">
-          <span>${esc(dealName(e.dealId))}</span>
-          <span><span style="color:${STATUS_COLOR[e.status] || '#94a3b8'};font-weight:700;">${STATUS_LABEL[e.status] || e.status}</span>${e.amount ? ' · ' + esc(e.amount) : ''}</span>
-        </div>`).join('') : '<div style="font-size:12px;color:var(--secondary);">No deal engagements yet.</div>';
-      const matches = matchingDeals(inv);
-      const matchId = 'match-' + inv.id;
-      let matchHtml = '';
-      if (matches.length) {
-        const visible = matches.slice(0, 5).map((d) => esc(d.name)).join(', ');
-        if (matches.length <= 5) {
-          matchHtml = `<div style="margin-top:8px;font-size:11px;color:var(--secondary);">💡 Fits check size: ${visible}</div>`;
-        } else {
-          const rest = matches.slice(5).map((d) => esc(d.name)).join(', ');
-          matchHtml = `<div style="margin-top:8px;font-size:11px;color:var(--secondary);">💡 Fits check size: ${visible}<span id="${matchId}" style="display:none;">, ${rest}</span> <a href="#" onclick="event.preventDefault();var s=document.getElementById('${matchId}');var a=this;if(s.style.display==='none'){s.style.display='inline';a.textContent='Show less';}else{s.style.display='none';a.textContent='Show ${matches.length - 5} more';}" style="font-weight:600;">Show ${matches.length - 5} more</a></div>`;
-        }
-      }
-      const checkSize = inv.checkMin && inv.checkMax ? `${esc(inv.checkMin)}–${esc(inv.checkMax)}` : inv.checkMin ? `From ${esc(inv.checkMin)}` : inv.checkMax ? `Up to ${esc(inv.checkMax)}` : '';
-      const meta = [TYPE_LABEL[inv.type] || inv.type, inv.instrument && inv.instrument !== 'both' ? inv.instrument : '', checkSize].filter(Boolean).join(' · ');
-      return `<div style="background:#fff;border-radius:12px;padding:1.25rem;box-shadow:var(--shadow-sm);border:1px solid var(--border);">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-          <div><div style="font-weight:700;font-size:15px;">${esc(inv.name)}</div>
-            <div style="font-size:12px;color:var(--secondary);">${esc(inv.firm || '')}</div></div>
-          <button class="doc-btn" onclick="HGCInvestors.openEdit(${inv.id})">Edit</button>
-        </div>
-        <div style="font-size:12px;color:var(--secondary);margin:6px 0;">${esc(meta)}</div>
-        ${(inv.sectors || []).length ? `<div style="font-size:11px;color:var(--secondary);margin-bottom:8px;">${(inv.sectors || []).map((s) => `<span style="background:var(--lighter);padding:2px 8px;border-radius:10px;margin-right:4px;">${esc(s)}</span>`).join('')}</div>` : ''}
-        <div style="font-size:11px;font-weight:700;color:var(--secondary);text-transform:uppercase;letter-spacing:.5px;margin:8px 0 6px;">Deal engagements</div>
-        ${engHtml}
-        <button class="add-doc-btn" style="margin-top:6px;" onclick="HGCInvestors.openEngagement(${inv.id})">+ Link to a deal</button>
-        ${matchHtml}
+    let summaryHtml = '';
+    if (list().length) {
+      summaryHtml = `<div class="metrics-grid mb-6">
+        <div class="metric-card"><div class="metric-label">Investors</div><div class="metric-value">${list().length}</div></div>
+        <div class="metric-card"><div class="metric-label">Total Committed</div><div class="metric-value">${formatCurrency(totalCommitted)}</div></div>
+        <div class="metric-card"><div class="metric-label">Deal Engagements</div><div class="metric-value">${totalEng}</div></div>
       </div>`;
-    }).join('');
+    }
+
+    let html = `
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input type="text" class="search-input" id="investorSearch" placeholder="Search investors..." value="${esc(q)}" onkeyup="HGCInvestors.render()">
+          <select id="investorTypeFilter" class="form-input btn-sm" style="width:auto;" onchange="HGCInvestors.render()">
+            <option value="all" ${typeF==='all'?'selected':''}>All types</option>
+            <option value="investor" ${typeF==='investor'?'selected':''}>Investors</option>
+            <option value="lender" ${typeF==='lender'?'selected':''}>Lenders</option>
+            <option value="family-office" ${typeF==='family-office'?'selected':''}>Family offices</option>
+          </select>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-primary" onclick="HGCInvestors.openEdit()">+ New Investor</button>
+        </div>
+      </div>
+      ${summaryHtml}
+    `;
+
+    if (!rows.length) {
+      html += '<div class="empty-state"><div class="empty-state-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="empty-state-title">No investors yet</div><div class="empty-state-text">Add your first investor or lender.</div></div>';
+      cont.innerHTML = html;
+      return;
+    }
+
+    html += '<div class="card"><table class="data-table"><thead><tr><th>Name</th><th>Firm</th><th>Type</th><th>Check Size</th><th>Engagements</th><th></th></tr></thead><tbody>';
+    rows.forEach((inv) => {
+      const checkSize = inv.checkMin && inv.checkMax ? `${esc(inv.checkMin)}\u2013${esc(inv.checkMax)}` : inv.checkMin ? `From ${esc(inv.checkMin)}` : inv.checkMax ? `Up to ${esc(inv.checkMax)}` : '\u2014';
+      const engCount = (inv.engagements || []).length;
+      const committedCount = (inv.engagements || []).filter(e => e.status === 'committed').length;
+      html += `<tr style="cursor:pointer;" onclick="HGCInvestors.openEdit(${inv.id})">
+        <td>
+          <div class="font-semibold">${esc(inv.name)}</div>
+          ${(inv.sectors || []).length ? `<div class="text-xs text-muted mt-2">${(inv.sectors || []).map(s => `<span class="badge badge-neutral" style="margin-right:4px;">${esc(s)}</span>`).join('')}</div>` : ''}
+        </td>
+        <td>${esc(inv.firm || '\u2014')}</td>
+        <td><span class="badge ${TYPE_BADGE[inv.type] || 'badge-neutral'}">${TYPE_LABEL[inv.type] || inv.type}</span></td>
+        <td>${checkSize}</td>
+        <td>
+          ${engCount > 0 ? `<span class="text-sm">${engCount} deal${engCount > 1 ? 's' : ''}</span>` : '<span class="text-xs text-muted">None</span>'}
+          ${committedCount > 0 ? ` <span class="badge badge-success">${committedCount} committed</span>` : ''}
+        </td>
+        <td>
+          <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();HGCInvestors.openEngagement(${inv.id})">+ Link Deal</button>
+        </td>
+      </tr>`;
+    });
+    html += '</tbody></table></div>';
+    cont.innerHTML = html;
   }
 
   // --- investor edit ---
@@ -121,7 +140,7 @@
 
   function save() {
     const name = $('invName').value.trim();
-    if (!name) { alert('⚠️ Enter a name'); return; }
+    if (!name) { if (typeof showToast === 'function') showToast('Enter a name', 'warning'); else alert('Enter a name'); return; }
     const idVal = $('invId').value;
     const splitList = (v) => {
       const items = v.split(',').map((s) => s.trim()).filter(Boolean);
@@ -142,6 +161,7 @@
       investors.push({ id: nextInvestorId++, ...data, engagements: [], createdDate: new Date().toISOString() });
     }
     saveData(); closeEdit(); render();
+    if (typeof showToast === 'function') showToast('Investor saved');
   }
   function remove() {
     const id = Number($('invId').value);
@@ -171,7 +191,7 @@
     const amountRaw = $('engAmount').value.trim();
     if (amountRaw) {
       const parsed = parseCapital(amountRaw);
-      if (!parsed || parsed <= 0) { alert('Engagement amount must be a positive number.'); return; }
+      if (!parsed || parsed <= 0) { if (typeof showToast === 'function') showToast('Engagement amount must be a positive number.', 'warning'); else alert('Engagement amount must be a positive number.'); return; }
     }
     const rec = { dealId: Number($('engDeal').value), status: $('engStatus').value, amount: amountRaw, notes: $('engNotes').value.trim(), updatedAt: new Date().toISOString() };
     const idx = $('engIdx').value;

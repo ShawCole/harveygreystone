@@ -15,19 +15,19 @@
 
   function cardStatus(deal) {
     const n = deal.ncnda;
-    if (!n) return '<div style="font-size:11px;color:var(--secondary);">Portal not set up</div>';
+    if (!n) return '<span class="badge badge-neutral">No portal</span>';
     const client = (n.signatures || []).some((s) => s.party === 'client');
-    const color = n.status === 'finalized' ? '#10b981' : client ? '#0ea5e9' : '#f59e0b';
-    const label = n.status === 'finalized' ? 'NCNDA finalized ✓' : client ? 'Client signed — needs our signature' : 'Awaiting client signature';
-    return `<div style="font-size:11px;font-weight:700;color:${color};">🔏 ${label}</div>`;
+    if (n.status === 'finalized') return '<span class="badge badge-success">NCNDA finalized</span>';
+    if (client) return '<span class="badge badge-info">Client signed</span>';
+    return '<span class="badge badge-warning">Awaiting client</span>';
   }
 
   async function open(dealId) {
     currentDealId = dealId;
     const deal = deals.find((d) => d.id === dealId);
     if (!deal) return;
-    document.getElementById('ncDealName').textContent = `Client Portal & NCNDA — ${deal.name}`;
-    document.getElementById('ncBody').innerHTML = '<p style="color:var(--secondary);">Loading…</p>';
+    document.getElementById('ncDealName').textContent = `Client Portal & NCNDA \u2014 ${deal.name}`;
+    document.getElementById('ncBody').innerHTML = '<p class="text-muted">Loading\u2026</p>';
     document.getElementById('ncndaModal').classList.add('show');
     try {
       const controller = new AbortController();
@@ -41,7 +41,7 @@
       const msg = e.name === 'AbortError'
         ? 'Loading is taking longer than expected. Please try again.'
         : 'Could not load the portal. Try again.';
-      document.getElementById('ncBody').innerHTML = `<p style="color:var(--danger);">${msg}</p>`;
+      document.getElementById('ncBody').innerHTML = `<p class="text-danger">${msg}</p>`;
     }
   }
   function close() {
@@ -57,65 +57,80 @@
     const client = sigs.find((s) => s.party === 'client');
     const uploads = view.clientUploads || [];
 
-    const statusColor = n.status === 'finalized' ? '#10b981' : '#f59e0b';
-    const statusText = n.status === 'finalized' ? 'Finalized' : 'Pending signatures';
+    const statusBadge = n.status === 'finalized'
+      ? '<span class="badge badge-success">Finalized</span>'
+      : '<span class="badge badge-warning">Pending signatures</span>';
 
     const certBlock = n.status === 'finalized'
-      ? `<div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);border-radius:12px;padding:1rem;margin-top:1rem;">
-           <div style="font-weight:700;color:#065f46;margin-bottom:4px;">✓ Verifiable certificate</div>
-           <div style="font-size:12px;">ID: <strong>${esc(n.certificateId)}</strong></div>
-           <div style="font-size:11px;color:var(--secondary);word-break:break-all;">Hash: ${esc(n.certHash)}</div>
-           <div style="font-size:11px;color:var(--secondary);">Finalized: ${new Date(n.finalizedAt).toLocaleString()}</div>
-           <a href="/api/certificate?cert=${encodeURIComponent(n.certificateId)}" target="_blank" style="font-size:12px;font-weight:600;">Open verification record →</a>
+      ? `<div class="card mt-4">
+           <div class="card-body">
+             <div class="font-bold text-success mb-2">Verifiable certificate</div>
+             <div class="text-xs">ID: <strong>${esc(n.certificateId)}</strong></div>
+             <div class="text-xs text-muted" style="word-break:break-all;">Hash: ${esc(n.certHash)}</div>
+             <div class="text-xs text-muted">Finalized: ${new Date(n.finalizedAt).toLocaleString()}</div>
+             <a href="/api/certificate?cert=${encodeURIComponent(n.certificateId)}" target="_blank" class="btn btn-secondary btn-sm mt-4">Open verification record</a>
+           </div>
          </div>`
       : '';
 
-    const sigRow = (s) => `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;">
-        <span><strong>${esc(s.name)}</strong>${s.title ? ' · ' + esc(s.title) : ''} <span style="color:var(--secondary);">(${esc(s.party)})</span></span>
-        <span style="color:var(--secondary);">${new Date(s.signedAt).toLocaleString()}</span></div>`;
+    const sigRow = (s) => `<div class="flex justify-between items-center text-xs" style="padding:6px 0;border-bottom:1px solid var(--gray-100);">
+        <span><strong>${esc(s.name)}</strong>${s.title ? ' \u00b7 ' + esc(s.title) : ''} <span class="text-muted">(${esc(s.party)})</span></span>
+        <span class="text-muted">${new Date(s.signedAt).toLocaleString()}</span></div>`;
 
-    const uploadRow = (u) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--lighter);border-radius:8px;margin-bottom:6px;font-size:12px;">
-        <span>📄 <a href="#" data-dl="${esc(u.path)}">${esc(u.filename)}</a></span>
-        <span style="color:var(--secondary);">${new Date(u.uploadedAt).toLocaleString()}</span></div>`;
+    const uploadRow = (u) => `<div class="flex justify-between items-center text-xs" style="padding:var(--sp-2) var(--sp-3);background:var(--gray-50);border-radius:var(--radius-md);margin-bottom:var(--sp-2);">
+        <span><a href="#" data-dl="${esc(u.path)}">${esc(u.filename)}</a></span>
+        <span class="text-muted">${new Date(u.uploadedAt).toLocaleString()}</span></div>`;
 
     document.getElementById('ncBody').innerHTML = `
-      <div style="display:flex;gap:1rem;align-items:center;background:var(--lighter);border-radius:12px;padding:1rem;margin-bottom:1.25rem;flex-wrap:wrap;">
-        <div><div style="font-size:11px;color:var(--secondary);text-transform:uppercase;letter-spacing:.5px;">Status</div>
-          <div style="font-weight:800;color:${statusColor};">${statusText}</div></div>
-        <div style="flex:1;min-width:220px;">
-          <div style="font-size:11px;color:var(--secondary);text-transform:uppercase;letter-spacing:.5px;">Client portal link</div>
-          <div style="display:flex;gap:6px;margin-top:4px;">
-            <input id="ncLink" readonly value="${esc(view.portalUrl)}" style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;">
-            <button class="btn btn-secondary btn-small" onclick="HGCNcnda.copy()">Copy</button>
-            <button class="btn btn-secondary btn-small" onclick="HGCNcnda.copyAndOpen()">Copy &amp; Open</button>
+      <div class="card mb-4">
+        <div class="card-body flex gap-4 items-center" style="flex-wrap:wrap;">
+          <div>
+            <div class="text-xs text-muted" style="text-transform:uppercase;letter-spacing:.5px;">Status</div>
+            ${statusBadge}
           </div>
-          <div style="font-size:11px;color:var(--secondary);margin-top:4px;">Send this to the client. They must sign the NCNDA before they can upload.</div>
+          <div style="flex:1;min-width:220px;">
+            <div class="text-xs text-muted" style="text-transform:uppercase;letter-spacing:.5px;">Client portal link</div>
+            <div class="flex gap-2 mt-2">
+              <input id="ncLink" readonly value="${esc(view.portalUrl)}" class="form-input text-xs" style="flex:1;">
+              <button class="btn btn-secondary btn-sm" onclick="HGCNcnda.copy()">Copy</button>
+              <button class="btn btn-secondary btn-sm" onclick="HGCNcnda.copyAndOpen()">Copy &amp; Open</button>
+            </div>
+            <div class="text-xs text-muted mt-2">Send this to the client. They must sign the NCNDA before they can upload.</div>
+          </div>
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+      <div class="form-row mb-6">
         <div>
-          <div style="font-weight:700;font-size:13px;margin-bottom:.5rem;">Our signatures (internal)</div>
-          ${internal.length ? internal.map(sigRow).join('') : '<div style="font-size:12px;color:var(--secondary);">No internal signatures yet.</div>'}
-          <div style="margin-top:1rem;padding:1rem;border:1px dashed var(--border);border-radius:10px;">
-            <div style="font-weight:600;font-size:12px;margin-bottom:.5rem;">Add your signature</div>
-            <input id="ncName" placeholder="Full name *" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;margin-bottom:6px;">
-            <input id="ncTitle" placeholder="Title (e.g. Managing Partner)" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;margin-bottom:6px;">
-            <input id="ncEmail" placeholder="Email" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;margin-bottom:8px;">
-            <button class="btn btn-primary btn-small" style="width:100%;" onclick="HGCNcnda.sign()">Sign NCNDA</button>
-            <div class="ncErr" id="ncErr" style="color:var(--danger);font-size:12px;margin-top:6px;"></div>
+          <div class="font-semibold text-sm mb-2">Our signatures (internal)</div>
+          ${internal.length ? internal.map(sigRow).join('') : '<div class="text-xs text-muted">No internal signatures yet.</div>'}
+          <div class="card mt-4">
+            <div class="card-body">
+              <div class="font-semibold text-xs mb-2">Add your signature</div>
+              <div class="form-group">
+                <input id="ncName" class="form-input" placeholder="Full name *">
+              </div>
+              <div class="form-group">
+                <input id="ncTitle" class="form-input" placeholder="Title (e.g. Managing Partner)">
+              </div>
+              <div class="form-group">
+                <input id="ncEmail" class="form-input" placeholder="Email">
+              </div>
+              <button class="btn btn-primary btn-sm w-full" onclick="HGCNcnda.sign()">Sign NCNDA</button>
+              <div id="ncErr" class="form-error mt-2"></div>
+            </div>
           </div>
         </div>
         <div>
-          <div style="font-weight:700;font-size:13px;margin-bottom:.5rem;">Client signature</div>
-          ${client ? sigRow(client) : '<div style="font-size:12px;color:var(--secondary);">Client has not signed yet.</div>'}
+          <div class="font-semibold text-sm mb-2">Client signature</div>
+          ${client ? sigRow(client) : '<div class="text-xs text-muted">Client has not signed yet.</div>'}
           ${certBlock}
         </div>
       </div>
 
-      <div style="margin-top:1.5rem;">
-        <div style="font-weight:700;font-size:13px;margin-bottom:.5rem;">Client uploads (${uploads.length})</div>
-        ${uploads.length ? uploads.map(uploadRow).join('') : '<div style="font-size:12px;color:var(--secondary);">No documents uploaded by the client yet.</div>'}
+      <div>
+        <div class="font-semibold text-sm mb-2">Client uploads (${uploads.length})</div>
+        ${uploads.length ? uploads.map(uploadRow).join('') : '<div class="text-xs text-muted">No documents uploaded by the client yet.</div>'}
       </div>`;
 
     // wire client-upload download links via delegation (no inline handlers)
@@ -137,12 +152,7 @@
     const el = document.getElementById('ncLink');
     el.select();
     navigator.clipboard.writeText(el.value).then(() => {}, () => { document.execCommand('copy'); });
-    const btn = document.querySelector('[onclick="HGCNcnda.copy()"]');
-    if (btn) {
-      const orig = btn.textContent;
-      btn.textContent = 'Copied!';
-      setTimeout(() => { btn.textContent = orig; }, 2000);
-    }
+    if (typeof showToast === 'function') showToast('Link copied', 'success');
   }
 
   function copyAndOpen() {
@@ -150,12 +160,7 @@
     el.select();
     navigator.clipboard.writeText(el.value).then(() => {}, () => { document.execCommand('copy'); });
     window.open(el.value, '_blank');
-    const btn = document.querySelector('[onclick="HGCNcnda.copyAndOpen()"]');
-    if (btn) {
-      const orig = btn.textContent;
-      btn.textContent = 'Copied!';
-      setTimeout(() => { btn.textContent = orig; }, 2000);
-    }
+    if (typeof showToast === 'function') showToast('Link copied & opened', 'success');
   }
 
   async function sign() {
@@ -169,11 +174,11 @@
       const r = await fetch('/api/ncnda', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dealId: currentDealId, name, title, email }) });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error || 'could not sign');
-      // reflect into the in-memory deal so the card status updates on close
       const deal = deals.find((x) => x.id === currentDealId);
       if (deal) deal.ncnda = d.ncnda;
       view.ncnda = d.ncnda;
       render();
+      if (typeof showToast === 'function') showToast('NCNDA signed', 'success');
     } catch (e) {
       err.textContent = e.message;
     }
@@ -181,9 +186,9 @@
 
   function ncndaBadge(deal) {
     const n = deal.ncnda;
-    if (!n) return '<span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:#e5e7eb;color:#6b7280;">No NCNDA</span>';
-    if (n.status === 'finalized') return '<span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(16,185,129,.15);color:#065f46;">Finalized</span>';
-    return '<span style="display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(245,158,11,.15);color:#92400e;">Pending Signatures</span>';
+    if (!n) return '<span class="badge badge-neutral">No NCNDA</span>';
+    if (n.status === 'finalized') return '<span class="badge badge-success">Finalized</span>';
+    return '<span class="badge badge-warning">Pending Signatures</span>';
   }
 
   window.HGCNcnda = { open, close, sign, copy, copyAndOpen, cardStatus, ncndaBadge };
