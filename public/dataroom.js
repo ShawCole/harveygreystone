@@ -127,7 +127,22 @@
         </label>
       </div>`;
 
-    let html = '';
+    let html = `
+      <div class="card mb-6">
+        <div class="card-header">
+          <div class="card-header-title">Batch Upload</div>
+        </div>
+        <div class="card-body">
+          <div class="upload-zone" id="drBatchZone">
+            <div class="upload-zone-text">
+              <strong>Drop multiple files here</strong> or click to select<br>
+              <span class="text-xs text-muted">Files will be auto-matched to document categories</span>
+            </div>
+          </div>
+          <input type="file" id="drBatchInput" multiple style="display:none">
+          <div id="drBatchPreview"></div>
+        </div>
+      </div>`;
     TEMPLATE.sections.forEach((sec) => {
       let sReq = 0, sDone = 0;
       sec.subfolders.forEach((sf, si) => sf.documents.forEach((doc, di) => {
@@ -160,6 +175,17 @@
       html += `</div></div>`;
     });
     document.getElementById('drBody').innerHTML = html;
+
+    // Set up batch upload zone
+    const batchZone = document.getElementById('drBatchZone');
+    const batchInput = document.getElementById('drBatchInput');
+    if (batchZone && batchInput) {
+      batchZone.onclick = () => batchInput.click();
+      batchZone.ondragover = (e) => { e.preventDefault(); batchZone.classList.add('dragover'); };
+      batchZone.ondragleave = () => batchZone.classList.remove('dragover');
+      batchZone.ondrop = (e) => { e.preventDefault(); batchZone.classList.remove('dragover'); handleBatchFiles(e.dataTransfer.files); };
+      batchInput.onchange = () => { handleBatchFiles(batchInput.files); batchInput.value = ''; };
+    }
   }
 
   function docRow(deal, id, doc, req, st) {
@@ -310,6 +336,158 @@
       }).join('');
   }
 
-  window.HGCDataRoom = { open, close, setStatus, toggleIntl, upload, download, removeFile, cardSummary, completeness, portfolioReadiness };
+  // --- Batch upload with auto-categorization ---
+
+  function matchFileToDoc(filename) {
+    if (!TEMPLATE) return null;
+    const name = filename.toLowerCase().replace(/[-_\.]/g, ' ').replace(/\.(pdf|doc|docx|xls|xlsx|ppt|pptx|jpg|jpeg|png|csv|txt)$/i, '');
+    let best = null, bestScore = 0;
+
+    TEMPLATE.sections.forEach((sec) => {
+      sec.subfolders.forEach((sf, si) => {
+        sf.documents.forEach((doc, di) => {
+          const docName = doc.name.toLowerCase();
+          const fileWords = name.split(/\s+/).filter(w => w.length > 2);
+          const docWords = docName.split(/\s+/).filter(w => w.length > 2);
+          let score = 0;
+          fileWords.forEach(fw => {
+            docWords.forEach(dw => {
+              if (dw.includes(fw) || fw.includes(dw)) score += 1;
+              if (dw === fw) score += 2;
+            });
+          });
+          const secWords = sec.name.toLowerCase().split(/\s+/);
+          fileWords.forEach(fw => {
+            secWords.forEach(sw => {
+              if (sw.includes(fw) || fw.includes(sw)) score += 0.5;
+            });
+          });
+
+          if (score > bestScore) {
+            bestScore = score;
+            best = { secId: sec.id, secName: sec.name, sfIdx: si, sfName: sf.name, docIdx: di, docName: doc.name, docId: docId(sec, si, di), score };
+          }
+        });
+      });
+    });
+
+    return best && bestScore >= 1 ? { ...best, confidence: Math.min(100, Math.round(bestScore * 20)) } : null;
+  }
+
+  let pendingBatch = [];
+
+  function handleBatchFiles(fileList) {
+    const files = Array.from(fileList);
+    pendingBatch = files.map(f => ({
+      file: f,
+      match: matchFileToDoc(f.name),
+      selected: true
+    }));
+    renderBatchPreview();
+  }
+
+  function renderBatchPreview() {
+    const preview = document.getElementById('drBatchPreview');
+    if (!preview || pendingBatch.length === 0) { if (preview) preview.innerHTML = ''; return; }
+
+    let html = `
+      <div class="mt-4">
+        <div class="flex justify-between items-center mb-4">
+          <div class="font-semibold">${pendingBatch.length} files matched</div>
+          <div class="flex gap-3">
+            <button class="btn btn-ghost btn-sm" onclick="HGCDataRoom.cancelBatch()">Cancel</button>
+            <button class="btn btn-primary btn-sm" onclick="HGCDataRoom.confirmBatch()">Upload ${pendingBatch.filter(b=>b.selected).length} Files</button>
+          </div>
+        </div>
+        <table class="data-table">
+          <thead><tr>
+            <th style="width:30px;"></th>
+            <th>File</th>
+            <th>Matched Document</th>
+            <th>Section</th>
+            <th>Confidence</th>
+          </tr></thead>
+          <tbody>`;
+
+    pendingBatch.forEach((b, i) => {
+      const m = b.match;
+      html += `<tr>
+        <td><input type="checkbox" ${b.selected ? 'checked' : ''} onchange="HGCDataRoom.toggleBatchItem(${i}, this.checked)"></td>
+        <td class="text-sm">${esc(b.file.name)}</td>`;
+      if (m) {
+        const confColor = m.confidence >= 70 ? 'badge-success' : m.confidence >= 40 ? 'badge-warning' : 'badge-danger';
+        html += `
+          <td class="text-sm">${esc(m.docName)}</td>
+          <td class="text-xs text-muted">${esc(m.secName)}</td>
+          <td><span class="badge ${confColor}">${m.confidence}%</span></td>`;
+      } else {
+        html += `
+          <td class="text-sm text-muted" colspan="2"><em>No match found \u2014 will skip</em></td>
+          <td><span class="badge badge-neutral">\u2014</span></td>`;
+        b.selected = false;
+      }
+      html += `</tr>`;
+    });
+
+    html += `</tbody></table></div>`;
+    preview.innerHTML = html;
+  }
+
+  async function confirmBatch() {
+    const deal = deals.find(d => d.id === currentDealId);
+    if (!deal) return;
+    if (!deal.dataRoom) deal.dataRoom = {};
+
+    const toUpload = pendingBatch.filter(b => b.selected && b.match);
+    const preview = document.getElementById('drBatchPreview');
+
+    for (let i = 0; i < toUpload.length; i++) {
+      const { file, match } = toUpload[i];
+      if (preview) {
+        const status = preview.querySelector('.font-semibold');
+        if (status) status.textContent = `Uploading ${i + 1} of ${toUpload.length}...`;
+      }
+
+      try {
+        const res = await fetch('/api/upload-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dealId: deal.id, docId: match.docId, filename: file.name, contentType: file.type || 'application/octet-stream' })
+        });
+        if (!res.ok) throw new Error('Failed to get upload URL');
+        const { url, path } = await res.json();
+
+        await fetch(url, { method: 'PUT', headers: { 'Content-Type': file.type || 'application/octet-stream' }, body: file });
+
+        deal.dataRoom[match.docId] = {
+          status: 'received',
+          file: { path, filename: file.name, size: file.size, uploadedAt: new Date().toISOString() },
+          updatedAt: new Date().toISOString()
+        };
+      } catch (err) {
+        console.error('Batch upload error for', file.name, err);
+      }
+    }
+
+    pendingBatch = [];
+    if (typeof saveData === 'function') saveData();
+    if (typeof showToast === 'function') showToast(`${toUpload.length} files uploaded and categorized`, 'success');
+    render();
+  }
+
+  function cancelBatch() {
+    pendingBatch = [];
+    const preview = document.getElementById('drBatchPreview');
+    if (preview) preview.innerHTML = '';
+  }
+
+  function toggleBatchItem(idx, checked) {
+    if (pendingBatch[idx]) {
+      pendingBatch[idx].selected = checked;
+      renderBatchPreview();
+    }
+  }
+
+  window.HGCDataRoom = { open, close, setStatus, toggleIntl, upload, download, removeFile, cardSummary, completeness, portfolioReadiness, cancelBatch, confirmBatch, toggleBatchItem };
   loadTemplate();
 })();

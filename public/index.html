@@ -1521,7 +1521,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
       listHtml = '<div class="empty-state"><div class="empty-state-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><div class="empty-state-title">No deals found</div><div class="empty-state-text">Try adjusting your search or filters.</div></div>';
     } else {
       listHtml = `<div class="card"><div class="deal-list-header" style="display:grid;grid-template-columns:1fr 140px 100px 80px 120px 60px;padding:var(--sp-3) var(--sp-5);border-bottom:2px solid var(--gray-200);font-size:var(--text-xs);font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:0.04em;">
-        <div>Deal</div><div>Capital</div><div>Status</div><div>Prob</div><div>Readiness</div><div></div>
+        <div>Deal</div><div>Capital</div><div>Status</div><div>Prob</div><div>Readiness</div><div>Data Room</div>
       </div>`;
       filtered.forEach(d => {
         const revenue = d.capital * d.fee / 100;
@@ -1540,8 +1540,8 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
               <div class="text-xs text-muted mt-2">${c.reqDone}/${c.req}</div>
             </div>
             <div>
-              <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();deleteDeal(${d.id})">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+              <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();HGCDataRoom.open(${d.id})" title="Open Data Room">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
               </button>
             </div>
           </div>
