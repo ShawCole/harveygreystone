@@ -399,8 +399,17 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   .deal-list-item { grid-template-columns: 1fr 120px 80px 60px; }
   .form-row { grid-template-columns: 1fr; }
 }
+/* Mobile hamburger button */
+.mobile-menu-btn { display: none; width: 36px; height: 36px; border: none; background: none; cursor: pointer; color: var(--gray-600); border-radius: var(--radius-md); align-items: center; justify-content: center; }
+.mobile-menu-btn:hover { background: var(--gray-100); }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 99; }
+
 @media (max-width: 768px) {
-  .sidebar { display: none; }
+  .sidebar { display: flex; transform: translateX(-100%); width: 280px; transition: transform 0.3s var(--ease); }
+  .sidebar.mobile-open { transform: translateX(0); }
+  .sidebar-overlay.show { display: block; }
+  .sidebar-collapse-btn { display: none; }
+  .mobile-menu-btn { display: flex; }
   .main-content { margin-left: 0 !important; }
   .kanban { grid-template-columns: 1fr; }
   .metrics-grid { grid-template-columns: 1fr 1fr; }
@@ -531,8 +540,12 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   <!-- Main Content -->
   <div class="main-content">
     <div class="confidential-banner">CONFIDENTIAL: All information is strictly protected under NDA. Unauthorized access or disclosure is prohibited.</div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileMenu()"></div>
     <div class="content-header">
       <div class="content-header-left">
+        <button class="mobile-menu-btn" onclick="openMobileMenu()" aria-label="Open menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
         <div class="breadcrumb">
           <span>HGC</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
@@ -1183,6 +1196,8 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 
   // ===== NAVIGATION =====
   function switchTab(tab) {
+    // Close mobile menu if open
+    closeMobileMenu();
     // Hide all views
     document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
     // Show target
@@ -1207,6 +1222,14 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 
   function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('collapsed');
+  }
+  function openMobileMenu() {
+    document.getElementById('sidebar').classList.add('mobile-open');
+    document.getElementById('sidebarOverlay').classList.add('show');
+  }
+  function closeMobileMenu() {
+    document.getElementById('sidebar').classList.remove('mobile-open');
+    document.getElementById('sidebarOverlay').classList.remove('show');
   }
 
   function updateNavBadges() {
