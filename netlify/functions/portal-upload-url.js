@@ -11,7 +11,7 @@ exports.handler = async (event) => {
   }
   let body;
   try { body = JSON.parse(event.body || '{}'); } catch { return { statusCode: 400, headers: JSON_HEADERS, body: JSON.stringify({ error: 'bad json' }) }; }
-  const { token, filename, contentType } = body;
+  const { token, filename, contentType, docId } = body;
   if (!token || !filename) return { statusCode: 400, headers: JSON_HEADERS, body: JSON.stringify({ error: 'token and filename required' }) };
   try {
     await ensureSchema();
@@ -20,7 +20,10 @@ exports.handler = async (event) => {
     const signed = (deal.payload.ncnda && (deal.payload.ncnda.signatures || []).some((s) => s.party === 'client'));
     if (!signed) return { statusCode: 403, headers: JSON_HEADERS, body: JSON.stringify({ error: 'You must sign the NCNDA before uploading documents.' }) };
     const safe = String(filename).replace(/[^\w.\- ]+/g, '_').slice(0, 200);
-    const path = `deals/${deal.id}/client-uploads/${Date.now()}_${safe}`;
+    const safeDocId = docId ? String(docId).replace(/[^\w.\-]+/g, '_').slice(0, 100) : null;
+    const path = safeDocId
+      ? `deals/${deal.id}/intake/${safeDocId}/${Date.now()}_${safe}`
+      : `deals/${deal.id}/client-uploads/${Date.now()}_${safe}`;
     const url = await signedPutUrl(path, contentType);
     return { statusCode: 200, headers: JSON_HEADERS, body: JSON.stringify({ url, path }) };
   } catch (err) {

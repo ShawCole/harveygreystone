@@ -1,0 +1,140 @@
+{
+  "version": "1.0",
+  "title": "HGC Funding Document Checklists",
+  "types": [
+    {
+      "id": "biz_unsecured",
+      "name": "Business Unsecured Loans & Lines of Credit",
+      "shortName": "Business Unsecured",
+      "documents": [
+        { "id": "ein", "name": "EIN", "required": true },
+        { "id": "articles", "name": "Articles of Incorporation", "required": true },
+        { "id": "dl", "name": "Driver's License", "required": true },
+        { "id": "ssn", "name": "SSN", "required": true },
+        { "id": "personal_tax_2yr", "name": "Personal Tax Returns (2 Years)", "required": true },
+        { "id": "biz_tax_2yr", "name": "Business Tax Returns (2 Years)", "required": true },
+        { "id": "bank_stmt_4mo", "name": "Business Bank Statements (4 Months)", "required": true },
+        { "id": "voided_biz_check", "name": "Voided Business Check", "required": true },
+        { "id": "personal_credit", "name": "Personal Credit Report with Scores (Experian, Equifax, TransUnion)", "required": true },
+        { "id": "pnl_2025", "name": "2025 Profit & Loss Statement", "required": true },
+        { "id": "bs_2025", "name": "2025 Balance Sheet", "required": true },
+        { "id": "pnl_2026_ytd", "name": "2026 Y-T-D Profit & Loss Statement", "required": true },
+        { "id": "bs_2026_ytd", "name": "2026 Y-T-D Balance Sheet", "required": true },
+        { "id": "ar_aging", "name": "2026 Y-T-D Accounts Receivable Aging Report", "required": false, "note": "Certain industries will not have A/R reports" },
+        { "id": "biz_credit", "name": "Business Credit Report (Experian & Equifax)", "required": true, "note": "Client can pay $69.99 for a NAV Prime Account for reports from Experian, Equifax, and Dun & Bradstreet" }
+      ]
+    },
+    {
+      "id": "biz_secured",
+      "name": "Business Secured Loans & Lines of Credit",
+      "shortName": "Business Secured",
+      "documents": [
+        { "id": "ein", "name": "EIN", "required": true },
+        { "id": "articles", "name": "Articles of Incorporation", "required": true },
+        { "id": "dl", "name": "Driver's License", "required": true },
+        { "id": "ssn", "name": "SSN", "required": true },
+        { "id": "personal_tax_2yr", "name": "Personal Tax Returns (2 Years)", "required": true },
+        { "id": "biz_tax_2yr", "name": "Business Tax Returns (2 Years)", "required": true },
+        { "id": "bank_stmt_4mo", "name": "Business Bank Statements (4 Months)", "required": true },
+        { "id": "voided_biz_check", "name": "Voided Business Check", "required": true },
+        { "id": "personal_credit", "name": "Personal Credit Report with Scores (Experian, Equifax, TransUnion)", "required": true },
+        { "id": "pnl_2025", "name": "2025 Profit & Loss Statement", "required": true },
+        { "id": "bs_2025", "name": "2025 Balance Sheet", "required": true },
+        { "id": "pnl_2026_ytd", "name": "2026 Y-T-D Profit & Loss Statement", "required": true },
+        { "id": "bs_2026_ytd", "name": "2026 Y-T-D Balance Sheet", "required": true },
+        { "id": "ar_aging", "name": "2026 Y-T-D Accounts Receivable Aging Report", "required": false, "note": "Certain industries will not have A/R reports" },
+        { "id": "collateral", "name": "Collateral Document (equipment, real estate, financial assets, etc.)", "required": true },
+        { "id": "biz_credit", "name": "Business Credit Report (Experian & Equifax)", "required": true, "note": "Client can pay $69.99 for a NAV Prime Account for reports from Experian, Equifax, and Dun & Bradstreet" }
+      ]
+    },
+    {
+      "id": "re_unsecured",
+      "name": "Unsecured Real Estate Loan & LOC",
+      "shortName": "RE Unsecured",
+      "documents": [
+        { "id": "ein", "name": "EIN", "required": true },
+        { "id": "articles", "name": "Articles of Incorporation", "required": true },
+        { "id": "dl", "name": "Driver's License", "required": true },
+        { "id": "ssn", "name": "SSN", "required": true },
+        { "id": "personal_tax_2yr", "name": "Personal Tax Returns (2 Years)", "required": true },
+        { "id": "biz_tax_2yr", "name": "Business Tax Returns (2 Years)", "required": true },
+        { "id": "bank_stmt_4mo", "name": "Business Bank Statements (4 Months)", "required": true },
+        { "id": "pitch_deck", "name": "Pitch Deck", "required": true },
+        { "id": "rent_roll", "name": "Rent Roll", "required": true },
+        { "id": "mortgage_stmt", "name": "Mortgage Statement", "required": true },
+        { "id": "property_insurance", "name": "Property Insurance", "required": true },
+        { "id": "voided_biz_check", "name": "Voided Business Check", "required": true },
+        { "id": "personal_credit", "name": "Personal Credit Report with Scores (Experian, Equifax, TransUnion)", "required": true },
+        { "id": "pnl_2025", "name": "2025 Profit & Loss Statement", "required": true },
+        { "id": "bs_2025", "name": "2025 Balance Sheet", "required": true },
+        { "id": "biz_credit", "name": "Business Credit Report (Experian & Equifax)", "required": true, "note": "Client can pay $69.99 for a NAV Prime Account for reports from Experian, Equifax, and Dun & Bradstreet" }
+      ]
+    },
+    {
+      "id": "re_secured",
+      "name": "Secured Real Estate Loans & LOC",
+      "shortName": "RE Secured",
+      "documents": [
+        { "id": "ein", "name": "EIN", "required": true },
+        { "id": "articles", "name": "Articles of Incorporation", "required": true },
+        { "id": "dl", "name": "Driver's License", "required": true },
+        { "id": "ssn", "name": "SSN", "required": true },
+        { "id": "personal_tax_2yr", "name": "Personal Tax Returns (2 Years)", "required": true },
+        { "id": "biz_tax_2yr", "name": "Business Tax Returns (2 Years)", "required": true },
+        { "id": "bank_stmt_4mo", "name": "Business Bank Statements (4 Months)", "required": true },
+        { "id": "pitch_deck", "name": "Pitch Deck", "required": true },
+        { "id": "rent_roll", "name": "Rent Roll", "required": true },
+        { "id": "mortgage_stmt", "name": "Mortgage Statement", "required": true },
+        { "id": "property_insurance", "name": "Property Insurance", "required": true },
+        { "id": "collateral", "name": "Collateral Document (equipment, real estate, financial assets, etc.)", "required": true },
+        { "id": "voided_biz_check", "name": "Voided Business Check", "required": true },
+        { "id": "personal_credit", "name": "Personal Credit Report with Scores (Experian, Equifax, TransUnion)", "required": true },
+        { "id": "pnl_2025", "name": "2025 Profit & Loss Statement", "required": true },
+        { "id": "bs_2025", "name": "2025 Balance Sheet", "required": true },
+        { "id": "biz_credit", "name": "Business Credit Report (Experian & Equifax)", "required": true, "note": "Client can pay $69.99 for a NAV Prime Account for reports from Experian, Equifax, and Dun & Bradstreet" }
+      ]
+    },
+    {
+      "id": "mca",
+      "name": "Merchant Cash Advance (MCA)",
+      "shortName": "MCA",
+      "documents": [
+        { "id": "ein", "name": "EIN", "required": true },
+        { "id": "articles", "name": "Articles of Incorporation", "required": true },
+        { "id": "dl", "name": "Driver's License", "required": true },
+        { "id": "ssn", "name": "SSN", "required": true },
+        { "id": "bank_stmt_6mo", "name": "Business Bank Statements (6 Months)", "required": true },
+        { "id": "voided_biz_check", "name": "Voided Business Check", "required": true },
+        { "id": "personal_credit", "name": "Personal Credit Report with Scores (Experian, Equifax, TransUnion)", "required": true },
+        { "id": "biz_credit", "name": "Business Credit Report (Experian & Equifax)", "required": true, "note": "Client can pay $69.99 for a NAV Prime Account for reports from Experian, Equifax, and Dun & Bradstreet" }
+      ]
+    },
+    {
+      "id": "biz_credit_stack",
+      "name": "Business Credit Card Stacking",
+      "shortName": "Biz Credit Stack",
+      "documents": [
+        { "id": "ein", "name": "EIN", "required": true },
+        { "id": "articles", "name": "Articles of Incorporation", "required": true },
+        { "id": "dl", "name": "Driver's License", "required": true },
+        { "id": "ssn", "name": "SSN", "required": true },
+        { "id": "voided_biz_check", "name": "Voided Business Check", "required": true },
+        { "id": "personal_credit", "name": "Personal Credit Report with Scores (Experian, Equifax, TransUnion)", "required": true },
+        { "id": "biz_credit", "name": "Business Credit Report (Experian & Equifax)", "required": true, "note": "Client can pay $69.99 for a NAV Prime Account for reports from Experian, Equifax, and Dun & Bradstreet" }
+      ]
+    },
+    {
+      "id": "personal",
+      "name": "Personal Loans, Personal LOC, and Personal Credit Card Stacking",
+      "shortName": "Personal",
+      "documents": [
+        { "id": "dl", "name": "Driver's License", "required": true },
+        { "id": "ssn", "name": "SSN", "required": true },
+        { "id": "voided_personal_check", "name": "Voided Personal Check", "required": true },
+        { "id": "pay_stubs", "name": "Paycheck Stubs (1 Month)", "required": true },
+        { "id": "w2_2yr", "name": "W-2s (2 Years)", "required": true },
+        { "id": "personal_credit", "name": "Personal Credit Report with Scores (Experian, Equifax, TransUnion)", "required": true }
+      ]
+    }
+  ]
+}

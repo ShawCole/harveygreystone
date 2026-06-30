@@ -65,15 +65,20 @@
   const token = new URLSearchParams(location.search).get('t');
   const C = document.getElementById('content');
   let state = null;
+  let fundingChecklists = null;
 
   function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
   async function load(){
     if(!token){ C.innerHTML='<p class="err">Missing access link. Please use the link provided to you.</p>'; return; }
     try{
-      const r = await fetch('/api/portal?token='+encodeURIComponent(token));
-      if(!r.ok){ const e=await r.json().catch(()=>({})); C.innerHTML='<p class="err">'+esc(e.error||'This link is invalid or has expired.')+'</p>'; return; }
-      state = await r.json();
+      const [portalRes, checklistRes] = await Promise.all([
+        fetch('/api/portal?token='+encodeURIComponent(token)),
+        fundingChecklists ? Promise.resolve(null) : fetch('/funding-checklists.json').then(r=>r.json()).catch(()=>null)
+      ]);
+      if(checklistRes) fundingChecklists = checklistRes;
+      if(!portalRes.ok){ const e=await portalRes.json().catch(()=>({})); C.innerHTML='<p class="err">'+esc(e.error||'This link is invalid or has expired.')+'</p>'; return; }
+      state = await portalRes.json();
       document.getElementById('title').textContent = state.company ? `${state.company}` : 'HGC & ARK Capital Consulting';
       document.getElementById('subtitle').textContent = 'Secure document portal · ' + (state.dealName||'');
       render();
@@ -130,13 +135,61 @@
     const certLine = state.certificateId
       ? `<div class="cert">✓ Agreement finalized. Verifiable certificate: <strong>${esc(state.certificateId)}</strong> · <a href="/api/certificate?cert=${encodeURIComponent(state.certificateId)}" target="_blank">verify</a></div>`
       : '';
-    const uploads = (state.uploads||[]).map(u=>`<div class="file"><span>📄 ${esc(u.filename)}</span><span class="muted">${new Date(u.uploadedAt).toLocaleString()}</span></div>`).join('') || '<p class="muted">No documents uploaded yet.</p>';
+    const uploads = (state.uploads||[]).map(u=>`<div class="file"><span>${esc(u.filename)}</span><span class="muted">${new Date(u.uploadedAt).toLocaleString()}</span></div>`).join('') || '';
+
+    // Determine if we have a funding-type checklist
+    const ft = state.fundingType && fundingChecklists
+      ? fundingChecklists.types.find(t => t.id === state.fundingType) : null;
+    const intake = state.clientIntake || {};
+
+    let checklistHtml = '';
+    if (ft) {
+      const docs = ft.documents;
+      const received = docs.filter(doc => intake[doc.id] && intake[doc.id].status === 'received').length;
+      const total = docs.length;
+      checklistHtml = `
+        <h2>Documents needed for your ${esc(ft.name)}</h2>
+        <p class="muted" style="margin-bottom:.75rem;">${received} of ${total} documents submitted. Your uploads are encrypted and visible only to the HGC &amp; ARK team.</p>
+        <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:1.5rem;">
+          <div style="height:100%;width:${total?Math.round(received/total*100):0}%;background:${received===total?'var(--success)':'var(--gold)'};border-radius:4px;transition:width .3s;"></div>
+        </div>
+      `;
+      docs.forEach(doc => {
+        const entry = intake[doc.id];
+        const isReceived = entry && entry.status === 'received';
+        const statusBadge = isReceived
+          ? `<span class="signed-badge" style="margin:0;padding:4px 10px;font-size:11px;">Received</span>`
+          : `<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(100,116,139,.1);color:var(--muted);padding:4px 10px;border-radius:var(--radius-md);font-size:11px;font-weight:600;">Missing</span>`;
+        const uploadId = 'intake-file-' + doc.id;
+        const uploadBtn = isReceived ? '' : `<button class="btn btn-primary" style="padding:6px 14px;font-size:12px;" onclick="document.getElementById('${uploadId}').click()">Upload</button><input type="file" id="${uploadId}" class="hide" onchange="handleIntake('${doc.id}', this.files)">`;
+        const receivedInfo = isReceived && entry.file ? `<span class="muted" style="font-size:11px;">${esc(entry.file.filename)} - ${new Date(entry.file.uploadedAt).toLocaleDateString()}</span>` : '';
+        checklistHtml += `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
+            <div style="flex:1;">
+              <div style="font-weight:600;font-size:13px;">${esc(doc.name)}${doc.required ? '<span style="color:var(--danger);margin-left:2px;">*</span>' : ''}</div>
+              ${doc.note ? '<div class="muted" style="font-size:11px;margin-top:2px;">'+esc(doc.note)+'</div>' : ''}
+              ${receivedInfo}
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+              ${statusBadge}
+              ${uploadBtn}
+            </div>
+          </div>
+        `;
+      });
+      checklistHtml += '<div style="margin-top:1.5rem;"><h2 style="font-size:15px;">Other Documents</h2><p class="muted" style="margin-bottom:.75rem;font-size:12px;">Upload any additional documents not listed above.</p></div>';
+    } else {
+      checklistHtml = `
+        <h2>Upload your documents</h2>
+        <p class="muted" style="margin-bottom:1rem;">Drop files below or click to browse. Your uploads are encrypted and visible only to the HGC &amp; ARK team.</p>
+      `;
+    }
+
     C.innerHTML = `
       <div class="step">Step 2 of 2 · Upload documents</div>
       <div class="signed-badge">✓ NCNDA signed${cs?` by ${esc(cs.name)}`:''} on ${cs?new Date(cs.signedAt).toLocaleDateString():''}</div>
-      <h2>Upload your documents</h2>
-      <p class="muted" style="margin-bottom:1rem;">Drop files below or click to browse. Your uploads are encrypted and visible only to the HGC &amp; ARK team.</p>
-      <div class="drop" id="drop"><div class="ico">📥</div><div class="t">Drop files here to upload</div><div class="s">PDF, Excel, Word, images — any deal document</div>
+      ${checklistHtml}
+      <div class="drop" id="drop"><div class="t">Drop files here to upload</div><div class="s">PDF, Excel, Word, images — any deal document</div>
         <input type="file" id="fileInput" multiple class="hide"></div>
       <div id="up-progress" style="font-size:13px;font-weight:600;color:var(--navy);margin-top:.75rem;"></div>
       <div id="up-success" class="hide" style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#065f46;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;margin-top:.75rem;"></div>
@@ -152,27 +205,36 @@
   }
 
   const ALLOWED_TYPES = ['.pdf','.doc','.docx','.xls','.xlsx','.ppt','.pptx','.jpg','.jpeg','.png','.txt','.csv'];
-  async function handle(files){
+  async function handle(files, docId){
     const err=document.getElementById('up-err'); err.classList.add('hide');
     const total = files.length;
     let current = 0;
     for(const f of files){
       const ext = (f.name.includes('.') ? '.' + f.name.split('.').pop() : '').toLowerCase();
-      if(!ALLOWED_TYPES.includes(ext)){ err.textContent='"'+f.name+'": File type not allowed. Accepted: '+ALLOWED_TYPES.join(', '); err.classList.remove('hide'); continue; }
+      if(!ALLOWED_TYPES.includes(ext)){ err.textContent='”'+f.name+'”: File type not allowed. Accepted: '+ALLOWED_TYPES.join(', '); err.classList.remove('hide'); continue; }
       current++;
       const prog=document.getElementById('up-progress'); if(prog) prog.textContent='Uploading file '+current+' of '+total+'…';
       try{
-        const r=await fetch('/api/portal-upload-url',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,filename:f.name,contentType:f.type||'application/octet-stream'})});
+        const body = {token,filename:f.name,contentType:f.type||'application/octet-stream'};
+        if(docId) body.docId = docId;
+        const r=await fetch('/api/portal-upload-url',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
         const d=await r.json();
         if(!r.ok) throw new Error(d.error||'Upload not permitted');
         const put=await fetch(d.url,{method:'PUT',headers:{'Content-Type':f.type||'application/octet-stream'},body:f});
         if(!put.ok) throw new Error('Upload failed');
-        await fetch('/api/portal-record',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,path:d.path,filename:f.name,size:f.size})});
-        const suc=document.getElementById('up-success'); if(suc){ suc.textContent='✓ Uploaded: '+f.name; suc.classList.remove('hide'); }
+        const recBody = {token,path:d.path,filename:f.name,size:f.size};
+        if(docId) recBody.docId = docId;
+        await fetch('/api/portal-record',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(recBody)});
+        const suc=document.getElementById('up-success'); if(suc){ suc.textContent='Uploaded: '+f.name; suc.classList.remove('hide'); }
       }catch(e){ err.textContent='”'+f.name+'”: '+e.message; err.classList.remove('hide'); }
     }
     const prog=document.getElementById('up-progress'); if(prog) prog.textContent='';
     await load();
+  }
+
+  function handleIntake(docId, files){
+    if(!files || !files.length) return;
+    handle(files, docId);
   }
 
   load();

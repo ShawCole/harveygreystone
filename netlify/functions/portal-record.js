@@ -9,20 +9,32 @@ exports.handler = async (event) => {
   }
   let body;
   try { body = JSON.parse(event.body || '{}'); } catch { return { statusCode: 400, headers: JSON_HEADERS, body: JSON.stringify({ error: 'bad json' }) }; }
-  const { token, path, filename, size } = body;
+  const { token, path, filename, size, docId } = body;
   if (!token || !path || !filename) return { statusCode: 400, headers: JSON_HEADERS, body: JSON.stringify({ error: 'token, path, filename required' }) };
   try {
     await ensureSchema();
     const deal = await findDealByToken(token);
     if (!deal) return { statusCode: 404, headers: JSON_HEADERS, body: JSON.stringify({ error: 'invalid or expired link' }) };
-    // path must belong to this deal's client-uploads namespace
-    if (!String(path).startsWith(`deals/${deal.id}/client-uploads/`)) {
+    // path must belong to this deal's client-uploads or intake namespace
+    const validClientPath = String(path).startsWith(`deals/${deal.id}/client-uploads/`);
+    const validIntakePath = String(path).startsWith(`deals/${deal.id}/intake/`);
+    if (!validClientPath && !validIntakePath) {
       return { statusCode: 400, headers: JSON_HEADERS, body: JSON.stringify({ error: 'invalid path' }) };
     }
     const signed = (deal.payload.ncnda && (deal.payload.ncnda.signatures || []).some((s) => s.party === 'client'));
     if (!signed) return { statusCode: 403, headers: JSON_HEADERS, body: JSON.stringify({ error: 'NCNDA not signed' }) };
     if (!Array.isArray(deal.payload.clientUploads)) deal.payload.clientUploads = [];
-    deal.payload.clientUploads.push({ path, filename: String(filename).slice(0, 200), size: Number(size) || 0, uploadedAt: new Date().toISOString() });
+    const uploadedAt = new Date().toISOString();
+    const safeName = String(filename).slice(0, 200);
+    deal.payload.clientUploads.push({ path, filename: safeName, size: Number(size) || 0, uploadedAt });
+    // If docId provided, update the clientIntake checklist tracker
+    if (docId) {
+      if (!deal.payload.clientIntake) deal.payload.clientIntake = {};
+      deal.payload.clientIntake[String(docId).slice(0, 100)] = {
+        status: 'received',
+        file: { path, filename: safeName, size: Number(size) || 0, uploadedAt }
+      };
+    }
     await saveDeal(deal.id, deal.payload);
     return { statusCode: 200, headers: JSON_HEADERS, body: JSON.stringify({ ok: true }) };
   } catch (err) {

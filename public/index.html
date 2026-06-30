@@ -684,6 +684,22 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
       </div>
       <div class="form-row">
         <div class="form-group">
+          <label class="form-label">Funding Type</label>
+          <select id="dealFundingType" class="form-input">
+            <option value="">Select funding type...</option>
+            <option value="biz_unsecured">Business Unsecured</option>
+            <option value="biz_secured">Business Secured</option>
+            <option value="re_unsecured">RE Unsecured</option>
+            <option value="re_secured">RE Secured</option>
+            <option value="mca">MCA</option>
+            <option value="biz_credit_stack">Biz Credit Stack</option>
+            <option value="personal">Personal</option>
+          </select>
+        </div>
+        <div class="form-group"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
           <label class="form-label">Years in Business</label>
           <input type="text" id="dealYears" class="form-input" placeholder="7">
         </div>
@@ -1037,6 +1053,37 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   </script>
 <script>
   const STORAGE_KEY = 'hgc_data';
+
+  let fundingChecklists = null;
+  fetch('/funding-checklists.json').then(r => r.json()).then(d => { fundingChecklists = d; }).catch(() => {});
+
+  const FUNDING_TYPE_OPTIONS = [
+    { value: '', label: 'Select funding type...' },
+    { value: 'biz_unsecured', label: 'Business Unsecured' },
+    { value: 'biz_secured', label: 'Business Secured' },
+    { value: 're_unsecured', label: 'RE Unsecured' },
+    { value: 're_secured', label: 'RE Secured' },
+    { value: 'mca', label: 'MCA' },
+    { value: 'biz_credit_stack', label: 'Biz Credit Stack' },
+    { value: 'personal', label: 'Personal' }
+  ];
+
+  function fundingTypeLabel(id) {
+    if (!id) return '';
+    const opt = FUNDING_TYPE_OPTIONS.find(o => o.value === id);
+    if (opt) return opt.label;
+    if (fundingChecklists) {
+      const t = fundingChecklists.types.find(t => t.id === id);
+      if (t) return t.shortName || t.name;
+    }
+    return id;
+  }
+
+  function fundingTypeSelectHtml(selected, idAttr) {
+    return `<select id="${idAttr}" class="form-input">${FUNDING_TYPE_OPTIONS.map(o =>
+      `<option value="${escHtml(o.value)}" ${selected === o.value ? 'selected' : ''}>${escHtml(o.label)}</option>`
+    ).join('')}</select>`;
+  }
 
   let deals = [
     {id: 1, name: "Voozaa", capital: 5000000, status: "lead", reference: "", client: "", fee: 5, equity: 0, rank: 1, files: [], notes: "", probability: 60, createdDate: new Date().toISOString()},
@@ -1530,7 +1577,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
           <div class="deal-list-item ${selectedDealId === d.id ? 'active' : ''}" draggable="true" data-deal-id="${d.id}" onclick="selectDeal(${d.id})" ondragstart="dealDragStart(event, ${d.id})" ondragover="dealDragOver(event)" ondrop="dealDrop(event, ${d.id})" ondragend="dealDragEnd(event)">
             <div>
               <div class="deal-list-name">${escHtml(d.name)}</div>
-              <div class="deal-list-sub">#${d.rank}${d.score ? ' · Score ' + d.score : ''} · ${formatCurrency(revenue)} est. rev</div>
+              <div class="deal-list-sub">#${d.rank}${d.score ? ' · Score ' + d.score : ''} · ${formatCurrency(revenue)} est. rev${d.fundingType ? ' · <span class="badge badge-info" style="font-size:10px;padding:1px 6px;">' + escHtml(fundingTypeLabel(d.fundingType)) + '</span>' : ''}</div>
             </div>
             <div class="font-semibold">${formatCurrency(d.capital)}</div>
             <div><span class="badge ${statusBadgeClass(d.status)}">${statusLabel(d.status)}</span></div>
@@ -1580,7 +1627,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         <div class="flex justify-between items-center">
           <div>
             <div class="deal-detail-title">${escHtml(d.name)}</div>
-            <div class="deal-detail-subtitle">${formatCurrency(d.capital)} · ${statusLabel(d.status)}</div>
+            <div class="deal-detail-subtitle">${formatCurrency(d.capital)} · ${statusLabel(d.status)}${d.fundingType ? ' · ' + escHtml(fundingTypeLabel(d.fundingType)) : ''}</div>
           </div>
           <button class="btn btn-ghost btn-sm" onclick="selectedDealId=null;renderDeals();">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -1590,6 +1637,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
       <div class="deal-detail-body">
         <div class="sub-tabs" id="dealSubTabs">
           <div class="sub-tab active" onclick="switchDealSubTab('overview')">Overview</div>
+          <div class="sub-tab" onclick="switchDealSubTab('detail-intake')">Client Intake</div>
           <div class="sub-tab" onclick="switchDealSubTab('detail-dataroom')">Data Room</div>
           <div class="sub-tab" onclick="switchDealSubTab('detail-investors')">Investors</div>
           <div class="sub-tab" onclick="switchDealSubTab('detail-portal')">Portal</div>
@@ -1623,6 +1671,17 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
               <input type="number" class="form-input" value="${d.probability}" step="5" min="0" max="100" onchange="updateDeal(${d.id}, 'probability', this.value)">
             </div>
           </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Funding Type</label>
+              <select class="form-input" onchange="updateDeal(${d.id}, 'fundingType', this.value)">
+                ${FUNDING_TYPE_OPTIONS.map(o =>
+                  '<option value="' + escHtml(o.value) + '" ' + ((d.fundingType || '') === o.value ? 'selected' : '') + '>' + escHtml(o.label) + '</option>'
+                ).join('')}
+              </select>
+            </div>
+            <div class="form-group"></div>
+          </div>
           <div class="card mb-4">
             <div class="card-body">
               <div class="flex justify-between text-sm mb-2"><span class="text-muted">Revenue (100%)</span><span class="font-semibold">${formatCurrency(revenue)}</span></div>
@@ -1640,6 +1699,10 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
             <label class="form-label">Notes</label>
             <textarea class="form-input" rows="3" onchange="updateDeal(${d.id}, 'notes', this.value)">${escHtml(d.notes || '')}</textarea>
           </div>
+        </div>
+
+        <div id="detail-intake" class="detail-tab-content">
+          ${renderClientIntake(d)}
         </div>
 
         <div id="detail-dataroom" class="detail-tab-content">
@@ -1662,6 +1725,92 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         </div>
       </div>
     `;
+  }
+
+  function renderClientIntake(deal) {
+    if (!deal.fundingType || !fundingChecklists) {
+      return '<div class="text-sm text-muted">Select a funding type on the Overview tab to see the required document checklist.</div>';
+    }
+    const ft = fundingChecklists.types.find(t => t.id === deal.fundingType);
+    if (!ft) {
+      return '<div class="text-sm text-muted">Unknown funding type. Select a valid funding type on the Overview tab.</div>';
+    }
+    const intake = deal.clientIntake || {};
+    const docs = ft.documents;
+    const received = docs.filter(doc => intake[doc.id] && intake[doc.id].status === 'received').length;
+    const total = docs.length;
+    const pct = total > 0 ? Math.round(received / total * 100) : 0;
+
+    let html = `
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <div class="font-semibold">${escHtml(ft.name)}</div>
+          <div class="text-xs text-muted">${received} of ${total} documents received</div>
+        </div>
+        <span class="badge ${pct === 100 ? 'badge-success' : pct > 0 ? 'badge-warning' : 'badge-neutral'}">${pct}%</span>
+      </div>
+      <div class="progress progress-lg mb-6"><div class="progress-fill ${progressColorClass(pct)}" style="width:${pct}%"></div></div>
+    `;
+
+    docs.forEach(doc => {
+      const entry = intake[doc.id];
+      const isReceived = entry && entry.status === 'received';
+      const statusHtml = isReceived
+        ? `<span class="badge badge-success">Received</span><div class="text-xs text-muted mt-2">${escHtml(entry.file?.filename || '')} - ${new Date(entry.file?.uploadedAt || '').toLocaleDateString()}</div>`
+        : `<span class="badge badge-neutral">Missing</span>`;
+      const uploadBtn = isReceived
+        ? ''
+        : `<button class="btn btn-secondary btn-sm" onclick="uploadIntakeDoc(${deal.id}, '${doc.id}')">Upload</button>`;
+      html += `
+        <div class="flex justify-between items-center" style="padding:var(--sp-3) 0;border-bottom:1px solid var(--gray-100);">
+          <div>
+            <div class="text-sm font-semibold">${escHtml(doc.name)}${doc.required ? '<span style="color:var(--danger);margin-left:2px;">*</span>' : ''}</div>
+            ${doc.note ? '<div class="text-xs text-muted">' + escHtml(doc.note) + '</div>' : ''}
+          </div>
+          <div class="flex items-center gap-3">
+            ${statusHtml}
+            ${uploadBtn}
+          </div>
+        </div>
+      `;
+    });
+    return html;
+  }
+
+  function uploadIntakeDoc(dealId, docId) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.txt,.csv';
+    input.onchange = async () => {
+      const file = input.files[0];
+      if (!file) return;
+      try {
+        const res = await fetch('/api/upload-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dealId, filename: file.name, contentType: file.type || 'application/octet-stream', folder: 'intake/' + docId })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Upload failed');
+        const put = await fetch(data.url, { method: 'PUT', headers: { 'Content-Type': file.type || 'application/octet-stream' }, body: file });
+        if (!put.ok) throw new Error('Upload failed');
+        // Update local deal
+        const deal = deals.find(d => d.id === dealId);
+        if (deal) {
+          if (!deal.clientIntake) deal.clientIntake = {};
+          deal.clientIntake[docId] = {
+            status: 'received',
+            file: { path: data.path, filename: file.name, size: file.size, uploadedAt: new Date().toISOString() }
+          };
+          saveData();
+          renderDeals();
+        }
+        showToast('Document uploaded');
+      } catch (err) {
+        showToast('Upload failed: ' + err.message, 'error');
+      }
+    };
+    input.click();
   }
 
   function switchDealSubTab(tabId) {
@@ -1760,6 +1909,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     renderDealFiles();
     ['dealName','dealCompany','dealContact','dealEmail','dealPhone','dealCapital','dealRevenue','dealYears','dealDescription','dealDocText','dealNotes','dealScore'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     const eq = document.getElementById('dealEquity'); if (eq) eq.value = '0';
+    const ft = document.getElementById('dealFundingType'); if (ft) ft.value = '';
     const st = document.getElementById('dealStatus'); if (st) st.value = 'lead';
     const fe = document.getElementById('dealFee'); if (fe) fe.value = '5';
     const pr = document.getElementById('dealProbability'); if (pr) pr.value = '50';
@@ -2020,6 +2170,7 @@ ${docText}`;
       description: document.getElementById('dealDescription').value,
       client: document.getElementById('dealContact').value,
       equity: parseFloat(document.getElementById('dealEquity').value) || 0,
+      fundingType: document.getElementById('dealFundingType').value,
       score: parseInt(document.getElementById('dealScore').value) || null,
       bankerFit: window._lastAnalysis?.bankerFit || null,
       investorFit: window._lastAnalysis?.investorFit || null,

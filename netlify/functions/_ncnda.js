@@ -94,6 +94,8 @@ function publicView(deal) {
     clientSigner: (sigs.find((s) => s.party === 'client') || null) && (() => { const c = sigs.find((s) => s.party === 'client'); return { name: c.name, title: c.title, signedAt: c.signedAt }; })(),
     certificateId: n.certificateId || null,
     uploads: (deal.payload.clientUploads || []).map((u) => ({ filename: u.filename, uploadedAt: u.uploadedAt })),
+    fundingType: deal.fundingType || deal.payload?.fundingType || null,
+    clientIntake: deal.payload?.clientIntake || {},
   };
 }
 
