@@ -488,6 +488,73 @@
     }
   }
 
-  window.HGCDataRoom = { open, close, setStatus, toggleIntl, upload, download, removeFile, cardSummary, completeness, portfolioReadiness, cancelBatch, confirmBatch, toggleBatchItem };
+  // Render data room into an arbitrary container (for deal detail modal)
+  function renderInline(dealId, container) {
+    if (!TEMPLATE) { container.innerHTML = '<div class="text-sm text-muted">Loading template...</div>'; return; }
+    const deal = deals.find(d => d.id === dealId);
+    if (!deal) return;
+    if (!deal.dataRoom) deal.dataRoom = {};
+    currentDealId = dealId;
+
+    const c = completeness(deal);
+    const b = band(deal.capital);
+    const bandNote = b === 'zero'
+      ? '<div class="text-danger font-semibold text-sm">Set deal capital to see required documents</div>'
+      : `<div class="font-bold">${BAND_LABEL[b]}</div>`;
+
+    let html = `<div id="drControls" class="card mb-4"><div class="card-body flex gap-5 items-center" style="flex-wrap:wrap;">
+      <div>${bandNote}</div>
+      <div class="flex-1"></div>
+      <div class="text-sm text-muted">${c.reqDone} / ${c.req} required</div>
+      <div class="progress" style="width:120px;"><div class="progress-fill ${c.pct>=100?'green':c.pct>=50?'amber':'red'}" style="width:${c.pct}%"></div></div>
+      <div class="font-bold">${c.pct}%</div>
+    </div></div>`;
+
+    // Batch upload zone
+    html += `<div class="card mb-4"><div class="card-header"><div class="card-header-title">Batch Upload</div></div>
+      <div class="card-body">
+        <div class="upload-zone" id="drBatchZone"><div class="upload-zone-text"><strong>Drop multiple files here</strong> or click to select<br><span class="text-xs text-muted">Files will be auto-matched to document categories</span></div></div>
+        <input type="file" id="drBatchInput" multiple style="display:none">
+        <div id="drBatchPreview"></div>
+      </div></div>`;
+
+    // Sections
+    html += '<div id="drBody">';
+    TEMPLATE.sections.forEach((sec, secIdx) => {
+      if (!inScope(deal, sec.id)) return;
+      const isOpen = expandedSections.has(secIdx);
+      html += `<div class="dr-section ${isOpen ? 'open' : ''}" data-sec="${secIdx}">
+        <div class="dr-section-header" data-act="toggle-section" data-sec="${secIdx}">
+          <div class="dr-section-title"><span class="dr-section-toggle">&#9656;</span> ${sec.id}. ${esc(sec.name)}</div>
+        </div><div class="dr-section-body">`;
+      sec.subfolders.forEach((sf, si) => {
+        html += `<div class="text-xs font-semibold" style="padding:var(--sp-2) var(--sp-4) var(--sp-1) var(--sp-6);color:var(--gray-500);">${esc(sf.name)}</div>`;
+        sf.documents.forEach((doc, di) => {
+          const id = docId(sec, si, di);
+          const req = isRequired(deal, sec, doc);
+          const st = docState(deal, id);
+          html += docRow(deal, id, doc, req, st);
+        });
+      });
+      html += '</div></div>';
+    });
+    html += '</div>';
+
+    container.innerHTML = html;
+    ensureDelegation();
+
+    // Wire batch upload
+    const batchZone = document.getElementById('drBatchZone');
+    const batchInput = document.getElementById('drBatchInput');
+    if (batchZone && batchInput) {
+      batchZone.onclick = () => batchInput.click();
+      batchZone.ondragover = (e) => { e.preventDefault(); batchZone.classList.add('dragover'); };
+      batchZone.ondragleave = () => batchZone.classList.remove('dragover');
+      batchZone.ondrop = (e) => { e.preventDefault(); batchZone.classList.remove('dragover'); handleBatchFiles(e.dataTransfer.files); };
+      batchInput.onchange = () => { handleBatchFiles(batchInput.files); batchInput.value = ''; };
+    }
+  }
+
+  window.HGCDataRoom = { open, close, setStatus, toggleIntl, upload, download, removeFile, cardSummary, completeness, portfolioReadiness, cancelBatch, confirmBatch, toggleBatchItem, renderInline };
   loadTemplate();
 })();

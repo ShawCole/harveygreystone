@@ -893,6 +893,20 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   </div>
 </div>
 
+<!-- DEAL DETAIL MODAL -->
+<div class="modal-backdrop" id="dealDetailModal">
+  <div class="modal-panel modal-lg">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="dealDetailModalTitle">Deal</div>
+        <div class="text-xs text-muted" id="dealDetailModalSub"></div>
+      </div>
+      <button class="modal-close" onclick="closeDealDetailModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="dealDetailModalBody"></div>
+  </div>
+</div>
+
 <!-- DATA ROOM MODAL -->
 <div class="modal-backdrop" id="dataRoomModal">
   <div class="modal-panel modal-lg">
@@ -1574,7 +1588,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         const revenue = d.capital * d.fee / 100;
         const c = window.HGCDataRoom ? HGCDataRoom.completeness(d) : { pct: 0, reqDone: 0, req: 0 };
         listHtml += `
-          <div class="deal-list-item ${selectedDealId === d.id ? 'active' : ''}" draggable="true" data-deal-id="${d.id}" onclick="selectDeal(${d.id})" ondragstart="dealDragStart(event, ${d.id})" ondragover="dealDragOver(event)" ondrop="dealDrop(event, ${d.id})" ondragend="dealDragEnd(event)">
+          <div class="deal-list-item" draggable="true" data-deal-id="${d.id}" onclick="selectDeal(${d.id})" ondragstart="dealDragStart(event, ${d.id})" ondragover="dealDragOver(event)" ondrop="dealDrop(event, ${d.id})" ondragend="dealDragEnd(event)">
             <div>
               <div class="deal-list-name">${escHtml(d.name)}</div>
               <div class="deal-list-sub">#${d.rank}${d.score ? ' · Score ' + d.score : ''} · ${formatCurrency(revenue)} est. rev${d.fundingType ? ' · <span class="badge badge-info" style="font-size:10px;padding:1px 6px;">' + escHtml(fundingTypeLabel(d.fundingType)) + '</span>' : ''}</div>
@@ -1597,22 +1611,22 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
       listHtml += '</div>';
     }
 
-    // Split layout
-    let detailHtml = '';
-    if (selectedDealId) {
-      const d = deals.find(x => x.id === selectedDealId);
-      if (d) detailHtml = renderDealDetail(d);
-    }
-
-    container.innerHTML = toolbarHtml + `<div class="deals-split ${selectedDealId ? 'has-detail' : ''}">
-      <div>${listHtml}</div>
-      ${detailHtml ? `<div class="deal-detail">${detailHtml}</div>` : ''}
-    </div>`;
+    container.innerHTML = toolbarHtml + `<div>${listHtml}</div>`;
   }
 
   function selectDeal(id) {
-    selectedDealId = (selectedDealId === id) ? null : id;
-    renderDeals();
+    selectedDealId = id;
+    const d = deals.find(x => x.id === id);
+    if (!d) return;
+    document.getElementById('dealDetailModalTitle').textContent = d.name;
+    document.getElementById('dealDetailModalSub').textContent = `${formatCurrency(d.capital)} · ${statusLabel(d.status)}${d.fundingType ? ' · ' + fundingTypeLabel(d.fundingType) : ''}`;
+    document.getElementById('dealDetailModalBody').innerHTML = renderDealDetail(d);
+    document.getElementById('dealDetailModal').classList.add('show');
+  }
+
+  function closeDealDetailModal() {
+    document.getElementById('dealDetailModal').classList.remove('show');
+    selectedDealId = null;
   }
 
   function renderDealDetail(d) {
@@ -1623,18 +1637,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     const investorSummary = window.HGCInvestors ? HGCInvestors.dealSummary(d) : '';
 
     return `
-      <div class="deal-detail-header">
-        <div class="flex justify-between items-center">
-          <div>
-            <div class="deal-detail-title">${escHtml(d.name)}</div>
-            <div class="deal-detail-subtitle">${formatCurrency(d.capital)} · ${statusLabel(d.status)}${d.fundingType ? ' · ' + escHtml(fundingTypeLabel(d.fundingType)) : ''}</div>
-          </div>
-          <button class="btn btn-ghost btn-sm" onclick="selectedDealId=null;renderDeals();">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
-        </div>
-      </div>
-      <div class="deal-detail-body">
+      <div>
         <div class="sub-tabs" id="dealSubTabs">
           <div class="sub-tab active" onclick="switchDealSubTab('overview')">Overview</div>
           <div class="sub-tab" onclick="switchDealSubTab('detail-intake')">Client Intake</div>
@@ -1708,7 +1711,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         <div id="detail-dataroom" class="detail-tab-content">
           <div class="progress-label"><span>Readiness</span><span>${c.reqDone}/${c.req} (${c.pct}%)</span></div>
           <div class="progress progress-lg mb-4"><div class="progress-fill ${progressColorClass(c.pct)}" style="width:${c.pct}%"></div></div>
-          <button class="btn btn-primary btn-sm mb-4" onclick="HGCDataRoom.open(${d.id})">Open Full Data Room</button>
+          <div id="dealDetailDrBody"></div>
         </div>
 
         <div id="detail-investors" class="detail-tab-content">
@@ -1725,6 +1728,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         </div>
       </div>
     `;
+  }
   }
 
   function renderClientIntake(deal) {
@@ -1814,17 +1818,21 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   }
 
   function switchDealSubTab(tabId) {
-    document.querySelectorAll('.deal-detail .detail-tab-content').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.deal-detail .sub-tab').forEach(el => el.classList.remove('active'));
+    const modal = document.getElementById('dealDetailModalBody');
+    if (!modal) return;
+    modal.querySelectorAll('.detail-tab-content').forEach(el => el.classList.remove('active'));
+    modal.querySelectorAll('.sub-tab').forEach(el => el.classList.remove('active'));
     const target = document.getElementById(tabId);
     if (target) target.classList.add('active');
-    // Find the tab button
-    const prefix = tabId === 'detail-overview' ? 'overview' : tabId.replace('detail-', '');
-    document.querySelectorAll('.deal-detail .sub-tab').forEach(el => {
-      if (el.textContent.toLowerCase().includes(prefix.replace('detail-',''))) el.classList.add('active');
+    // Highlight the clicked tab
+    modal.querySelectorAll('.sub-tab').forEach(el => {
+      if (el.getAttribute('onclick') && el.getAttribute('onclick').includes("'" + tabId + "'")) el.classList.add('active');
     });
-    // Activate by onclick matching
-    event.target.classList.add('active');
+    // If switching to dataroom tab, render it inline
+    if (tabId === 'detail-dataroom' && selectedDealId && window.HGCDataRoom) {
+      const drBody = document.getElementById('dealDetailDrBody');
+      if (drBody) HGCDataRoom.renderInline(selectedDealId, drBody);
+    }
   }
 
   function renderKanban(filtered) {
