@@ -219,23 +219,27 @@
   }
 
   let delegated = false;
+  const delegatedContainers = new WeakSet();
   function ensureDelegation() {
-    if (delegated) return;
-    const body = document.getElementById('drBody');
-    if (!body) return;
-    body.addEventListener('click', (e) => {
-      const el = e.target.closest('[data-act]');
-      if (!el || !body.contains(el)) return;
-      const act = el.dataset.act;
-      if (act === 'download') { e.preventDefault(); download(el.dataset.path); }
-      else if (act === 'remove') { e.preventDefault(); removeFile(el.dataset.id); }
-      else if (act === 'upload') { e.preventDefault(); upload(el.dataset.id); }
-      else if (act === 'toggle-section') { e.preventDefault(); const idx = Number(el.dataset.sec); if (expandedSections.has(idx)) expandedSections.delete(idx); else expandedSections.add(idx); render(); }
-    });
-    body.addEventListener('change', (e) => {
-      const el = e.target.closest('select[data-act="status"]');
-      if (!el || !body.contains(el)) return;
-      setStatus(el.dataset.id, el.value);
+    // Attach to whichever container exists (modal drBody or inline target)
+    const targets = [document.getElementById('drBody'), inlineTarget].filter(Boolean);
+    targets.forEach(body => {
+      if (delegatedContainers.has(body)) return;
+      body.addEventListener('click', (e) => {
+        const el = e.target.closest('[data-act]');
+        if (!el || !body.contains(el)) return;
+        const act = el.dataset.act;
+        if (act === 'download') { e.preventDefault(); download(el.dataset.path); }
+        else if (act === 'remove') { e.preventDefault(); removeFile(el.dataset.id); }
+        else if (act === 'upload') { e.preventDefault(); upload(el.dataset.id); }
+        else if (act === 'toggle-section') { e.preventDefault(); const idx = Number(el.dataset.sec); if (expandedSections.has(idx)) expandedSections.delete(idx); else expandedSections.add(idx); render(); }
+      });
+      body.addEventListener('change', (e) => {
+        const el = e.target.closest('select[data-act="status"]');
+        if (!el || !body.contains(el)) return;
+        setStatus(el.dataset.id, el.value);
+      });
+      delegatedContainers.add(body);
     });
     delegated = true;
   }
