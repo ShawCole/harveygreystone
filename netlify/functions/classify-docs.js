@@ -1,10 +1,12 @@
+// NOTE: Requires aiplatform.googleapis.com API enabled on GCP project dataroom-500817
 const { authed, unauthorized } = require('./_auth');
-const Anthropic = require('@anthropic-ai/sdk');
+const { VertexAI } = require('@google-cloud/vertexai');
 
 const JSON_HEADERS = { 'Content-Type': 'application/json' };
 
-const MODEL = 'claude-sonnet-4-6';
-const MAX_TOKENS = 8000;
+const PROJECT = process.env.GOOGLE_CLOUD_PROJECT_ID || 'dataroom-500817';
+const LOCATION = 'us-central1';
+const MODEL = 'gemini-2.5-flash';
 
 const SYSTEM = `You are a document classification assistant for a capital-raising data room. Given a list of uploaded files (with their extracted text) and a template of document categories, classify each file into the best matching category and extract any people/stakeholders mentioned.
 
@@ -29,20 +31,19 @@ For contacts, extract any names, roles, titles, companies, emails, and phone num
 
 If a file doesn't match any category well, set confidence below 30 and matchedDocName to "Uncategorized".`;
 
-let client = null;
-function getClient() {
-  if (!client) client = new Anthropic();
-  return client;
+let vertexAI = null;
+function getModel() {
+  if (!vertexAI) vertexAI = new VertexAI({ project: PROJECT, location: LOCATION });
+  return vertexAI.getGenerativeModel({
+    model: MODEL,
+    systemInstruction: { parts: [{ text: SYSTEM }] },
+  });
 }
 
 exports.handler = async (event) => {
   if (!authed(event)) return unauthorized();
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, headers: JSON_HEADERS, body: JSON.stringify({ error: 'method not allowed' }) };
-  }
-
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return { statusCode: 503, headers: JSON_HEADERS, body: JSON.stringify({ error: 'AI classification unavailable (no API key).' }) };
   }
 
   let files, templateSections;
@@ -76,16 +77,13 @@ exports.handler = async (event) => {
   const userPrompt = `Here are ${files.length} uploaded files to classify:\n\n${fileDescriptions}\n\n---\n\nHere is the data room template with all document categories:\n\n${templateDescription}\n\nClassify each file into the best matching category and extract any stakeholder contacts found in the text.`;
 
   try {
-    const response = await getClient().messages.create({
-      model: MODEL,
-      max_tokens: MAX_TOKENS,
-      system: SYSTEM,
-      messages: [{ role: 'user', content: userPrompt }],
+    const model = getModel();
+    const genResult = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
     });
 
-    const resultText = response.content
-      .filter(b => b.type === 'text')
-      .map(b => b.text)
+    const resultText = genResult.response.candidates[0].content.parts
+      .map(p => p.text)
       .join('')
       .trim();
 

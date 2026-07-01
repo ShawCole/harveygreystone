@@ -1,11 +1,12 @@
+// NOTE: Requires aiplatform.googleapis.com API enabled on GCP project dataroom-500817
 const { authed, unauthorized } = require('./_auth');
-const Anthropic = require('@anthropic-ai/sdk');
+const { VertexAI } = require('@google-cloud/vertexai');
 
 const JSON_HEADERS = { 'Content-Type': 'application/json' };
 
-// Model + generation settings for the first-pass underwriting memo.
-const MODEL = 'claude-opus-4-8';
-const MAX_TOKENS = 32000; // memos run long (≈15 sections); streaming avoids HTTP timeouts.
+const PROJECT = process.env.GOOGLE_CLOUD_PROJECT_ID || 'dataroom-500817';
+const LOCATION = 'us-central1';
+const MODEL = 'gemini-2.5-flash';
 
 // Reinforce the exact output contract the frontend parses: a single JSON object
 // on line 1 (no markdown fences), then the full memo. The detailed instructions
@@ -14,20 +15,19 @@ const SYSTEM = `You are a meticulous, skeptical capital-markets underwriter perf
 
 Output format is strict: the VERY FIRST line of your response must be the single-line JSON object the user specifies (raw JSON, no markdown, no code fences, no leading text). After that JSON line, write the full underwriter memo. Do not wrap the JSON in backticks.`;
 
-let client = null;
-function getClient() {
-  if (!client) client = new Anthropic(); // reads ANTHROPIC_API_KEY from env
-  return client;
+let vertexAI = null;
+function getModel() {
+  if (!vertexAI) vertexAI = new VertexAI({ project: PROJECT, location: LOCATION });
+  return vertexAI.getGenerativeModel({
+    model: MODEL,
+    systemInstruction: { parts: [{ text: SYSTEM }] },
+  });
 }
 
 exports.handler = async (event) => {
   if (!authed(event)) return unauthorized();
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, headers: JSON_HEADERS, body: JSON.stringify({ error: 'method not allowed' }) };
-  }
-
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return { statusCode: 503, headers: JSON_HEADERS, body: JSON.stringify({ error: 'AI underwriting is not configured (no API key).' }) };
   }
 
   let prompt;
@@ -39,27 +39,13 @@ exports.handler = async (event) => {
   }
 
   try {
-    // Stream internally (long output) and assemble the full text. The client
-    // consumes a single buffered { result } response; Cloud Run's request
-    // timeout (600s) comfortably covers a full memo.
-    const stream = getClient().messages.stream({
-      model: MODEL,
-      max_tokens: MAX_TOKENS,
-      thinking: { type: 'adaptive' },
-      output_config: { effort: 'high' },
-      system: SYSTEM,
-      messages: [{ role: 'user', content: prompt }],
+    const model = getModel();
+    const genResult = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
     });
 
-    const message = await stream.finalMessage();
-
-    if (message.stop_reason === 'refusal') {
-      return { statusCode: 422, headers: JSON_HEADERS, body: JSON.stringify({ error: 'The model declined to analyze these documents.' }) };
-    }
-
-    const result = message.content
-      .filter((b) => b.type === 'text')
-      .map((b) => b.text)
+    const result = genResult.response.candidates[0].content.parts
+      .map(p => p.text)
       .join('')
       .trim();
 
