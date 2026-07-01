@@ -35,6 +35,7 @@ const ROUTES = [
   'portal-record',
   'certificate',
   'questionnaire-submit',
+  'classify-docs',
 ];
 
 function toEvent(req) {

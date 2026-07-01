@@ -388,14 +388,113 @@
   }
 
   let pendingBatch = [];
+  let pendingContacts = [];
+  let addContactsChecked = true;
 
-  function handleBatchFiles(fileList) {
+  async function handleBatchFiles(fileList) {
     const files = Array.from(fileList);
-    pendingBatch = files.map(f => ({
-      file: f,
-      match: matchFileToDoc(f.name),
-      selected: true
-    }));
+    const preview = document.getElementById('drBatchPreview');
+
+    // Initialize pendingBatch with files (no matches yet)
+    pendingBatch = files.map(f => ({ file: f, match: null, selected: true }));
+    pendingContacts = [];
+
+    // Show loading state
+    if (preview) {
+      preview.innerHTML = `
+        <div class="mt-4" style="text-align:center;padding:2rem;">
+          <div class="font-semibold mb-2">Analyzing ${files.length} document${files.length > 1 ? 's' : ''} with AI...</div>
+          <div class="text-sm text-muted">Extracting text and classifying documents</div>
+          <div class="progress mt-4" style="max-width:300px;margin:0 auto;"><div class="progress-fill amber" style="width:30%;animation:pulse 1.5s infinite;"></div></div>
+        </div>`;
+    }
+
+    // Extract text from PDFs client-side
+    const fileData = [];
+    for (const f of files) {
+      let text = '';
+      if ((f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')) && typeof extractPdfText === 'function') {
+        try {
+          text = await extractPdfText(f);
+        } catch (e) {
+          console.warn('PDF text extraction failed for', f.name, e);
+        }
+      }
+      fileData.push({ filename: f.name, text });
+    }
+
+    // Build template sections for the API
+    const templateSections = TEMPLATE ? TEMPLATE.sections.map(sec => ({
+      id: sec.id,
+      name: sec.name,
+      subfolders: sec.subfolders.map(sf => ({
+        name: sf.name,
+        documents: sf.documents.map(d => ({ name: d.name }))
+      }))
+    })) : [];
+
+    // Try AI classification
+    let aiSuccess = false;
+    try {
+      const res = await fetch('/api/classify-docs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ files: fileData, templateSections })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.classifications && Array.isArray(data.classifications)) {
+          // Map AI classifications back to pendingBatch
+          pendingBatch = files.map((f, i) => {
+            const cls = data.classifications.find(c => c.filename === f.name) || data.classifications[i];
+            if (cls && cls.confidence >= 30 && cls.matchedDocName !== 'Uncategorized') {
+              return {
+                file: f,
+                match: {
+                  secId: cls.matchedSection,
+                  secName: cls.matchedSectionName,
+                  sfIdx: cls.matchedSubfolderIndex,
+                  docIdx: cls.matchedDocIndex,
+                  docName: cls.matchedDocName,
+                  docId: `${cls.matchedSection}.${cls.matchedSubfolderIndex}.${cls.matchedDocIndex}`,
+                  confidence: cls.confidence,
+                  reasoning: cls.reasoning
+                },
+                selected: true
+              };
+            }
+            return { file: f, match: null, selected: false };
+          });
+
+          // Collect all contacts
+          pendingContacts = [];
+          data.classifications.forEach(cls => {
+            if (cls.contacts && cls.contacts.length > 0) {
+              cls.contacts.forEach(c => {
+                // Deduplicate by name
+                if (c.name && !pendingContacts.find(pc => pc.name.toLowerCase() === c.name.toLowerCase())) {
+                  pendingContacts.push(c);
+                }
+              });
+            }
+          });
+
+          aiSuccess = true;
+        }
+      }
+    } catch (e) {
+      console.warn('AI classification failed, falling back to fuzzy match:', e);
+    }
+
+    // Fallback to fuzzy matching if AI failed
+    if (!aiSuccess) {
+      pendingBatch = files.map(f => ({
+        file: f,
+        match: matchFileToDoc(f.name),
+        selected: true
+      }));
+    }
+
     renderBatchPreview();
   }
 
@@ -442,7 +541,42 @@
       html += `</tr>`;
     });
 
-    html += `</tbody></table></div>`;
+    html += `</tbody></table>`;
+
+    // Contacts section
+    if (pendingContacts.length > 0) {
+      html += `
+        <div class="mt-6 mb-2">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="font-semibold">Contacts Found (${pendingContacts.length})</div>
+            <label class="flex items-center gap-2 text-sm" style="cursor:pointer;">
+              <input type="checkbox" ${addContactsChecked ? 'checked' : ''} onchange="HGCDataRoom.toggleAddContacts(this.checked)" style="width:14px;height:14px;cursor:pointer;">
+              Add to deal contacts
+            </label>
+          </div>
+          <table class="data-table">
+            <thead><tr>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Company</th>
+              <th>Email</th>
+              <th>Phone</th>
+            </tr></thead>
+            <tbody>`;
+      pendingContacts.forEach(c => {
+        html += `<tr>
+          <td class="text-sm font-semibold">${esc(c.name || '')}</td>
+          <td class="text-sm">${esc(c.role || '')}</td>
+          <td class="text-sm">${esc(c.company || '')}</td>
+          <td class="text-sm">${esc(c.email || '')}</td>
+          <td class="text-sm">${esc(c.phone || '')}</td>
+        </tr>`;
+      });
+      html += `</tbody></table>
+        </div>`;
+    }
+
+    html += `</div>`;
     preview.innerHTML = html;
   }
 
@@ -482,9 +616,29 @@
       }
     }
 
+    // Add extracted contacts if checkbox is checked
+    let contactsAdded = 0;
+    if (addContactsChecked && pendingContacts.length > 0 && typeof contacts !== 'undefined' && typeof nextContactId !== 'undefined') {
+      pendingContacts.forEach(c => {
+        // Skip if a contact with the same name already exists
+        if (contacts.find(existing => existing.name && existing.name.toLowerCase() === c.name.toLowerCase())) return;
+        contacts.push({
+          id: nextContactId++,
+          name: c.name || '',
+          company: c.company || '',
+          role: c.role || '',
+          email: c.email || '',
+          phone: c.phone || ''
+        });
+        contactsAdded++;
+      });
+    }
+
     pendingBatch = [];
+    pendingContacts = [];
     if (typeof saveData === 'function') saveData();
-    if (typeof showToast === 'function') showToast(`${toUpload.length} files uploaded and categorized`, 'success');
+    const contactMsg = contactsAdded > 0 ? ` + ${contactsAdded} contacts added` : '';
+    if (typeof showToast === 'function') showToast(`${toUpload.length} files uploaded and categorized${contactMsg}`, 'success');
     render();
   }
 
@@ -499,6 +653,10 @@
       pendingBatch[idx].selected = checked;
       renderBatchPreview();
     }
+  }
+
+  function toggleAddContacts(checked) {
+    addContactsChecked = checked;
   }
 
   // Render data room into an arbitrary container (for deal detail modal)
@@ -570,6 +728,6 @@
     }
   }
 
-  window.HGCDataRoom = { open, close, setStatus, toggleIntl, upload, download, removeFile, cardSummary, completeness, portfolioReadiness, cancelBatch, confirmBatch, toggleBatchItem, renderInline };
+  window.HGCDataRoom = { open, close, setStatus, toggleIntl, upload, download, removeFile, cardSummary, completeness, portfolioReadiness, cancelBatch, confirmBatch, toggleBatchItem, toggleAddContacts, renderInline };
   loadTemplate();
 })();
