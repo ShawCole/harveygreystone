@@ -8,6 +8,7 @@
   let TEMPLATE = null;
   let currentDealId = null;
   const expandedSections = new Set();
+  let inlineTarget = null;
 
   const STATUSES = ['outstanding', 'requested', 'received', 'reviewed', 'na'];
   const STATUS_LABEL = { outstanding: 'Outstanding', requested: 'Requested', received: 'Received', reviewed: 'Reviewed', na: 'N/A' };
@@ -90,6 +91,7 @@
     if (!deal) return;
     if (!deal.dataRoom) deal.dataRoom = {};
     currentDealId = dealId;
+    inlineTarget = null;
     document.getElementById('drDealName').textContent = `Data Room \u2014 ${deal.name}`;
     ensureDelegation();
     render();
@@ -98,6 +100,7 @@
   function close() {
     document.getElementById('dataRoomModal').classList.remove('show');
     currentDealId = null;
+    inlineTarget = null;
     if (typeof renderDeals === 'function') renderDeals();
   }
 
@@ -110,6 +113,12 @@
     const bandNote = b === 'zero'
       ? '<div class="text-danger font-semibold text-sm">Set deal capital to see required documents</div>'
       : `<div class="font-bold">${BAND_LABEL[b]}</div>`;
+
+    // If rendering inline (deal detail modal), build everything into inlineTarget
+    if (inlineTarget) {
+      renderInline(currentDealId, inlineTarget);
+      return;
+    }
 
     document.getElementById('drControls').innerHTML = `
       <div class="card-body flex gap-5 items-center" style="flex-wrap:wrap;">
@@ -494,6 +503,8 @@
     const deal = deals.find(d => d.id === dealId);
     if (!deal) return;
     if (!deal.dataRoom) deal.dataRoom = {};
+    currentDealId = dealId;
+    inlineTarget = container;
     currentDealId = dealId;
 
     const c = completeness(deal);
