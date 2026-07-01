@@ -493,6 +493,7 @@
         match: matchFileToDoc(f.name),
         selected: true
       }));
+      if (typeof showToast === 'function') showToast('AI classification unavailable, using filename matching', 'warning');
     }
 
     renderBatchPreview();
@@ -515,9 +516,10 @@
           <thead><tr>
             <th style="width:30px;"></th>
             <th>File</th>
-            <th>Matched Document</th>
+            <th>AI Category</th>
             <th>Section</th>
             <th>Confidence</th>
+            <th>Reasoning</th>
           </tr></thead>
           <tbody>`;
 
@@ -531,11 +533,13 @@
         html += `
           <td class="text-sm">${esc(m.docName)}</td>
           <td class="text-xs text-muted">${esc(m.secName)}</td>
-          <td><span class="badge ${confColor}">${m.confidence}%</span></td>`;
+          <td><span class="badge ${confColor}">${m.confidence}%</span></td>
+          <td class="text-xs text-muted">${esc(m.reasoning || '')}</td>`;
       } else {
         html += `
           <td class="text-sm text-muted" colspan="2"><em>No match found \u2014 will skip</em></td>
-          <td><span class="badge badge-neutral">\u2014</span></td>`;
+          <td><span class="badge badge-neutral">\u2014</span></td>
+          <td></td>`;
         b.selected = false;
       }
       html += `</tr>`;
@@ -549,13 +553,10 @@
         <div class="mt-6 mb-2">
           <div class="flex items-center gap-3 mb-3">
             <div class="font-semibold">Contacts Found (${pendingContacts.length})</div>
-            <label class="flex items-center gap-2 text-sm" style="cursor:pointer;">
-              <input type="checkbox" ${addContactsChecked ? 'checked' : ''} onchange="HGCDataRoom.toggleAddContacts(this.checked)" style="width:14px;height:14px;cursor:pointer;">
-              Add to deal contacts
-            </label>
           </div>
           <table class="data-table">
             <thead><tr>
+              <th style="width:30px;"></th>
               <th>Name</th>
               <th>Role</th>
               <th>Company</th>
@@ -563,8 +564,10 @@
               <th>Phone</th>
             </tr></thead>
             <tbody>`;
-      pendingContacts.forEach(c => {
+      pendingContacts.forEach((c, ci) => {
+        const checked = c._addToContacts !== false;
         html += `<tr>
+          <td><input type="checkbox" ${checked ? 'checked' : ''} onchange="HGCDataRoom.toggleContactItem(${ci}, this.checked)" style="width:14px;height:14px;cursor:pointer;"></td>
           <td class="text-sm font-semibold">${esc(c.name || '')}</td>
           <td class="text-sm">${esc(c.role || '')}</td>
           <td class="text-sm">${esc(c.company || '')}</td>
@@ -616,11 +619,13 @@
       }
     }
 
-    // Add extracted contacts if checkbox is checked
+    // Add extracted contacts where individual checkbox is checked
     let contactsAdded = 0;
-    if (addContactsChecked && pendingContacts.length > 0 && typeof contacts !== 'undefined' && typeof nextContactId !== 'undefined') {
+    if (pendingContacts.length > 0 && typeof contacts !== 'undefined' && typeof nextContactId !== 'undefined') {
       pendingContacts.forEach(c => {
-        // Skip if a contact with the same name already exists
+        // Skip if this contact's checkbox was unchecked
+        if (c._addToContacts === false) return;
+        // Deduplicate by name — skip if a contact with the same name already exists
         if (contacts.find(existing => existing.name && existing.name.toLowerCase() === c.name.toLowerCase())) return;
         contacts.push({
           id: nextContactId++,
@@ -657,6 +662,12 @@
 
   function toggleAddContacts(checked) {
     addContactsChecked = checked;
+  }
+
+  function toggleContactItem(idx, checked) {
+    if (pendingContacts[idx]) {
+      pendingContacts[idx]._addToContacts = checked;
+    }
   }
 
   // Render data room into an arbitrary container (for deal detail modal)
@@ -728,6 +739,6 @@
     }
   }
 
-  window.HGCDataRoom = { open, close, setStatus, toggleIntl, upload, download, removeFile, cardSummary, completeness, portfolioReadiness, cancelBatch, confirmBatch, toggleBatchItem, toggleAddContacts, renderInline };
+  window.HGCDataRoom = { open, close, setStatus, toggleIntl, upload, download, removeFile, cardSummary, completeness, portfolioReadiness, cancelBatch, confirmBatch, toggleBatchItem, toggleAddContacts, toggleContactItem, renderInline };
   loadTemplate();
 })();

@@ -766,6 +766,9 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
           <div class="uw-tile"><div class="uw-tile-label">DSCR</div><div class="uw-tile-value" id="aiDscr"></div></div>
           <div class="uw-tile"><div class="uw-tile-label">Leverage</div><div class="uw-tile-value" id="aiLeverage"></div></div>
           <div class="uw-tile"><div class="uw-tile-label">Margins</div><div class="uw-tile-value" id="aiMargins"></div></div>
+          <div class="uw-tile"><div class="uw-tile-label">Use of Funds</div><div class="uw-tile-value" id="aiUseOfFunds"></div></div>
+          <div class="uw-tile"><div class="uw-tile-label">Exit Strategy</div><div class="uw-tile-value" id="aiExitStrategy"></div></div>
+          <div class="uw-tile"><div class="uw-tile-label">Key Terms</div><div class="uw-tile-value" id="aiKeyTerms"></div></div>
         </div>
         <div class="uw-tile mb-4">
           <div class="uw-tile-label">Plausibility Read</div>
@@ -2073,6 +2076,9 @@ ${docText}`;
       document.getElementById('aiLeverage').textContent = f.leverage || '\u2014';
       document.getElementById('aiMargins').textContent = f.margins || '\u2014';
       document.getElementById('aiConsistency').textContent = f.consistency || '\u2014';
+      document.getElementById('aiUseOfFunds').textContent = f.useOfFunds || '\u2014';
+      document.getElementById('aiExitStrategy').textContent = f.exitStrategy || '\u2014';
+      document.getElementById('aiKeyTerms').textContent = f.keyTerms || '\u2014';
       document.getElementById('aiShortTerm').textContent = f.shortTerm || '\u2014';
       document.getElementById('aiLongTerm').textContent = f.longTerm || '\u2014';
       if (f.dealType) {
@@ -2353,9 +2359,11 @@ ${docText}`;
     const prompt = `You are a seasoned underwriter / licensed-broker-level analyst doing a thorough FIRST-PASS workup. NOT final verified underwriting — a licensed broker signs off after. Documents may be in any language; read natively but OUTPUT IN ENGLISH.
 
 Respond with a JSON object on the very first line (no markdown/backticks), exactly these keys, "" or null if missing:
-{"name":"deal/company name","company":"company","contact":"contact","email":"","phone":"","capital":"amount sought","revenue":"trailing revenue","years":"years in business","description":"1-2 sentence description","sourceLanguage":"language","valuation":"valuation estimate + basis","bankerFit":75,"investorFit":60,"riskScore":40,"profitabilityScore":70,"dealType":"DEBT/BANK or EQUITY/FUND or HYBRID","roi":"ROI/return profile","loiStatus":"LOI status","dscr":"debt service coverage","leverage":"leverage/debt-to-equity","margins":"margins","shortTerm":"short-term placeable amount + reason","longTerm":"long-term placeable amount + reason","greenFlags":["g1","g2","g3"],"redFlags":["r1","r2","r3"],"score":75,"execSummary":"3-4 sentence summary","consistency":"plausibility read — cannot verify authenticity, only internal consistency"}
+{"name":"deal/company name","company":"company","contact":"contact","email":"","phone":"","capital":"amount sought","revenue":"trailing revenue","years":"years in business","description":"1-2 sentence description","sourceLanguage":"language","valuation":"valuation estimate + basis","bankerFit":75,"investorFit":60,"riskScore":40,"profitabilityScore":70,"dealType":"DEBT/BANK or EQUITY/FUND or HYBRID","roi":"ROI/return profile","loiStatus":"LOI status","dscr":"debt service coverage","leverage":"leverage/debt-to-equity","margins":"margins","useOfFunds":"stated use of proceeds","exitStrategy":"exit / repayment path","keyTerms":"notable deal terms (rate, equity %, preferences, collateral)","shortTerm":"short-term placeable amount + reason","longTerm":"long-term placeable amount + reason","greenFlags":["g1","g2","g3"],"redFlags":["r1","r2","r3"],"score":75,"execSummary":"3-4 sentence summary","consistency":"plausibility read — cannot verify authenticity, only internal consistency"}
 
-riskScore: higher = riskier. Then after the JSON line write the full memo: EXECUTIVE SUMMARY, BUSINESS OVERVIEW, FINANCIAL ANALYSIS, VALUATION ANALYSIS, RISK ASSESSMENT, DEAL STRUCTURE (LOI/terms/ROI/DSCR/leverage/exit), BANKER VIEW, FUND VIEW, GREEN FLAGS, RED FLAGS, CAPACITY (short vs long), DILIGENCE GAPS, SCREENING VERDICT. Specific, quantitative, skeptical. Never fabricate — write NOT PROVIDED where missing.
+bankerFit = 1-100 attractiveness as debt/bank deal (cashflow, collateral, DSCR, serviceability). investorFit = 1-100 as equity/fund deal (growth, upside, scalability). riskScore = 1-100 where HIGHER means RISKIER. profitabilityScore = 1-100 profitability strength. score = overall 1-100 deal quality.
+
+SECOND, after the JSON line, write the FULL underwriter memo with these sections: EXECUTIVE SUMMARY, BUSINESS OVERVIEW, THE ASK & USE OF FUNDS, FINANCIAL ANALYSIS (revenue, growth, margins, profitability, show math), VALUATION ANALYSIS (multiple basis, comparables logic), RISK ASSESSMENT (operational, market, financial, concentration, execution), DEAL STRUCTURE (LOI status, proposed terms, ROI/return math, DSCR, leverage, exit/repayment), BANKER VIEW, FUND/INVESTOR VIEW, GREEN FLAGS, RED FLAGS (ranked), CAPACITY (short vs long term), DILIGENCE GAPS (what the licensed broker must obtain), SCREENING VERDICT (ADVANCE TO UNDERWRITING / NEEDS MORE INFO / LIKELY PASS + rationale). Be specific, quantitative, skeptical. Never fabricate figures — write NOT PROVIDED where data is missing.
 
 === DOCUMENT TEXT ===
 ${docText}`;
@@ -2406,6 +2414,8 @@ ${docText}`;
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;" class="mb-4">
           ${tile('Valuation',escHtml(f.valuation))}${tile('ROI',escHtml(f.roi))}${tile('Deal Type',escHtml(f.dealType))}
           ${tile('LOI/Terms',escHtml(f.loiStatus))}${tile('DSCR',escHtml(f.dscr))}${tile('Margins',escHtml(f.margins))}
+          ${tile('Use of Funds',escHtml(f.useOfFunds))}${tile('Exit Strategy',escHtml(f.exitStrategy))}${tile('Key Terms',escHtml(f.keyTerms))}
+          ${tile('Leverage',escHtml(f.leverage))}${tile('Consistency',escHtml(f.consistency))}${tile('Source Language',escHtml(f.sourceLanguage))}
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;" class="mb-4">
           <div class="uw-flags-green"><div class="text-xs font-bold mb-2" style="color:#6ee7b7;">Green Flags</div><ul class="text-xs" style="line-height:1.6;padding-left:1rem;margin:0;">${(f.greenFlags||[]).map(g=>`<li>${escHtml(g)}</li>`).join('')||'<li class="text-muted">None</li>'}</ul></div>
