@@ -619,7 +619,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 <!-- ===== MODALS ===== -->
 
 <!-- Add/Edit Deal Modal -->
-<div class="modal-backdrop" id="addDealModal">
+<div class="modal-backdrop" id="addDealModal" onclick="if(event.target===this)closeAddDealModal()">
   <div class="modal-panel modal-lg">
     <div class="modal-header">
       <div class="modal-title" id="dealModalTitle">New Deal</div>
@@ -816,7 +816,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 </div>
 
 <!-- Add Contact Modal -->
-<div class="modal-backdrop" id="addContactModal">
+<div class="modal-backdrop" id="addContactModal" onclick="if(event.target===this)closeAddContactModal()">
   <div class="modal-panel modal-md">
     <div class="modal-header">
       <div class="modal-title">Add Contact</div>
@@ -856,7 +856,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 </div>
 
 <!-- Add Task Modal -->
-<div class="modal-backdrop" id="addTaskModal">
+<div class="modal-backdrop" id="addTaskModal" onclick="if(event.target===this)closeAddTaskModal()">
   <div class="modal-panel modal-md">
     <div class="modal-header">
       <div class="modal-title">Add Task</div>
@@ -894,7 +894,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 </div>
 
 <!-- DEAL DETAIL MODAL -->
-<div class="modal-backdrop" id="dealDetailModal">
+<div class="modal-backdrop" id="dealDetailModal" onclick="if(event.target===this)closeDealDetailModal()">
   <div class="modal-panel modal-lg">
     <div class="modal-header">
       <div>
@@ -908,7 +908,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 </div>
 
 <!-- DATA ROOM MODAL -->
-<div class="modal-backdrop" id="dataRoomModal">
+<div class="modal-backdrop" id="dataRoomModal" onclick="if(event.target===this)HGCDataRoom.close()">
   <div class="modal-panel modal-lg">
     <div class="modal-header">
       <div>
@@ -925,7 +925,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 </div>
 
 <!-- CLIENT PORTAL & NCNDA MODAL -->
-<div class="modal-backdrop" id="ncndaModal">
+<div class="modal-backdrop" id="ncndaModal" onclick="if(event.target===this)HGCNcnda.close()">
   <div class="modal-panel modal-lg">
     <div class="modal-header">
       <div>
@@ -939,7 +939,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 </div>
 
 <!-- INVESTOR EDIT MODAL -->
-<div class="modal-backdrop" id="investorModal">
+<div class="modal-backdrop" id="investorModal" onclick="if(event.target===this)HGCInvestors.closeEdit()">
   <div class="modal-panel modal-md">
     <div class="modal-header">
       <div class="modal-title" id="invModalTitle">New Investor</div>
@@ -1015,7 +1015,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 </div>
 
 <!-- ENGAGEMENT MODAL -->
-<div class="modal-backdrop" id="engagementModal">
+<div class="modal-backdrop" id="engagementModal" onclick="if(event.target===this)HGCInvestors.closeEngagement()">
   <div class="modal-panel modal-sm">
     <div class="modal-header">
       <div>
