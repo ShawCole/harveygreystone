@@ -448,15 +448,17 @@
           pendingBatch = files.map((f, i) => {
             const cls = data.classifications.find(c => c.filename === f.name) || data.classifications[i];
             if (cls && cls.confidence >= 30 && cls.matchedDocName !== 'Uncategorized') {
+              // Ensure section ID is zero-padded to match template format (e.g., "4" → "04")
+              const secId = String(cls.matchedSection).padStart(2, '0');
               return {
                 file: f,
                 match: {
-                  secId: cls.matchedSection,
+                  secId: secId,
                   secName: cls.matchedSectionName,
                   sfIdx: cls.matchedSubfolderIndex,
                   docIdx: cls.matchedDocIndex,
                   docName: cls.matchedDocName,
-                  docId: `${cls.matchedSection}.${cls.matchedSubfolderIndex}.${cls.matchedDocIndex}`,
+                  docId: `${secId}.${cls.matchedSubfolderIndex}.${cls.matchedDocIndex}`,
                   confidence: cls.confidence,
                   reasoning: cls.reasoning
                 },
