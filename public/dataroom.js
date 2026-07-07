@@ -450,20 +450,32 @@
             if (cls && cls.confidence >= 30 && cls.matchedDocName !== 'Uncategorized') {
               // Ensure section ID is zero-padded to match template format (e.g., "4" → "04")
               const secId = String(cls.matchedSection).padStart(2, '0');
-              return {
-                file: f,
-                match: {
-                  secId: secId,
-                  secName: cls.matchedSectionName,
-                  sfIdx: cls.matchedSubfolderIndex,
-                  docIdx: cls.matchedDocIndex,
-                  docName: cls.matchedDocName,
-                  docId: `${secId}.${cls.matchedSubfolderIndex}.${cls.matchedDocIndex}`,
-                  confidence: cls.confidence,
-                  reasoning: cls.reasoning
-                },
-                selected: true
-              };
+              // Validate AI-returned indexes against the template so we never save
+              // under an orphan docId that no row will ever render
+              const sec = TEMPLATE && TEMPLATE.sections.find(s => s.id === secId);
+              const sfIdx = Number(cls.matchedSubfolderIndex);
+              const dIdx = Number(cls.matchedDocIndex);
+              const sf = sec && sec.subfolders[sfIdx];
+              const docEntry = sf && sf.documents[dIdx];
+              if (docEntry) {
+                return {
+                  file: f,
+                  match: {
+                    secId: secId,
+                    secName: sec.name,
+                    sfIdx: sfIdx,
+                    docIdx: dIdx,
+                    docName: docEntry.name,
+                    docId: `${secId}.${sfIdx}.${dIdx}`,
+                    confidence: cls.confidence,
+                    reasoning: cls.reasoning
+                  },
+                  selected: true
+                };
+              }
+              // AI indexes didn't resolve — fall back to fuzzy filename match
+              const fuzzy = matchFileToDoc(f.name);
+              if (fuzzy) return { file: f, match: fuzzy, selected: true };
             }
             return { file: f, match: null, selected: false };
           });
@@ -616,6 +628,9 @@
           file: { path, filename: file.name, size: file.size, uploadedAt: new Date().toISOString() },
           updatedAt: new Date().toISOString()
         };
+        // Auto-expand the section that received this file so it's visible immediately
+        const secIdx = TEMPLATE ? TEMPLATE.sections.findIndex(s => s.id === match.secId) : -1;
+        if (secIdx >= 0) expandedSections.add(secIdx);
       } catch (err) {
         console.error('Batch upload error for', file.name, err);
       }
@@ -704,14 +719,23 @@
         <div id="drBatchPreview"></div>
       </div></div>`;
 
-    // Sections
+    // Sections — render ALL sections (out-of-scope dimmed) so uploaded files
+    // always have a visible, clickable surface regardless of deal size band.
     html += '<div id="drBody">';
     TEMPLATE.sections.forEach((sec, secIdx) => {
-      if (!inScope(deal, sec.id)) return;
+      const scoped = inScope(deal, sec.id);
       const isOpen = expandedSections.has(secIdx);
-      html += `<div class="dr-section ${isOpen ? 'open' : ''}" data-sec="${secIdx}">
+      let secFiles = 0;
+      sec.subfolders.forEach((sf, si) => sf.documents.forEach((doc, di) => {
+        if (docState(deal, docId(sec, si, di)).file) secFiles++;
+      }));
+      const fileBadge = secFiles > 0 ? `<span class="badge badge-info">${secFiles} file${secFiles > 1 ? 's' : ''}</span>` : '';
+      html += `<div class="dr-section ${isOpen ? 'open' : ''}" data-sec="${secIdx}" style="${scoped ? '' : 'opacity:0.7;'}">
         <div class="dr-section-header" data-act="toggle-section" data-sec="${secIdx}">
-          <div class="dr-section-title"><span class="dr-section-toggle">&#9656;</span> ${sec.id}. ${esc(sec.name)}</div>
+          <div class="dr-section-title"><span class="dr-section-toggle">&#9656;</span> ${sec.id}. ${esc(sec.name)}
+            ${scoped ? '' : '<span class="text-xs text-muted font-semibold">(optional at this deal size)</span>'}
+          </div>
+          ${fileBadge}
         </div><div class="dr-section-body">`;
       sec.subfolders.forEach((sf, si) => {
         html += `<div class="text-xs font-semibold" style="padding:var(--sp-2) var(--sp-4) var(--sp-1) var(--sp-6);color:var(--gray-500);">${esc(sf.name)}</div>`;
