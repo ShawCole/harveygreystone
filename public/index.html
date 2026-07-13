@@ -133,6 +133,13 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 .rail-deal.active { background: var(--accent-blue-muted); border-color: var(--accent-blue-light); }
 .rail-deal-name { font-family: var(--serif); font-size: 14px; font-weight: 700; color: var(--navy); display: flex; align-items: center; gap: 6px; }
 .rail-deal-meta { font-size: 11.5px; color: var(--gray-500); margin-top: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.rail-group { border: 1px solid transparent; border-radius: var(--radius-md); padding: 9px 10px; margin: 2px var(--sp-2); cursor: pointer; user-select: none; }
+.rail-group:hover { background: var(--gray-50); border-color: var(--gray-200); }
+.rail-group-toggle { display: inline-block; color: var(--gray-400); font-size: 11px; transition: transform var(--duration) var(--ease); }
+.rail-group.open .rail-group-toggle { transform: rotate(90deg); }
+.rail-deal-child { margin-left: var(--sp-6); border-left: 2px solid var(--gray-200); border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+.rail-deal-child.active { border-left-color: var(--accent-blue); }
+.rail-group-empty { margin: 2px var(--sp-2) 6px var(--sp-6); padding: 8px 10px; font-size: 11.5px; color: var(--gray-500); border-left: 2px solid var(--gray-200); }
 .owner-chip { font-size: 10px; font-weight: 700; background: var(--info-light); color: var(--navy); border-radius: var(--radius-full); padding: 1px 7px; }
 .main-content { flex: 1; margin-left: var(--sidebar-width); transition: margin-left var(--duration) var(--ease); display: flex; flex-direction: column; min-height: 100vh; }
 .sidebar.collapsed ~ .main-content { margin-left: var(--sidebar-collapsed); }
@@ -720,7 +727,12 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
             <option value="personal">Personal</option>
           </select>
         </div>
-        <div class="form-group"></div>
+        <div class="form-group">
+          <label class="form-label">Group</label>
+          <select id="dealGroup" class="form-input">
+            <option value="">No group</option>
+          </select>
+        </div>
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -1325,9 +1337,10 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     document.getElementById('mainApp').classList.remove('hidden');
     await loadData();
     updateNavBadges();
-    // Default view: open newest deal if any (renderDealRail called inside openDeal), else show dashboard
-    const newestDeal = deals.length
-      ? [...deals].sort((a, b) => (b.createdDate || '').localeCompare(a.createdDate || '') || b.id - a.id)[0]
+    // Default view: open newest real deal (never a group) if any, else show dashboard
+    const realDeals = deals.filter(d => !d.isGroup);
+    const newestDeal = realDeals.length
+      ? [...realDeals].sort((a, b) => (b.createdDate || '').localeCompare(a.createdDate || '') || b.id - a.id)[0]
       : null;
     if (newestDeal) {
       openDeal(newestDeal.id);
@@ -1405,7 +1418,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     const dc = document.getElementById('navDealsCount');
     if (dc) dc.textContent = deals.length;
     const rc = document.getElementById('railDealCount');
-    if (rc) rc.textContent = deals.length;
+    if (rc) rc.textContent = deals.filter(d => !d.isGroup).length;
     const tc = document.getElementById('navTasksCount');
     if (tc) {
       const open = tasks.filter(t => !t.completed).length;
@@ -1415,18 +1428,52 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   }
 
   // ===== DEAL RAIL (Task 2) =====
-  function renderDealRail() {
-    const rail = document.getElementById('dealRail');
-    if (!rail) return;
-    const sorted = [...deals].sort((a, b) => (b.createdDate || '').localeCompare(a.createdDate || '') || b.id - a.id);
-    rail.innerHTML = sorted.map(d => `
-      <div class="rail-deal ${selectedDealId === d.id ? 'active' : ''}" onclick="openDeal(${d.id})">
+  const expandedGroups = new Set();
+  function toggleGroup(groupId) {
+    if (expandedGroups.has(groupId)) expandedGroups.delete(groupId);
+    else expandedGroups.add(groupId);
+    renderDealRail();
+  }
+
+  function railDealHtml(d, child) {
+    return `
+      <div class="rail-deal ${child ? 'rail-deal-child' : ''} ${selectedDealId === d.id ? 'active' : ''}" onclick="openDeal(${d.id})">
         <div class="rail-deal-name">&#128193; ${escHtml(d.name)} ${brandChip(d)}</div>
         <div class="rail-deal-meta">
           <span>${escHtml(STAGE_LABEL[d.stage] || d.stage || '')}</span>
           <span class="owner-chip">${escHtml(d.owner || 'unassigned')}</span>
         </div>
-      </div>`).join('');
+      </div>`;
+  }
+
+  function renderDealRail() {
+    const rail = document.getElementById('dealRail');
+    if (!rail) return;
+    const byNewest = (a, b) => (b.createdDate || '').localeCompare(a.createdDate || '') || b.id - a.id;
+    const groups = deals.filter(d => d.isGroup).sort(byNewest);
+    // "loose" = not a group and not a member of any EXISTING group (orphan groupIds still show)
+    const loose = deals.filter(d => !d.isGroup && !(d.groupId && groups.some(g => g.id === d.groupId))).sort(byNewest);
+
+    let html = '';
+    for (const g of groups) {
+      const children = deals.filter(d => !d.isGroup && d.groupId === g.id).sort(byNewest);
+      const open = expandedGroups.has(g.id);
+      // If the selected deal is inside a collapsed group, force it open so the active item is visible
+      if (!open && children.some(c => c.id === selectedDealId)) expandedGroups.add(g.id);
+      const isOpen = expandedGroups.has(g.id);
+      html += `
+        <div class="rail-group ${isOpen ? 'open' : ''}" onclick="toggleGroup(${g.id})">
+          <div class="rail-deal-name"><span class="rail-group-toggle">&#9656;</span> &#128194; ${escHtml(g.name)} ${brandChip(g)}</div>
+          <div class="rail-deal-meta"><span>${children.length} deal${children.length === 1 ? '' : 's'}</span></div>
+        </div>`;
+      if (isOpen) {
+        html += children.length
+          ? children.map(c => railDealHtml(c, true)).join('')
+          : '<div class="rail-group-empty">No deals in this group yet — assign one via a deal\u2019s Edit form.</div>';
+      }
+    }
+    html += loose.map(d => railDealHtml(d, false)).join('');
+    rail.innerHTML = html;
     const active = rail.querySelector('.rail-deal.active');
     if (active) active.scrollIntoView({ block: 'nearest' });
     const link = document.getElementById('intakeLink');
@@ -1786,6 +1833,28 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     const d = deals.find(x => x.id === id);
     const c = document.getElementById('view-deal');
     if (!d || !c) return;
+    // Groups are categories, not deals — no pipeline/tabs, just name + members.
+    if (d.isGroup) {
+      expandedGroups.add(d.id);
+      const children = deals.filter(x => !x.isGroup && x.groupId === d.id);
+      c.innerHTML = `
+        <div class="deal-pane-head">
+          <div class="deal-pane-title">
+            <h1 class="brand-serif">${escHtml(d.name)}</h1>
+            <span class="badge badge-neutral">DEAL GROUP</span> ${brandChip(d)}
+            <button class="btn btn-ghost btn-sm" onclick="editDeal(${d.id})">Rename</button>
+          </div>
+        </div>
+        <div class="card"><div class="card-header"><div class="card-header-title">Deals in this group (${children.length})</div></div>
+          <div class="card-body">${children.length
+            ? children.map(x => `<div class="flex items-center gap-3" style="padding:.5rem 0;border-bottom:1px solid var(--gray-100);cursor:pointer;" onclick="openDeal(${x.id})">
+                <span>&#128193;</span><span class="font-semibold text-sm">${escHtml(x.name)}</span>
+                <span class="text-xs text-muted">${escHtml(STAGE_LABEL[x.stage] || x.stage || '')}</span>
+              </div>`).join('')
+            : '<div class="text-sm text-muted">No deals yet. Assign a deal to this group via its Edit form (Group dropdown).</div>'}</div></div>`;
+      renderDealRail();
+      return;
+    }
     const ndaBadge = (typeof HGCNcnda !== 'undefined' && HGCNcnda.ncndaBadge) ? HGCNcnda.ncndaBadge(d) : '';
     c.innerHTML = `
       <div class="deal-pane-head">
@@ -1965,6 +2034,10 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     set('dealDescription', d.description);
     set('dealNotes', d.notes);
     set('dealFundingType', d.fundingType);
+    set('dealGroup', d.groupId || '');
+    // A group record can't be assigned to another group — hide the field while editing one
+    const grpField = document.getElementById('dealGroup');
+    if (grpField) grpField.closest('.form-group').style.display = d.isGroup ? 'none' : '';
     set('dealStatus', d.status);
     set('dealFee', d.fee);
     set('dealProbability', d.probability);
@@ -2153,6 +2226,14 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     ['dealName','dealCompany','dealContact','dealEmail','dealPhone','dealCapital','dealRevenue','dealYears','dealDescription','dealDocText','dealNotes','dealScore'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     const eq = document.getElementById('dealEquity'); if (eq) eq.value = '0';
     const ft = document.getElementById('dealFundingType'); if (ft) ft.value = '';
+    // Populate the Group dropdown from current group deals
+    const grp = document.getElementById('dealGroup');
+    if (grp) {
+      grp.innerHTML = '<option value="">No group</option>' +
+        deals.filter(g => g.isGroup).map(g => `<option value="${g.id}">${escHtml(g.name)}</option>`).join('');
+      grp.value = '';
+      grp.closest('.form-group').style.display = ''; // may have been hidden by a group edit
+    }
     const st = document.getElementById('dealStatus'); if (st) st.value = 'lead';
     const fe = document.getElementById('dealFee'); if (fe) fe.value = '5';
     const pr = document.getElementById('dealProbability'); if (pr) pr.value = '50';
@@ -2412,6 +2493,7 @@ ${docText}`;
       client: document.getElementById('dealContact').value,
       equity: parseFloat(document.getElementById('dealEquity').value) || 0,
       fundingType: document.getElementById('dealFundingType').value,
+      groupId: Number(document.getElementById('dealGroup').value) || null,
       score: parseInt(document.getElementById('dealScore').value) || null,
       notes: document.getElementById('dealNotes').value || '',
       memoText: memoText
@@ -2440,6 +2522,7 @@ ${docText}`;
       deal.client = f.client;
       deal.equity = f.equity;
       deal.fundingType = f.fundingType;
+      deal.groupId = deal.isGroup ? null : f.groupId; // a group can't belong to a group
       deal.score = f.score;
       deal.notes = f.notes;
       deal.memo = f.memoText;
@@ -2486,6 +2569,7 @@ ${docText}`;
       client: f.client,
       equity: f.equity,
       fundingType: f.fundingType,
+      groupId: f.groupId,
       score: f.score,
       bankerFit: window._lastAnalysis?.bankerFit || null,
       investorFit: window._lastAnalysis?.investorFit || null,
