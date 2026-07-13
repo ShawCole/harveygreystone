@@ -29,3 +29,18 @@ test('getBrand returns full config with key', () => {
   assert.strictEqual(b.wordmark, 'CAPITAL STREAMS');
   assert.ok(b.legalEntity.includes('Capital Streams LLC'));
 });
+
+test('brand handler resolves from host header', async () => {
+  const { handler } = require('../netlify/functions/brand');
+  const res = await handler({ httpMethod: 'GET', headers: { host: 'app.harveygreystone.com' }, queryStringParameters: {} });
+  assert.strictEqual(res.statusCode, 200);
+  const body = JSON.parse(res.body);
+  assert.strictEqual(body.key, 'harveygreystone');
+});
+
+test('brand handler honors ?b= override', async () => {
+  const { handler } = require('../netlify/functions/brand');
+  const res = await handler({ httpMethod: 'GET', headers: { host: 'app.harveygreystone.com' }, queryStringParameters: { b: 'capitalstreams' } });
+  const body = JSON.parse(res.body);
+  assert.strictEqual(body.key, 'capitalstreams');
+});
