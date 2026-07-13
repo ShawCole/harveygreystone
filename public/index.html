@@ -197,6 +197,14 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 .badge-lender { background: var(--warning-light); color: #b45309; }
 .badge-family-office { background: #fae8ff; color: #a21caf; }
 
+/* Stage pill bar (Task 1 — v2 pipeline) */
+.stage-bar { display: flex; flex-wrap: wrap; gap: 6px; }
+.stage-pill { font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: var(--radius-full); border: 1px solid var(--gray-200); background: var(--white); color: var(--gray-600); cursor: pointer; transition: all var(--duration) var(--ease); user-select: none; }
+.stage-pill:hover { border-color: var(--accent-blue); color: var(--navy); }
+.stage-pill.active { background: var(--navy); border-color: var(--navy); color: var(--white); }
+.stage-pill.declined { color: var(--danger); }
+.stage-pill.declined.active { background: var(--danger); border-color: var(--danger); color: var(--white); }
+
 /* Tables */
 .data-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
 .data-table th { text-align: left; padding: var(--sp-3) var(--sp-4); font-size: var(--text-xs); font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid var(--gray-200); background: var(--gray-50); white-space: nowrap; user-select: none; }
@@ -1142,6 +1150,54 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     if (authLogo) authLogo.textContent = window.BRAND.displayName;
   })();
 
+  // --- Pipeline stages (v2) ---
+  // `stage` is the primary pipeline state; legacy `status` is derived from it
+  // via stageToStatus() so filters/kanban/charts/exports keep working.
+  const STAGES = [
+    { id: 'intake',           label: 'Link Sent' },
+    { id: 'docs_in',          label: 'Docs Coming In' },
+    { id: 'intake_complete',  label: 'Intake Complete' },
+    { id: 'ai_vetted',        label: 'AI Vetted' },
+    { id: 'revisit_client',   label: 'Revisit with Client (call)' },
+    { id: 'good_deal',        label: 'Good Deal' },
+    { id: 'summary_review',   label: 'Project Summary Review' },
+    { id: 'contract',         label: 'Client Contract / Success Fee' },
+    { id: 'underwriting',     label: 'Official Underwriting' },
+    { id: 'letterhead',       label: 'Letterhead / Term Sheet' },
+    { id: 'signing',          label: 'Signing' },
+    { id: 'funding_date',     label: 'Funding Date Set' },
+    { id: 'funded',           label: 'Funded' },
+  ];
+  const STAGE_LABEL = Object.fromEntries(STAGES.map(s => [s.id, s.label]));
+  STAGE_LABEL.declined = 'Declined';
+
+  function stageToStatus(stage) {
+    const i = STAGES.findIndex(s => s.id === stage);
+    if (stage === 'funded') return 'closed';
+    if (i >= 8) return 'negotiation';   // underwriting..funding_date
+    if (i >= 4) return 'proposal';      // revisit_client..contract
+    return 'lead';                      // intake..ai_vetted (and declined/unknown)
+  }
+  function statusToStage(status) {
+    return { lead: 'intake', proposal: 'good_deal', negotiation: 'underwriting', closed: 'funded' }[status] || 'intake';
+  }
+
+  function recordHistory(deal, note, stage) {
+    deal.history = deal.history || [];
+    deal.history.push({ at: new Date().toISOString(), stage: stage || deal.stage || '', note, actor: 'team' });
+  }
+
+  function setStage(dealId, stageId) {
+    const d = deals.find(x => x.id === dealId);
+    if (!d || d.stage === stageId) return;
+    d.stage = stageId;
+    d.status = stageId === 'declined' ? d.status : stageToStatus(stageId);
+    recordHistory(d, `Moved to ${STAGE_LABEL[stageId] || stageId}`, stageId);
+    saveData();
+    if (typeof renderDealPane === 'function') renderDealPane(dealId);
+    if (typeof renderDealRail === 'function') renderDealRail();
+  }
+
   let nextTaskId = 1;
   let nextContactId = 1;
   let nextInvestorId = 1;
@@ -1177,6 +1233,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         dbReady = true;
         nextDealId = (deals.reduce((m, d) => Math.max(m, d.id), 0) || 16) + 1;
         deals.forEach(d => { if (!d.brand) d.brand = 'harveygreystone'; });
+        deals.forEach(d => { if (!d.stage) d.stage = statusToStage(d.status); });
         nextTaskId = (tasks.reduce((m, t) => Math.max(m, t.id), 0) || 0) + 1;
         nextContactId = (contacts.reduce((m, c) => Math.max(m, c.id), 0) || 0) + 1;
         nextInvestorId = (investors.reduce((m, i) => Math.max(m, i.id), 0) || 0) + 1;
@@ -1919,6 +1976,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
       if (field === 'capital') deal[field] = parseCapital(value);
       else if (['fee', 'probability', 'rank'].includes(field)) deal[field] = parseFloat(value) || 0;
       else deal[field] = value;
+      if (field === 'status') deal.stage = statusToStage(value);
       saveData();
       renderDeals();
     }
@@ -2196,6 +2254,8 @@ ${docText}`;
       brand: (window.BRAND && window.BRAND.key) || 'harveygreystone',
       name, capital,
       status: document.getElementById('dealStatus').value,
+      stage: statusToStage(document.getElementById('dealStatus') ? document.getElementById('dealStatus').value : 'lead'),
+      history: [{ at: new Date().toISOString(), stage: 'intake', note: 'Deal created', actor: 'team' }],
       fee: parseFloat(document.getElementById('dealFee').value) || 5,
       probability: parseInt(document.getElementById('dealProbability').value) || 50,
       rank: deals.length + 1,
@@ -2465,6 +2525,8 @@ ${docText}`;
       name: f.name || f.company || 'Audited Deal',
       capital: parseCapital(f.capital || '0'),
       status: 'lead', fee: 5, probability: 50,
+      stage: 'intake',
+      history: [{ at: new Date().toISOString(), stage: 'intake', note: 'Deal created', actor: 'team' }],
       rank: deals.length + 1,
       reference: '', company: f.company||'', contact: f.contact||'', email: f.email||'', phone: f.phone||'',
       revenue: f.revenue||'', years: f.years||'', description: f.description||'', client: f.contact||'',
