@@ -122,6 +122,8 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 .sidebar-collapse-btn { position: absolute; top: var(--sp-5); right: var(--sp-3); width: 28px; height: 28px; border-radius: var(--radius-full); background: var(--gray-100); border: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--gray-500); font-size: 12px; z-index: 101; }
 .sidebar-collapse-btn:hover { background: var(--gray-200); color: var(--navy); }
 .sidebar.collapsed .sidebar-collapse-btn svg { transform: rotate(180deg); }
+.sidebar.collapsed .intake-box, .sidebar.collapsed .deal-rail, .sidebar.collapsed .rail-label { display: none; }
+.sidebar.collapsed .rail-modules { flex-direction: column; align-items: center; }
 /* Deal Rail (Task 2) */
 .rail-modules { display: flex; gap: 4px; padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--gray-200); flex-wrap: wrap; }
 .rail-icon { width: 34px; height: 34px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--gray-500); cursor: pointer; font-size: 15px; position: relative; }
@@ -530,7 +532,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
       <div class="rail-icon" data-tab="contacts" title="Contacts" onclick="switchTab('contacts')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
       </div>
-      <div class="rail-icon" data-tab="tasks" title="Tasks" onclick="switchTab('tasks')" style="position:relative;">
+      <div class="rail-icon" data-tab="tasks" title="Tasks" onclick="switchTab('tasks')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
         <span class="rail-badge hidden" id="navTasksCount"></span>
       </div>
@@ -542,7 +544,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         <button class="btn btn-primary btn-sm" onclick="copyIntakeLink()">Copy</button>
       </div>
     </div>
-    <div class="rail-label" style="display:flex;justify-content:space-between;align-items:center;">Deals
+    <div class="rail-label" style="display:flex;justify-content:space-between;align-items:center;">Deals <span class="text-xs text-muted" id="railDealCount"></span>
       <button class="btn btn-ghost btn-sm" onclick="openAddDealModal()" title="New deal">＋</button>
     </div>
     <div class="deal-rail" id="dealRail"></div>
@@ -1327,14 +1329,14 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     document.getElementById('mainApp').classList.remove('hidden');
     await loadData();
     updateNavBadges();
-    renderDealRail();
-    // Default view: open newest deal if any, else show dashboard
+    // Default view: open newest deal if any (renderDealRail called inside openDeal), else show dashboard
     const newestDeal = deals.length
       ? [...deals].sort((a, b) => (b.createdDate || '').localeCompare(a.createdDate || '') || b.id - a.id)[0]
       : null;
     if (newestDeal) {
       openDeal(newestDeal.id);
     } else {
+      renderDealRail();
       renderDashboard();
     }
   }
@@ -1402,6 +1404,8 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   function updateNavBadges() {
     const dc = document.getElementById('navDealsCount');
     if (dc) dc.textContent = deals.length;
+    const rc = document.getElementById('railDealCount');
+    if (rc) rc.textContent = deals.length;
     const tc = document.getElementById('navTasksCount');
     if (tc) {
       const open = tasks.filter(t => !t.completed).length;
@@ -1423,6 +1427,8 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
           <span class="owner-chip">${escHtml(d.owner || 'unassigned')}</span>
         </div>
       </div>`).join('');
+    const active = rail.querySelector('.rail-deal.active');
+    if (active) active.scrollIntoView({ block: 'nearest' });
     const link = document.getElementById('intakeLink');
     if (link && !link.value) link.value = location.origin + '/apply';
   }
