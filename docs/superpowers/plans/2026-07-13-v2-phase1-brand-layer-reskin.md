@@ -92,7 +92,7 @@ test('getBrand returns full config with key', () => {
 
 - [ ] **Step 3: Run test to verify it fails**
 
-Run: `cd ~/repos/harveygreystone && node --test tests/`
+Run: `cd ~/repos/harveygreystone && node --test tests/*.test.js`
 Expected: FAIL — `Cannot find module '../netlify/functions/_brands'`
 
 - [ ] **Step 4: Implement `netlify/functions/_brands.js`**
@@ -134,7 +134,7 @@ module.exports = { resolveBrand, getBrand };
 
 - [ ] **Step 5: Run test to verify it passes**
 
-Run: `cd ~/repos/harveygreystone && node --test tests/`
+Run: `cd ~/repos/harveygreystone && node --test tests/*.test.js`
 Expected: 6 passing
 
 - [ ] **Step 6: Add test script to `package.json`**
@@ -143,7 +143,7 @@ In `package.json` `"scripts"` block, add after the `start` line:
 
 ```json
     "start": "node server.js",
-    "test": "node --test tests/"
+    "test": "node --test tests/*.test.js"
 ```
 
 - [ ] **Step 7: Commit**
@@ -183,7 +183,7 @@ test('brand handler honors ?b= override', async () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `node --test tests/`
+Run: `node --test tests/*.test.js`
 Expected: 6 pass, 2 FAIL — `Cannot find module '../netlify/functions/brand'`
 
 - [ ] **Step 3: Implement `netlify/functions/brand.js`**
@@ -215,7 +215,7 @@ In the `ROUTES` array (after `'classify-docs',`), add:
 
 - [ ] **Step 5: Run tests + syntax check**
 
-Run: `node --test tests/ && node --check server.js`
+Run: `node --test tests/*.test.js && node --check server.js`
 Expected: 8 passing, no syntax error
 
 - [ ] **Step 6: Commit**
@@ -514,7 +514,7 @@ with the same `portal-brand` header element and CSS as portal.html.
 - [ ] **Step 4: Syntax checks**
 
 ```bash
-node --check netlify/functions/_ncnda.js && node --test tests/
+node --check netlify/functions/_ncnda.js && node --test tests/*.test.js
 for f in portal questionnaire; do node -e "const vm=require('vm'); const fs=require('fs'); const h=fs.readFileSync('public/$f.html','utf8'); const s=h.match(/<script>([\s\S]*?)<\/script>/g)||[]; s.forEach((x,i)=>{try{new vm.Script(x.replace(/<\/?script>/g,''));console.log('$f block',i,': OK')}catch(e){console.log('$f block',i,':',e.message)}})"; done
 ```
 
@@ -536,7 +536,7 @@ git commit -m "feat: brand-aware light re-skin of client portal and questionnair
 - [ ] **Step 1: Full local verification**
 
 ```bash
-cd ~/repos/harveygreystone && node --test tests/ && node --check server.js && node --check public/dataroom.js && node --check public/investors.js && node --check public/ncnda.js && node -e "const vm=require('vm'); const fs=require('fs'); const h=fs.readFileSync('public/index.html','utf8'); const s=h.match(/<script>([\s\S]*?)<\/script>/g)||[]; s.forEach((x,i)=>{try{new vm.Script(x.replace(/<\/?script>/g,''));console.log('Block',i,': OK')}catch(e){console.log('Block',i,':',e.message)}})"
+cd ~/repos/harveygreystone && node --test tests/*.test.js && node --check server.js && node --check public/dataroom.js && node --check public/investors.js && node --check public/ncnda.js && node -e "const vm=require('vm'); const fs=require('fs'); const h=fs.readFileSync('public/index.html','utf8'); const s=h.match(/<script>([\s\S]*?)<\/script>/g)||[]; s.forEach((x,i)=>{try{new vm.Script(x.replace(/<\/?script>/g,''));console.log('Block',i,': OK')}catch(e){console.log('Block',i,':',e.message)}})"
 ```
 
 Expected: 8 tests pass, every check OK
