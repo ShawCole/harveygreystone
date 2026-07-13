@@ -606,6 +606,7 @@
 
     const toUpload = pendingBatch.filter(b => b.selected && b.match);
     const preview = document.getElementById('drBatchPreview');
+    const failed = [];
 
     for (let i = 0; i < toUpload.length; i++) {
       const { file, match } = toUpload[i];
@@ -623,7 +624,8 @@
         if (!res.ok) throw new Error('Failed to get upload URL');
         const { url, path } = await res.json();
 
-        await fetch(url, { method: 'PUT', headers: { 'Content-Type': file.type || 'application/octet-stream' }, body: file });
+        const put = await fetch(url, { method: 'PUT', headers: { 'Content-Type': file.type || 'application/octet-stream' }, body: file });
+        if (!put.ok) throw new Error('Storage upload failed (HTTP ' + put.status + ')');
 
         deal.dataRoom[match.docId] = {
           status: 'received',
@@ -635,6 +637,7 @@
         if (secIdx >= 0) expandedSections.add(secIdx);
       } catch (err) {
         console.error('Batch upload error for', file.name, err);
+        failed.push({ name: file.name, reason: err.message || 'network error' });
       }
     }
 
@@ -661,8 +664,15 @@
     pendingBatch = [];
     pendingContacts = [];
     if (typeof saveData === 'function') saveData();
+    const okCount = toUpload.length - failed.length;
     const contactMsg = contactsAdded > 0 ? ` + ${contactsAdded} contacts added` : '';
-    if (typeof showToast === 'function') showToast(`${toUpload.length} files uploaded and categorized${contactMsg}`, 'success');
+    if (failed.length === 0) {
+      if (typeof showToast === 'function') showToast(`${okCount} files uploaded and categorized${contactMsg}`, 'success');
+    } else {
+      const msg = `${okCount}/${toUpload.length} files uploaded — FAILED: ${failed.map(f => f.name).join(', ')} (${failed[0].reason})`;
+      if (typeof showToast === 'function') showToast(msg, 'error');
+      alert('Some uploads failed:\n\n' + failed.map(f => `• ${f.name} — ${f.reason}`).join('\n') + '\n\nPlease retry those files.');
+    }
     render();
   }
 
