@@ -1223,6 +1223,14 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   }
 
   // ===== DATA =====
+  // Backfill fields added after the original seed schema. Runs after EVERY
+  // load path (API, localStorage fallback, hardcoded seed) so no deal is ever
+  // missing brand/stage regardless of where it came from.
+  function normalizeDeals() {
+    deals.forEach(d => { if (!d.brand) d.brand = 'harveygreystone'; });
+    deals.forEach(d => { if (!d.stage) d.stage = statusToStage(d.status); });
+  }
+
   async function loadData() {
     try {
       const res = await fetch('/api/deals');
@@ -1234,8 +1242,6 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         investors = data.investors || investors;
         dbReady = true;
         nextDealId = (deals.reduce((m, d) => Math.max(m, d.id), 0) || 16) + 1;
-        deals.forEach(d => { if (!d.brand) d.brand = 'harveygreystone'; });
-        deals.forEach(d => { if (!d.stage) d.stage = statusToStage(d.status); });
         nextTaskId = (tasks.reduce((m, t) => Math.max(m, t.id), 0) || 0) + 1;
         nextContactId = (contacts.reduce((m, c) => Math.max(m, c.id), 0) || 0) + 1;
         nextInvestorId = (investors.reduce((m, i) => Math.max(m, i.id), 0) || 0) + 1;
@@ -1250,6 +1256,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         investors = data.investors || investors;
       }
     }
+    normalizeDeals();
   }
 
   async function saveData() {
