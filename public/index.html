@@ -105,15 +105,7 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 .sidebar-brand { padding: var(--sp-6) var(--sp-5); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: var(--sp-3); }
 .sidebar-brand-text { font-size: var(--text-sm); font-weight: 700; color: var(--navy); white-space: nowrap; overflow: hidden; }
 .sidebar-brand-sub { font-size: var(--text-xs); color: var(--gray-500); font-weight: 400; letter-spacing: .28em; text-transform: uppercase; }
-.sidebar.collapsed .sidebar-brand-text, .sidebar.collapsed .sidebar-brand-sub, .sidebar.collapsed .nav-label, .sidebar.collapsed .sidebar-footer-info, .sidebar.collapsed .nav-section-label, .sidebar.collapsed .nav-badge { display: none; }
-.sidebar-nav { flex: 1; padding: var(--sp-4) 0; overflow-y: auto; }
-.nav-section-label { font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.06em; padding: var(--sp-4) var(--sp-5) var(--sp-2); }
-.nav-item { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-5); margin: var(--sp-1) var(--sp-2); border-radius: var(--radius-md); color: var(--gray-600); cursor: pointer; transition: all var(--duration) var(--ease); font-size: var(--text-sm); font-weight: 500; white-space: nowrap; }
-.nav-item:hover { background: var(--gray-100); color: var(--navy); }
-.nav-item.active { background: var(--accent-blue-muted); color: var(--navy); }
-.nav-item svg, .nav-icon { width: 20px; height: 20px; flex-shrink: 0; opacity: 0.7; }
-.nav-item.active svg, .nav-item.active .nav-icon { opacity: 1; }
-.nav-badge { margin-left: auto; background: var(--danger); color: var(--white); font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: var(--radius-full); min-width: 20px; text-align: center; }
+.sidebar.collapsed .sidebar-brand-text, .sidebar.collapsed .sidebar-brand-sub, .sidebar.collapsed .sidebar-footer-info { display: none; }
 .sidebar-footer { padding: var(--sp-4) var(--sp-5); border-top: 1px solid var(--gray-200); display: flex; align-items: center; gap: var(--sp-3); }
 .sidebar-avatar { width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--gray-100); display: flex; align-items: center; justify-content: center; color: var(--navy); font-weight: 600; font-size: var(--text-xs); flex-shrink: 0; }
 .sidebar-footer-info { white-space: nowrap; overflow: hidden; }
@@ -122,6 +114,26 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 .sidebar-collapse-btn { position: absolute; top: var(--sp-5); right: var(--sp-3); width: 28px; height: 28px; border-radius: var(--radius-full); background: var(--gray-100); border: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--gray-500); font-size: 12px; z-index: 101; }
 .sidebar-collapse-btn:hover { background: var(--gray-200); color: var(--navy); }
 .sidebar.collapsed .sidebar-collapse-btn svg { transform: rotate(180deg); }
+.sidebar.collapsed .intake-box, .sidebar.collapsed .deal-rail, .sidebar.collapsed .rail-label { display: none; }
+.sidebar.collapsed .rail-modules { flex-direction: column; align-items: center; }
+/* Deal Rail (Task 2) */
+.rail-modules { display: flex; gap: 4px; padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--gray-200); flex-wrap: wrap; }
+.rail-icon { width: 34px; height: 34px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--gray-500); cursor: pointer; font-size: 15px; position: relative; }
+.rail-icon:hover { background: var(--gray-100); color: var(--navy); }
+.rail-icon.active { background: var(--accent-blue-muted); color: var(--navy); }
+.rail-icon svg { width: 18px; height: 18px; }
+.rail-badge { position: absolute; top: 2px; right: 2px; background: var(--danger); color: var(--white); font-size: 9px; font-weight: 700; padding: 1px 4px; border-radius: var(--radius-full); min-width: 14px; text-align: center; line-height: 14px; }
+.rail-label { font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: .08em; padding: var(--sp-4) var(--sp-4) var(--sp-2); }
+.intake-box { padding: 0 var(--sp-4) var(--sp-3); border-bottom: 1px solid var(--gray-200); }
+.intake-row { display: flex; gap: 6px; }
+.intake-row input { flex: 1; min-width: 0; font-size: 12px; font-family: var(--font-mono); background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: 6px 8px; color: var(--gray-600); }
+.deal-rail { flex: 1; overflow-y: auto; padding: 0 var(--sp-2) var(--sp-4); }
+.rail-deal { border: 1px solid transparent; border-radius: var(--radius-md); padding: 9px 10px; margin: 2px var(--sp-2); cursor: pointer; }
+.rail-deal:hover { background: var(--gray-50); border-color: var(--gray-200); }
+.rail-deal.active { background: var(--accent-blue-muted); border-color: var(--accent-blue-light); }
+.rail-deal-name { font-family: var(--serif); font-size: 14px; font-weight: 700; color: var(--navy); display: flex; align-items: center; gap: 6px; }
+.rail-deal-meta { font-size: 11.5px; color: var(--gray-500); margin-top: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.owner-chip { font-size: 10px; font-weight: 700; background: var(--info-light); color: var(--navy); border-radius: var(--radius-full); padding: 1px 7px; }
 .main-content { flex: 1; margin-left: var(--sidebar-width); transition: margin-left var(--duration) var(--ease); display: flex; flex-direction: column; min-height: 100vh; }
 .sidebar.collapsed ~ .main-content { margin-left: var(--sidebar-collapsed); }
 .content-header { height: var(--header-height); background: var(--white); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; padding: 0 var(--sp-8); position: sticky; top: 0; z-index: 50; }
@@ -130,7 +142,7 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 .breadcrumb-current { color: var(--gray-800); font-weight: 600; }
 .content-header-right { display: flex; align-items: center; gap: var(--sp-3); }
 .page-content { flex: 1; padding: var(--sp-8); max-width: 1400px; width: 100%; }
-.confidential-banner { background: var(--danger-light); color: var(--danger); font-size: var(--text-xs); font-weight: 600; text-align: center; padding: var(--sp-1) var(--sp-4); letter-spacing: 0.04em; text-transform: uppercase; }
+
 
 /* Cards */
 .card { background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); overflow: hidden; }
@@ -197,6 +209,14 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 .badge-lender { background: var(--warning-light); color: #b45309; }
 .badge-family-office { background: #fae8ff; color: #a21caf; }
 
+/* Stage pill bar (Task 1 — v2 pipeline) */
+.stage-bar { display: flex; flex-wrap: wrap; gap: 6px; }
+.stage-pill { font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: var(--radius-full); border: 1px solid var(--gray-200); background: var(--white); color: var(--gray-600); cursor: pointer; transition: all var(--duration) var(--ease); user-select: none; }
+.stage-pill:hover { border-color: var(--accent-blue); color: var(--navy); }
+.stage-pill.active { background: var(--navy); border-color: var(--navy); color: var(--white); }
+.stage-pill.declined { color: var(--danger); }
+.stage-pill.declined.active { background: var(--danger); border-color: var(--danger); color: var(--white); }
+
 /* Tables */
 .data-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
 .data-table th { text-align: left; padding: var(--sp-3) var(--sp-4); font-size: var(--text-xs); font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid var(--gray-200); background: var(--gray-50); white-space: nowrap; user-select: none; }
@@ -250,6 +270,16 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 .sub-tab { padding: var(--sp-3) var(--sp-5); font-size: var(--text-sm); font-weight: 500; color: var(--gray-500); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all var(--duration) var(--ease); white-space: nowrap; }
 .sub-tab:hover { color: var(--gray-700); }
 .sub-tab.active { color: var(--navy); border-bottom-color: var(--navy); }
+
+/* Deal pane (persistent main-pane workspace) */
+.deal-pane-head { margin-bottom: var(--sp-5); }
+.deal-pane-title { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.deal-pane-title h1 { font-size: 26px; color: var(--navy); margin: 0; }
+.deal-pane-sub { display: flex; align-items: center; gap: 10px; margin: 10px 0 14px; flex-wrap: wrap; }
+.deal-tabs { display: flex; border-bottom: 2px solid var(--gray-200); margin-bottom: var(--sp-6); gap: 0; }
+.deal-tabs .tab { padding: var(--sp-3) var(--sp-5); font-size: var(--text-sm); font-weight: 500; color: var(--gray-500); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all var(--duration) var(--ease); white-space: nowrap; }
+.deal-tabs .tab:hover { color: var(--gray-700); }
+.deal-tabs .tab.active { color: var(--navy); border-bottom-color: var(--navy); }
 
 /* Upload zone */
 .upload-zone { border: 2px dashed var(--gray-300); border-radius: var(--radius-lg); padding: var(--sp-10); text-align: center; cursor: pointer; transition: all var(--duration) var(--ease); background: var(--gray-50); }
@@ -348,8 +378,6 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 .section-header { font-size: var(--text-lg); font-weight: 600; color: var(--gray-800); margin-bottom: var(--sp-5); padding-bottom: var(--sp-3); border-bottom: 1px solid var(--gray-200); }
 
 /* Detail tabs */
-.detail-tab-content { display: none; }
-.detail-tab-content.active { display: block; }
 
 /* Deal split layout */
 .deals-split { display: grid; grid-template-columns: 1fr; transition: all 0.3s var(--ease); }
@@ -487,46 +515,39 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         <div class="sidebar-brand-sub" id="brandTagline">Deal Platform</div>
       </div>
     </div>
-    <div class="sidebar-nav">
-      <!-- Overview -->
-      <div class="nav-section-label">Overview</div>
-      <div class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard')">
+    <div class="rail-modules" id="railModules">
+      <!-- module icons — SVGs reused from old nav items -->
+      <div class="rail-icon active" data-tab="dashboard" title="Dashboard" onclick="switchTab('dashboard')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        <span class="nav-label">Dashboard</span>
       </div>
-      <!-- Deal Flow -->
-      <div class="nav-section-label">Deal Flow</div>
-      <div class="nav-item" data-tab="deals" onclick="switchTab('deals')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        <span class="nav-label">Deals</span>
-        <span class="nav-badge" id="navDealsCount">0</span>
-      </div>
-      <div class="nav-item" data-tab="dataroom" onclick="switchTab('dataroom')">
+      <div class="rail-icon" data-tab="dataroom" title="Data Room" onclick="switchTab('dataroom')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-        <span class="nav-label">Data Room</span>
       </div>
-      <div class="nav-item" data-tab="underwriting" onclick="switchTab('underwriting')">
+      <div class="rail-icon" data-tab="underwriting" title="Underwriting" onclick="switchTab('underwriting')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>
-        <span class="nav-label">Underwriting</span>
       </div>
-      <!-- Relationships -->
-      <div class="nav-section-label">Relationships</div>
-      <div class="nav-item" data-tab="investors" onclick="switchTab('investors')">
+      <div class="rail-icon" data-tab="investors" title="Investors" onclick="switchTab('investors')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <span class="nav-label">Investors</span>
       </div>
-      <div class="nav-item" data-tab="contacts" onclick="switchTab('contacts')">
+      <div class="rail-icon" data-tab="contacts" title="Contacts" onclick="switchTab('contacts')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-        <span class="nav-label">Contacts</span>
       </div>
-      <!-- Operations -->
-      <div class="nav-section-label">Operations</div>
-      <div class="nav-item" data-tab="tasks" onclick="switchTab('tasks')">
+      <div class="rail-icon" data-tab="tasks" title="Tasks" onclick="switchTab('tasks')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-        <span class="nav-label">Tasks</span>
-        <span class="nav-badge" id="navTasksCount" class="hidden">0</span>
+        <span class="rail-badge hidden" id="navTasksCount"></span>
       </div>
     </div>
+    <div class="intake-box">
+      <div class="rail-label">Client Intake Link</div>
+      <div class="intake-row">
+        <input id="intakeLink" readonly value="">
+        <button class="btn btn-primary btn-sm" onclick="copyIntakeLink()">Copy</button>
+      </div>
+    </div>
+    <div class="rail-label" style="display:flex;justify-content:space-between;align-items:center;">Deals <span class="text-xs text-muted" id="railDealCount"></span>
+      <button class="btn btn-ghost btn-sm" onclick="openAddDealModal()" title="New deal">＋</button>
+    </div>
+    <div class="deal-rail" id="dealRail"></div>
     <div class="sidebar-footer">
       <div class="sidebar-avatar">HG</div>
       <div class="sidebar-footer-info">
@@ -540,7 +561,6 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 
   <!-- Main Content -->
   <div class="main-content">
-    <div class="confidential-banner">CONFIDENTIAL: All information is strictly protected under NDA. Unauthorized access or disclosure is prohibited.</div>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileMenu()"></div>
     <div class="content-header">
       <div class="content-header-left">
@@ -610,6 +630,9 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
       <section id="view-tasks" class="hidden">
         <!-- rendered by renderTasks() -->
       </section>
+
+      <!-- DEAL DETAIL (persistent main pane) -->
+      <div id="view-deal" class="hidden"><!-- rendered by renderDealPane() --></div>
     </div>
   </div>
 </div>
@@ -897,19 +920,6 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   </div>
 </div>
 
-<!-- DEAL DETAIL MODAL -->
-<div class="modal-backdrop" id="dealDetailModal" onclick="if(event.target===this)closeDealDetailModal()">
-  <div class="modal-panel modal-lg">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title" id="dealDetailModalTitle">Deal</div>
-        <div class="text-xs text-muted" id="dealDetailModalSub"></div>
-      </div>
-      <button class="modal-close" onclick="closeDealDetailModal()">&times;</button>
-    </div>
-    <div class="modal-body" id="dealDetailModalBody"></div>
-  </div>
-</div>
 
 <!-- DATA ROOM MODAL -->
 <div class="modal-backdrop" id="dataRoomModal" onclick="if(event.target===this)HGCDataRoom.close()">
@@ -1142,6 +1152,54 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     if (authLogo) authLogo.textContent = window.BRAND.displayName;
   })();
 
+  // --- Pipeline stages (v2) ---
+  // `stage` is the primary pipeline state; legacy `status` is derived from it
+  // via stageToStatus() so filters/kanban/charts/exports keep working.
+  const STAGES = [
+    { id: 'intake',           label: 'Link Sent' },
+    { id: 'docs_in',          label: 'Docs Coming In' },
+    { id: 'intake_complete',  label: 'Intake Complete' },
+    { id: 'ai_vetted',        label: 'AI Vetted' },
+    { id: 'revisit_client',   label: 'Revisit with Client (call)' },
+    { id: 'good_deal',        label: 'Good Deal' },
+    { id: 'summary_review',   label: 'Project Summary Review' },
+    { id: 'contract',         label: 'Client Contract / Success Fee' },
+    { id: 'underwriting',     label: 'Official Underwriting' },
+    { id: 'letterhead',       label: 'Letterhead / Term Sheet' },
+    { id: 'signing',          label: 'Signing' },
+    { id: 'funding_date',     label: 'Funding Date Set' },
+    { id: 'funded',           label: 'Funded' },
+  ];
+  const STAGE_LABEL = Object.fromEntries(STAGES.map(s => [s.id, s.label]));
+  STAGE_LABEL.declined = 'Declined';
+
+  function stageToStatus(stage) {
+    const i = STAGES.findIndex(s => s.id === stage);
+    if (stage === 'funded') return 'closed';
+    if (i >= 8) return 'negotiation';   // underwriting..funding_date
+    if (i >= 4) return 'proposal';      // revisit_client..contract
+    return 'lead';                      // intake..ai_vetted (and declined/unknown)
+  }
+  function statusToStage(status) {
+    return { lead: 'intake', proposal: 'good_deal', negotiation: 'underwriting', closed: 'funded' }[status] || 'intake';
+  }
+
+  function recordHistory(deal, note, stage) {
+    deal.history = deal.history || [];
+    deal.history.push({ at: new Date().toISOString(), stage: stage || deal.stage || '', note, actor: 'team' });
+  }
+
+  function setStage(dealId, stageId) {
+    const d = deals.find(x => x.id === dealId);
+    if (!d || d.stage === stageId) return;
+    d.stage = stageId;
+    d.status = stageId === 'declined' ? d.status : stageToStatus(stageId);
+    recordHistory(d, `Moved to ${STAGE_LABEL[stageId] || stageId}`, stageId);
+    saveData();
+    if (typeof renderDealPane === 'function') renderDealPane(dealId);
+    if (typeof renderDealRail === 'function') renderDealRail();
+  }
+
   let nextTaskId = 1;
   let nextContactId = 1;
   let nextInvestorId = 1;
@@ -1165,6 +1223,14 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   }
 
   // ===== DATA =====
+  // Backfill fields added after the original seed schema. Runs after EVERY
+  // load path (API, localStorage fallback, hardcoded seed) so no deal is ever
+  // missing brand/stage regardless of where it came from.
+  function normalizeDeals() {
+    deals.forEach(d => { if (!d.brand) d.brand = 'harveygreystone'; });
+    deals.forEach(d => { if (!d.stage) d.stage = statusToStage(d.status); });
+  }
+
   async function loadData() {
     try {
       const res = await fetch('/api/deals');
@@ -1176,7 +1242,6 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         investors = data.investors || investors;
         dbReady = true;
         nextDealId = (deals.reduce((m, d) => Math.max(m, d.id), 0) || 16) + 1;
-        deals.forEach(d => { if (!d.brand) d.brand = 'harveygreystone'; });
         nextTaskId = (tasks.reduce((m, t) => Math.max(m, t.id), 0) || 0) + 1;
         nextContactId = (contacts.reduce((m, c) => Math.max(m, c.id), 0) || 0) + 1;
         nextInvestorId = (investors.reduce((m, i) => Math.max(m, i.id), 0) || 0) + 1;
@@ -1191,6 +1256,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         investors = data.investors || investors;
       }
     }
+    normalizeDeals();
   }
 
   async function saveData() {
@@ -1259,13 +1325,23 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     document.getElementById('mainApp').classList.remove('hidden');
     await loadData();
     updateNavBadges();
-    renderDashboard();
+    // Default view: open newest deal if any (renderDealRail called inside openDeal), else show dashboard
+    const newestDeal = deals.length
+      ? [...deals].sort((a, b) => (b.createdDate || '').localeCompare(a.createdDate || '') || b.id - a.id)[0]
+      : null;
+    if (newestDeal) {
+      openDeal(newestDeal.id);
+    } else {
+      renderDealRail();
+      renderDashboard();
+    }
   }
 
   async function refreshFromDB() {
     await loadData();
     updateNavBadges();
-    const tab = document.querySelector('.nav-item.active')?.dataset.tab || 'dashboard';
+    renderDealRail();
+    const tab = document.querySelector('.rail-icon.active')?.dataset.tab || 'dashboard';
     switchTab(tab);
     showToast('Synced from server', 'success');
   }
@@ -1286,21 +1362,31 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     // Show target
     const target = document.getElementById('view-' + tab);
     if (target) target.classList.remove('hidden');
-    // Update nav active
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    const navItem = document.querySelector(`.nav-item[data-tab="${tab}"]`);
-    if (navItem) navItem.classList.add('active');
+    // Update rail-icon active: 'deal' has no icon, so only module tabs light up
+    if (tab !== 'deal') {
+      document.querySelectorAll('.rail-icon[data-tab]').forEach(el => el.classList.remove('active'));
+      const railIcon = document.querySelector(`.rail-icon[data-tab="${tab}"]`);
+      if (railIcon) railIcon.classList.add('active');
+    }
     // Update breadcrumb
     const titles = { dashboard: 'Dashboard', deals: 'Deals', dataroom: 'Data Room', underwriting: 'Underwriting', investors: 'Investors', contacts: 'Contacts', tasks: 'Tasks' };
-    document.getElementById('breadcrumbTitle').textContent = titles[tab] || tab;
+    if (tab === 'deal') {
+      const dd = deals.find(x => x.id === selectedDealId);
+      document.getElementById('breadcrumbTitle').textContent = dd ? dd.name : 'Deal';
+    } else {
+      document.getElementById('breadcrumbTitle').textContent = titles[tab] || tab;
+    }
     // Render
     if (tab === 'dashboard') renderDashboard();
     else if (tab === 'deals') renderDeals();
+    else if (tab === 'deal') { /* rendered by renderDealPane via openDeal */ }
     else if (tab === 'dataroom') renderDataRoomPage();
     else if (tab === 'underwriting') renderUnderwriting();
     else if (tab === 'investors') { if (window.HGCInvestors) HGCInvestors.render(); }
     else if (tab === 'contacts') renderContacts();
     else if (tab === 'tasks') renderTasks();
+    // Refresh deal rail on every tab switch
+    renderDealRail();
   }
 
   function toggleSidebar() {
@@ -1318,8 +1404,39 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   function updateNavBadges() {
     const dc = document.getElementById('navDealsCount');
     if (dc) dc.textContent = deals.length;
+    const rc = document.getElementById('railDealCount');
+    if (rc) rc.textContent = deals.length;
     const tc = document.getElementById('navTasksCount');
-    if (tc) { tc.textContent = tasks.filter(t => !t.completed).length; tc.classList.toggle('hidden', tasks.length === 0); }
+    if (tc) {
+      const open = tasks.filter(t => !t.completed).length;
+      tc.textContent = open;
+      tc.classList.toggle('hidden', open === 0);
+    }
+  }
+
+  // ===== DEAL RAIL (Task 2) =====
+  function renderDealRail() {
+    const rail = document.getElementById('dealRail');
+    if (!rail) return;
+    const sorted = [...deals].sort((a, b) => (b.createdDate || '').localeCompare(a.createdDate || '') || b.id - a.id);
+    rail.innerHTML = sorted.map(d => `
+      <div class="rail-deal ${selectedDealId === d.id ? 'active' : ''}" onclick="openDeal(${d.id})">
+        <div class="rail-deal-name">&#128193; ${escHtml(d.name)} ${brandChip(d)}</div>
+        <div class="rail-deal-meta">
+          <span>${escHtml(STAGE_LABEL[d.stage] || d.stage || '')}</span>
+          <span class="owner-chip">${escHtml(d.owner || 'unassigned')}</span>
+        </div>
+      </div>`).join('');
+    const active = rail.querySelector('.rail-deal.active');
+    if (active) active.scrollIntoView({ block: 'nearest' });
+    const link = document.getElementById('intakeLink');
+    if (link && !link.value) link.value = location.origin + '/apply';
+  }
+
+  function copyIntakeLink() {
+    const link = document.getElementById('intakeLink');
+    if (!link) return;
+    navigator.clipboard.writeText(link.value).then(() => showToast('Intake link copied'));
   }
 
   // ===== UTILITIES =====
@@ -1616,7 +1733,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         const revenue = d.capital * d.fee / 100;
         const c = window.HGCDataRoom ? HGCDataRoom.completeness(d) : { pct: 0, reqDone: 0, req: 0 };
         listHtml += `
-          <div class="deal-list-item" draggable="true" data-deal-id="${d.id}" onclick="selectDeal(${d.id})" ondragstart="dealDragStart(event, ${d.id})" ondragover="dealDragOver(event)" ondrop="dealDrop(event, ${d.id})" ondragend="dealDragEnd(event)">
+          <div class="deal-list-item" draggable="true" data-deal-id="${d.id}" onclick="openDeal(${d.id})" ondragstart="dealDragStart(event, ${d.id})" ondragover="dealDragOver(event)" ondrop="dealDrop(event, ${d.id})" ondragend="dealDragEnd(event)">
             <div>
               <div class="deal-list-name">${escHtml(d.name)} ${brandChip(d)}</div>
               <div class="deal-list-sub">#${d.rank}${d.score ? ' · Score ' + d.score : ''} · ${formatCurrency(revenue)} est. rev${d.fundingType ? ' · <span class="badge badge-info" style="font-size:10px;padding:1px 6px;">' + escHtml(fundingTypeLabel(d.fundingType)) + '</span>' : ''}</div>
@@ -1642,123 +1759,220 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     container.innerHTML = toolbarHtml + `<div>${listHtml}</div>`;
   }
 
-  function selectDeal(id) {
+  // ===== DEAL PANE (persistent main-pane workspace) =====
+  let currentDealTab = 'overview';
+
+  function openDeal(id) {
     selectedDealId = id;
+    currentDealTab = currentDealTab || 'overview';
+    switchTab('deal');
+    renderDealPane(id);
+    renderDealRail();
+  }
+
+  // Keep selectDeal as alias (kanban drag-drop + any external callers)
+  function selectDeal(id) { openDeal(id); }
+
+  const DEAL_TABS = [
+    { id: 'overview',  label: 'Overview' },
+    { id: 'documents', label: 'Documents' },
+    { id: 'answers',   label: 'Client Answers' },
+    { id: 'ai',        label: 'AI Analysis' },
+    { id: 'offers',    label: 'Offer & Contracts' },
+    { id: 'history',   label: 'History' },
+  ];
+
+  function renderDealPane(id) {
     const d = deals.find(x => x.id === id);
-    if (!d) return;
-    document.getElementById('dealDetailModalTitle').innerHTML = escHtml(d.name) + ' ' + brandChip(d);
-    document.getElementById('dealDetailModalSub').textContent = `${formatCurrency(d.capital)} · ${statusLabel(d.status)}${d.fundingType ? ' · ' + fundingTypeLabel(d.fundingType) : ''}`;
-    document.getElementById('dealDetailModalBody').innerHTML = renderDealDetail(d);
-    document.getElementById('dealDetailModal').classList.add('show');
-  }
-
-  function closeDealDetailModal() {
-    document.getElementById('dealDetailModal').classList.remove('show');
-    selectedDealId = null;
-  }
-
-  function renderDealDetail(d) {
-    const revenue = d.capital * d.fee / 100;
-    const expRevenue = revenue * (d.probability / 100);
-    const c = window.HGCDataRoom ? HGCDataRoom.completeness(d) : { pct: 0, reqDone: 0, req: 0 };
-    const ncndaBadge = window.HGCNcnda ? HGCNcnda.ncndaBadge(d) : '';
-    const investorSummary = window.HGCInvestors ? HGCInvestors.dealSummary(d) : '';
-
-    return `
-      <div>
-        <div class="sub-tabs" id="dealSubTabs">
-          <div class="sub-tab active" onclick="switchDealSubTab('overview')">Overview</div>
-          <div class="sub-tab" onclick="switchDealSubTab('detail-intake')">Client Intake</div>
-          <div class="sub-tab" onclick="switchDealSubTab('detail-dataroom')">Data Room</div>
-          <div class="sub-tab" onclick="switchDealSubTab('detail-investors')">Investors</div>
-          <div class="sub-tab" onclick="switchDealSubTab('detail-portal')">Portal</div>
-          <div class="sub-tab" onclick="switchDealSubTab('detail-uw')">Underwriting</div>
+    const c = document.getElementById('view-deal');
+    if (!d || !c) return;
+    const ndaBadge = (typeof HGCNcnda !== 'undefined' && HGCNcnda.ncndaBadge) ? HGCNcnda.ncndaBadge(d) : '';
+    c.innerHTML = `
+      <div class="deal-pane-head">
+        <div class="deal-pane-title">
+          <h1 class="brand-serif">${escHtml(d.name)}</h1>
+          ${d.fundingType ? `<span class="badge badge-info">${escHtml(fundingTypeLabel(d.fundingType))}</span>` : ''}
+          ${brandChip(d)} ${ndaBadge}
         </div>
-
-        <div id="detail-overview" class="detail-tab-content active">
-          ${d.execSummary ? `<div class="card mb-4"><div class="card-body text-sm" style="font-style:italic;color:var(--gray-600);">${escHtml(d.execSummary)}</div></div>` : ''}
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Capital</label>
-              <input type="text" class="form-input" value="${formatCurrency(d.capital)}" onchange="updateDeal(${d.id}, 'capital', this.value)">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Status</label>
-              <select class="form-input" onchange="updateDeal(${d.id}, 'status', this.value)">
-                <option value="lead" ${d.status==='lead'?'selected':''}>Lead</option>
-                <option value="proposal" ${d.status==='proposal'?'selected':''}>Proposal</option>
-                <option value="negotiation" ${d.status==='negotiation'?'selected':''}>Negotiation</option>
-                <option value="closed" ${d.status==='closed'?'selected':''}>Closed</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Fee %</label>
-              <input type="number" class="form-input" value="${d.fee}" step="0.1" onchange="updateDeal(${d.id}, 'fee', this.value)">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Win Probability %</label>
-              <input type="number" class="form-input" value="${d.probability}" step="5" min="0" max="100" onchange="updateDeal(${d.id}, 'probability', this.value)">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Funding Type</label>
-              <select class="form-input" onchange="updateDeal(${d.id}, 'fundingType', this.value)">
-                ${FUNDING_TYPE_OPTIONS.map(o =>
-                  '<option value="' + escHtml(o.value) + '" ' + ((d.fundingType || '') === o.value ? 'selected' : '') + '>' + escHtml(o.label) + '</option>'
-                ).join('')}
-              </select>
-            </div>
-            <div class="form-group"></div>
-          </div>
-          <div class="card mb-4">
-            <div class="card-body">
-              <div class="flex justify-between text-sm mb-2"><span class="text-muted">Revenue (100%)</span><span class="font-semibold">${formatCurrency(revenue)}</span></div>
-              <div class="flex justify-between text-sm"><span class="text-muted">Expected Value</span><span class="font-semibold">${formatCurrency(expRevenue)}</span></div>
-            </div>
-          </div>
-          ${d.score ? `
-            <div class="card mb-4"><div class="card-body">
-              <div class="progress-label"><span>Deal Score</span><span>${d.score}/100</span></div>
-              <div class="progress progress-lg"><div class="progress-fill ${progressColorClass(d.score)}" style="width:${d.score}%"></div></div>
-            </div></div>
-          ` : ''}
-          ${investorSummary}
-          <div class="form-group">
-            <label class="form-label">Notes</label>
-            <textarea class="form-input" rows="3" onchange="updateDeal(${d.id}, 'notes', this.value)">${escHtml(d.notes || '')}</textarea>
-          </div>
+        <div class="deal-pane-sub">
+          <label class="text-xs text-muted">Owner</label>
+          <select class="form-input btn-sm" onchange="setOwner(${d.id}, this.value)">
+            <option value="">— unassigned —</option>
+            ${['Maurice','Ethan','Noah','Shaw','Francis','Marcus'].map(n => `<option ${d.owner === n ? 'selected' : ''}>${n}</option>`).join('')}
+          </select>
+          <span class="text-sm text-muted">${escHtml(d.contact || '')}${d.email ? ' · ' + escHtml(d.email) : ''}${d.phone ? ' · ' + escHtml(d.phone) : ''}</span>
+          <button class="btn btn-secondary btn-sm" onclick="emailClient(${d.id})">Email Client</button>
+          <button class="btn btn-ghost btn-sm" onclick="editDeal(${d.id})">Edit</button>
         </div>
-
-        <div id="detail-intake" class="detail-tab-content">
-          ${renderClientIntake(d)}
-        </div>
-
-        <div id="detail-dataroom" class="detail-tab-content">
-          <div class="progress-label"><span>Readiness</span><span>${c.reqDone}/${c.req} (${c.pct}%)</span></div>
-          <div class="progress progress-lg mb-4"><div class="progress-fill ${progressColorClass(c.pct)}" style="width:${c.pct}%"></div></div>
-          <div id="dealDetailDrBody"></div>
-        </div>
-
-        <div id="detail-investors" class="detail-tab-content">
-          ${investorSummary || '<div class="text-sm text-muted">No investors linked yet.</div>'}
-        </div>
-
-        <div id="detail-portal" class="detail-tab-content">
-          ${ncndaBadge}
-          <button class="btn btn-primary btn-sm mt-4" onclick="HGCNcnda.open(${d.id})">Open Portal &amp; NCNDA</button>
-        </div>
-
-        <div id="detail-uw" class="detail-tab-content">
-          ${d.memo ? `<div class="card"><div class="card-body text-sm" style="line-height:1.7;">${formatMemo(d.memo)}</div></div>` : '<div class="text-sm text-muted">No underwriting memo yet. Add documents to generate one.</div>'}
+        <div class="deal-tabs">
+          ${DEAL_TABS.map(t => `<div class="tab ${currentDealTab === t.id ? 'active' : ''}" onclick="switchDealTab('${t.id}')">${t.label}</div>`).join('')}
         </div>
       </div>
-    `;
+      <div class="deal-pane-body" id="dealPaneBody"></div>`;
+    renderDealTabBody(d);
   }
 
-  function renderClientIntake(deal) {
+  function switchDealTab(tab) {
+    currentDealTab = tab;
+    const d = deals.find(x => x.id === selectedDealId);
+    if (!d) return;
+    document.querySelectorAll('.deal-tabs .tab').forEach(t => t.classList.toggle('active', t.textContent === DEAL_TABS.find(x => x.id === tab).label));
+    renderDealTabBody(d);
+  }
+
+  function renderDealTabBody(d) {
+    const b = document.getElementById('dealPaneBody');
+    if (!b) return;
+    if (currentDealTab === 'overview') {
+      const investorSummary = (typeof HGCInvestors !== 'undefined') ? HGCInvestors.dealSummary(d) : '';
+      b.innerHTML = `
+        <div class="card mb-4"><div class="card-header"><div class="card-header-title">Pipeline — click a stage to move the deal</div></div>
+          <div class="card-body"><div class="stage-bar">
+            ${STAGES.map(s => `<span class="stage-pill ${d.stage === s.id ? 'active' : ''}" onclick="setStage(${d.id}, '${s.id}')">${s.label}</span>`).join('')}
+            <span class="stage-pill declined ${d.stage === 'declined' ? 'active' : ''}" onclick="setStage(${d.id}, 'declined')">Declined</span>
+          </div></div></div>
+        <div class="card mb-4"><div class="card-header"><div class="card-header-title">Client's Private Link — status page & uploads</div></div>
+          <div class="card-body"><div class="intake-row">
+            <input readonly value="${d.ncnda && d.ncnda.token ? location.origin + '/portal.html?t=' + escHtml(d.ncnda.token) : 'Portal link is created when the deal is saved to the server'}" style="flex:1;">
+            ${d.ncnda && d.ncnda.token ? `<button class="btn btn-primary btn-sm" onclick="navigator.clipboard.writeText(this.previousElementSibling.value).then(()=>showToast('Link copied'))">Copy</button>` : ''}
+            ${(typeof HGCNcnda !== 'undefined') ? `<button class="btn btn-secondary btn-sm" onclick="HGCNcnda.open(${d.id})">NCNDA &amp; Portal</button>` : ''}
+          </div></div></div>
+        <div class="card mb-4"><div class="card-header"><div class="card-header-title">Deal Details</div></div>
+          <div class="card-body" id="dealOverviewForm"></div></div>
+        ${investorSummary ? `<div class="card mt-4"><div class="card-header"><div class="card-header-title">Investors</div></div><div class="card-body">${investorSummary}</div></div>` : ''}`;
+      renderOverviewForm(d);
+    } else if (currentDealTab === 'documents') {
+      b.innerHTML = '<div id="dealPaneDr"></div>';
+      if (typeof HGCDataRoom !== 'undefined') HGCDataRoom.renderInline(d.id, document.getElementById('dealPaneDr'));
+      // Below the data room, append the client-intake checklist card
+      const intake = document.createElement('div');
+      intake.innerHTML = `<div class="card mt-4"><div class="card-header"><div class="card-header-title">Client Intake Checklist</div></div><div class="card-body">${renderClientIntakeHtml(d)}</div></div>`;
+      b.appendChild(intake);
+    } else if (currentDealTab === 'answers') {
+      b.innerHTML = `<div class="card"><div class="card-body text-muted">No client questionnaire yet. The client funnel (Phase 2) fills this tab.</div></div>`;
+    } else if (currentDealTab === 'ai') {
+      b.innerHTML = d.memo
+        ? `<div class="card"><div class="card-header"><div class="card-header-title">Underwriting Memo</div></div><div class="card-body">${formatMemo(d.memo)}</div></div>`
+        : `<div class="card"><div class="card-body text-muted">No AI analysis yet. Run underwriting from the Underwriting view, or wait for the AI Desk (Phase 3).</div></div>`;
+    } else if (currentDealTab === 'offers') {
+      b.innerHTML = `<div class="card"><div class="card-body text-muted">Letterheads and contracts arrive with the AI Desk (Phase 3).</div></div>`;
+    } else if (currentDealTab === 'history') {
+      const rows = (d.history || []).slice().reverse().map(h => `
+        <tr><td class="text-xs text-muted" style="white-space:nowrap;">${h.at ? new Date(h.at).toLocaleString() : '—'}</td>
+        <td><span class="badge badge-neutral">${escHtml(h.actor || '')}</span></td>
+        <td class="text-sm">${escHtml(h.note || '')}</td></tr>`).join('');
+      b.innerHTML = `<div class="card"><div class="card-body">${rows
+        ? `<table class="data-table"><thead><tr><th>When</th><th>Who</th><th>What</th></tr></thead><tbody>${rows}</tbody></table>`
+        : '<div class="text-muted">No history yet — stage moves are recorded from now on.</div>'}</div></div>`;
+    }
+  }
+
+  function renderOverviewForm(d) {
+    const form = document.getElementById('dealOverviewForm');
+    if (!form) return;
+    const revenue = d.capital * d.fee / 100;
+    const expRevenue = revenue * (d.probability / 100);
+    form.innerHTML = `
+      ${d.execSummary ? `<div class="card mb-4"><div class="card-body text-sm" style="font-style:italic;color:var(--gray-600);">${escHtml(d.execSummary)}</div></div>` : ''}
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Capital</label>
+          <input type="text" class="form-input" value="${formatCurrency(d.capital)}" onchange="updateDeal(${d.id}, 'capital', this.value)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-input" onchange="updateDeal(${d.id}, 'status', this.value)">
+            <option value="lead" ${d.status==='lead'?'selected':''}>Lead</option>
+            <option value="proposal" ${d.status==='proposal'?'selected':''}>Proposal</option>
+            <option value="negotiation" ${d.status==='negotiation'?'selected':''}>Negotiation</option>
+            <option value="closed" ${d.status==='closed'?'selected':''}>Closed</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Fee %</label>
+          <input type="number" class="form-input" value="${d.fee}" step="0.1" onchange="updateDeal(${d.id}, 'fee', this.value)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Win Probability %</label>
+          <input type="number" class="form-input" value="${d.probability}" step="5" min="0" max="100" onchange="updateDeal(${d.id}, 'probability', this.value)">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Funding Type</label>
+          <select class="form-input" onchange="updateDeal(${d.id}, 'fundingType', this.value)">
+            ${FUNDING_TYPE_OPTIONS.map(o =>
+              '<option value="' + escHtml(o.value) + '" ' + ((d.fundingType || '') === o.value ? 'selected' : '') + '>' + escHtml(o.label) + '</option>'
+            ).join('')}
+          </select>
+        </div>
+        <div class="form-group"></div>
+      </div>
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="flex justify-between text-sm mb-2"><span class="text-muted">Revenue (100%)</span><span class="font-semibold">${formatCurrency(revenue)}</span></div>
+          <div class="flex justify-between text-sm"><span class="text-muted">Expected Value</span><span class="font-semibold">${formatCurrency(expRevenue)}</span></div>
+        </div>
+      </div>
+      ${d.score ? `
+        <div class="card mb-4"><div class="card-body">
+          <div class="progress-label"><span>Deal Score</span><span>${d.score}/100</span></div>
+          <div class="progress progress-lg"><div class="progress-fill ${progressColorClass(d.score)}" style="width:${d.score}%"></div></div>
+        </div></div>
+      ` : ''}
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-input" rows="3" onchange="updateDeal(${d.id}, 'notes', this.value)">${escHtml(d.notes || '')}</textarea>
+      </div>`;
+  }
+
+  function setOwner(dealId, owner) {
+    const d = deals.find(x => x.id === dealId);
+    if (!d) return;
+    d.owner = owner;
+    recordHistory(d, owner ? `Owner set to ${owner}` : 'Owner unassigned');
+    saveData();
+    renderDealRail();
+  }
+
+  function emailClient(dealId) {
+    const d = deals.find(x => x.id === dealId);
+    if (!d || !d.email) { showToast('No client email on this deal', 'warning'); return; }
+    const link = d.ncnda && d.ncnda.token ? location.origin + '/portal.html?t=' + d.ncnda.token : '';
+    location.href = 'mailto:' + encodeURIComponent(d.email)
+      + '?subject=' + encodeURIComponent(`${d.name} — your secure document portal`)
+      + '&body=' + encodeURIComponent(`Hi ${d.contact || ''},\n\nHere is your secure link to sign the NDA and upload your documents:\n${link}\n\nThank you.`);
+  }
+
+  function editDeal(dealId) {
+    // Open the addDealModal pre-filled — there is no dedicated edit modal;
+    // openAddDealModal() clears all fields, so we pre-fill after opening.
+    openAddDealModal();
+    const d = deals.find(x => x.id === dealId);
+    if (!d) return;
+    document.getElementById('dealModalTitle').textContent = 'Edit Deal';
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+    set('dealName', d.name);
+    set('dealCompany', d.company);
+    set('dealContact', d.contact);
+    set('dealEmail', d.email);
+    set('dealPhone', d.phone);
+    set('dealCapital', d.capital);
+    set('dealRevenue', d.revenue);
+    set('dealYears', d.years);
+    set('dealDescription', d.description);
+    set('dealNotes', d.notes);
+    set('dealFundingType', d.fundingType);
+    set('dealStatus', d.status);
+    set('dealFee', d.fee);
+    set('dealProbability', d.probability);
+    set('dealEquity', d.equity);
+    editingDealId = dealId;
+  }
+
+  function renderClientIntakeHtml(deal) {
     if (!deal.fundingType || !fundingChecklists) {
       return '<div class="text-sm text-muted">Select a funding type on the Overview tab to see the required document checklist.</div>';
     }
@@ -1834,7 +2048,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
             file: { path: data.path, filename: file.name, size: file.size, uploadedAt: new Date().toISOString() }
           };
           saveData();
-          renderDeals();
+          if (selectedDealId === dealId) renderDealPane(dealId);
         }
         showToast('Document uploaded');
       } catch (err) {
@@ -1842,24 +2056,6 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
       }
     };
     input.click();
-  }
-
-  function switchDealSubTab(tabId) {
-    const modal = document.getElementById('dealDetailModalBody');
-    if (!modal) return;
-    modal.querySelectorAll('.detail-tab-content').forEach(el => el.classList.remove('active'));
-    modal.querySelectorAll('.sub-tab').forEach(el => el.classList.remove('active'));
-    const target = document.getElementById(tabId);
-    if (target) target.classList.add('active');
-    // Highlight the clicked tab
-    modal.querySelectorAll('.sub-tab').forEach(el => {
-      if (el.getAttribute('onclick') && el.getAttribute('onclick').includes("'" + tabId + "'")) el.classList.add('active');
-    });
-    // If switching to dataroom tab, render it inline
-    if (tabId === 'detail-dataroom' && selectedDealId && window.HGCDataRoom) {
-      const drBody = document.getElementById('dealDetailDrBody');
-      if (drBody) HGCDataRoom.renderInline(selectedDealId, drBody);
-    }
   }
 
   function renderKanban(filtered) {
@@ -1876,7 +2072,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         </div>
         <div class="kanban-column-body">`;
       dealsInStage.forEach(d => {
-        html += `<div class="kanban-card" draggable="true" ondragstart="dealDragStart(event,${d.id})" ondragover="dealDragOver(event)" ondrop="dealDrop(event,${d.id})" ondragend="dealDragEnd(event)" onclick="selectDeal(${d.id})">
+        html += `<div class="kanban-card" draggable="true" ondragstart="dealDragStart(event,${d.id})" ondragover="dealDragOver(event)" ondrop="dealDrop(event,${d.id})" ondragend="dealDragEnd(event)" onclick="openDeal(${d.id})">
           <div class="kanban-card-title">${escHtml(d.name)}</div>
           <div class="kanban-card-meta">${formatCurrency(d.capital)} &middot; ${d.probability}%</div>
         </div>`;
@@ -1919,8 +2115,17 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
       if (field === 'capital') deal[field] = parseCapital(value);
       else if (['fee', 'probability', 'rank'].includes(field)) deal[field] = parseFloat(value) || 0;
       else deal[field] = value;
+      if (field === 'status') {
+        const newStage = statusToStage(value);
+        if (deal.stage !== newStage) {
+          deal.stage = newStage;
+          recordHistory(deal, `Status changed to ${value} — stage moved to ${STAGE_LABEL[newStage] || newStage}`, newStage);
+        }
+      }
       saveData();
       renderDeals();
+      if (typeof renderDealRail === 'function') renderDealRail();
+      if (field === 'status' && typeof renderDealPane === 'function' && selectedDealId === id && currentDealTab === 'overview') renderDealPane(id);
     }
   }
 
@@ -1935,11 +2140,14 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   }
 
   // ===== DEAL MODAL =====
+  let editingDealId = null;
   let dealFiles = [];
   let dealDropReady = false;
 
   function openAddDealModal() {
+    editingDealId = null;
     document.getElementById('addDealModal').classList.add('show');
+    document.getElementById('dealModalTitle').textContent = 'New Deal';
     dealFiles = [];
     renderDealFiles();
     ['dealName','dealCompany','dealContact','dealEmail','dealPhone','dealCapital','dealRevenue','dealYears','dealDescription','dealDocText','dealNotes','dealScore'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
@@ -2183,23 +2391,17 @@ ${docText}`;
 
   function closeAddDealModal() {
     document.getElementById('addDealModal').classList.remove('show');
+    editingDealId = null; // defensive: Cancel during edit must not leave a stale edit target
   }
 
-  function addDeal() {
-    const name = document.getElementById('dealName').value.trim();
-    const capital = parseCapital(document.getElementById('dealCapital').value);
-    if (!name) { showToast('Enter deal name', 'warning'); return; }
-
+  function readDealForm() {
     const memoText = document.getElementById('dealMemo').dataset.raw || '';
-    deals.push({
-      id: nextDealId++,
-      brand: (window.BRAND && window.BRAND.key) || 'harveygreystone',
-      name, capital,
+    return {
+      name: document.getElementById('dealName').value.trim(),
+      capital: parseCapital(document.getElementById('dealCapital').value),
       status: document.getElementById('dealStatus').value,
       fee: parseFloat(document.getElementById('dealFee').value) || 5,
       probability: parseInt(document.getElementById('dealProbability').value) || 50,
-      rank: deals.length + 1,
-      reference: '',
       company: document.getElementById('dealCompany').value,
       contact: document.getElementById('dealContact').value,
       email: document.getElementById('dealEmail').value,
@@ -2211,6 +2413,80 @@ ${docText}`;
       equity: parseFloat(document.getElementById('dealEquity').value) || 0,
       fundingType: document.getElementById('dealFundingType').value,
       score: parseInt(document.getElementById('dealScore').value) || null,
+      notes: document.getElementById('dealNotes').value || '',
+      memoText: memoText
+    };
+  }
+
+  function addDeal() {
+    const f = readDealForm();
+    if (!f.name) { showToast('Enter deal name', 'warning'); return; }
+
+    // --- Upsert: edit existing deal ---
+    if (editingDealId) {
+      const deal = deals.find(x => x.id === editingDealId);
+      if (!deal) { editingDealId = null; return; }
+      deal.name = f.name;
+      deal.capital = f.capital;
+      deal.fee = f.fee;
+      deal.probability = f.probability;
+      deal.company = f.company;
+      deal.contact = f.contact;
+      deal.email = f.email;
+      deal.phone = f.phone;
+      deal.revenue = f.revenue;
+      deal.years = f.years;
+      deal.description = f.description;
+      deal.client = f.client;
+      deal.equity = f.equity;
+      deal.fundingType = f.fundingType;
+      deal.score = f.score;
+      deal.notes = f.notes;
+      deal.memo = f.memoText;
+      // Stage update if status changed
+      if (deal.status !== f.status) {
+        deal.status = f.status;
+        const newStage = statusToStage(f.status);
+        if (deal.stage !== newStage) {
+          deal.stage = newStage;
+          recordHistory(deal, `Status changed to ${f.status} — stage moved to ${STAGE_LABEL[newStage] || newStage}`, newStage);
+        }
+      }
+      recordHistory(deal, 'Deal details edited');
+      const editedId = editingDealId;
+      editingDealId = null;
+      saveData();
+      closeAddDealModal();
+      renderDealPane(selectedDealId === editedId ? editedId : selectedDealId);
+      renderDealRail();
+      showToast('Deal updated');
+      return;
+    }
+
+    // --- New deal ---
+    const memoText = f.memoText;
+    deals.push({
+      id: nextDealId++,
+      brand: (window.BRAND && window.BRAND.key) || 'harveygreystone',
+      name: f.name, capital: f.capital,
+      status: f.status,
+      stage: statusToStage(f.status),
+      history: [{ at: new Date().toISOString(), stage: statusToStage(f.status), note: 'Deal created', actor: 'team' }],
+      fee: f.fee,
+      probability: f.probability,
+      rank: deals.length + 1,
+      reference: '',
+      company: f.company,
+      contact: f.contact,
+      email: f.email,
+      phone: f.phone,
+      revenue: f.revenue,
+      years: f.years,
+      description: f.description,
+      client: f.client,
+      equity: f.equity,
+      fundingType: f.fundingType,
+      score: f.score,
       bankerFit: window._lastAnalysis?.bankerFit || null,
       investorFit: window._lastAnalysis?.investorFit || null,
       riskScore: window._lastAnalysis?.riskScore || null,
@@ -2219,9 +2495,9 @@ ${docText}`;
       roi: window._lastAnalysis?.roi || '',
       dealType: window._lastAnalysis?.dealType || '',
       execSummary: document.getElementById('dealExecSummary').textContent !== 'Auto-generated when you scan documents.' ? document.getElementById('dealExecSummary').textContent : '',
-      files: dealFiles.map(f => ({ id: f.id, name: f.name })),
+      files: dealFiles.map(fl => ({ id: fl.id, name: fl.name })),
       memo: memoText,
-      notes: (document.getElementById('dealNotes').value || '') + (memoText ? '\n\n=== UNDERWRITING MEMO ===\n' + memoText : ''),
+      notes: f.notes + (memoText ? '\n\n=== UNDERWRITING MEMO ===\n' + memoText : ''),
       createdDate: new Date().toISOString()
     });
 
@@ -2465,6 +2741,8 @@ ${docText}`;
       name: f.name || f.company || 'Audited Deal',
       capital: parseCapital(f.capital || '0'),
       status: 'lead', fee: 5, probability: 50,
+      stage: 'intake',
+      history: [{ at: new Date().toISOString(), stage: 'intake', note: 'Deal created', actor: 'team' }],
       rank: deals.length + 1,
       reference: '', company: f.company||'', contact: f.contact||'', email: f.email||'', phone: f.phone||'',
       revenue: f.revenue||'', years: f.years||'', description: f.description||'', client: f.contact||'',

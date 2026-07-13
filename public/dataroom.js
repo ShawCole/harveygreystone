@@ -221,8 +221,10 @@
   let delegated = false;
   const delegatedContainers = new WeakSet();
   function ensureDelegation() {
-    // Attach to whichever container exists (modal drBody or inline target)
-    const targets = [document.getElementById('drBody'), inlineTarget].filter(Boolean);
+    // Attach to whichever container exists (modal drBody or inline target).
+    // When inline mode is active, delegate ONLY on the inline container —
+    // drBody lives *inside* inlineTarget so attaching both causes double-fire.
+    const targets = inlineTarget ? [inlineTarget] : [document.getElementById('drBody')].filter(Boolean);
     targets.forEach(body => {
       if (delegatedContainers.has(body)) return;
       body.addEventListener('click', (e) => {
@@ -695,7 +697,6 @@
     if (!deal.dataRoom) deal.dataRoom = {};
     currentDealId = dealId;
     inlineTarget = container;
-    currentDealId = dealId;
 
     const c = completeness(deal);
     const b = band(deal.capital);
