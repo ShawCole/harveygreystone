@@ -3,45 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>HGC &amp; ARK — Deal Platform Requirements</title>
+<title>Harvey Greystone — Questionnaire</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 :root{
-  --bg:#f8fafc;
+  --navy:#0f2b45; --navy-dark:#0f2b45; --navy-light:#1c3a57; --charcoal:#1c3a57;
+  --gold:#5aa9e0; --gold-light:#a9d2ef; --gold-muted:rgba(90,169,224,0.15);
+  --gray-50:#f4f9fd; --gray-100:#e8f3fc; --gray-200:#d8e7f3; --gray-300:#c8dff2;
+  --gray-400:#8fa9c0; --gray-500:#69829a; --gray-600:#5e7f9b; --gray-700:#1c3a57;
+  --gray-800:#16324a; --gray-900:#0f2b45;
+  --success:#188a4e; --success-light:rgba(24,138,78,0.12);
+  --warning:#b17d12; --warning-light:rgba(177,125,18,0.12);
+  --danger:#c34a45; --danger-light:rgba(195,74,69,0.12);
+  --info:#5aa9e0; --info-light:rgba(90,169,224,0.12);
+  --radius-sm:6px; --radius-md:10px; --radius-lg:14px;
+  --serif:Georgia,'Times New Roman',serif;
+  --bg:#e8f3fc;
   --surface:#ffffff;
-  --surface-2:#f1f5f9;
-  --border:#e2e8f0;
-  --border-active:#cbd5e1;
+  --surface-2:#f4f9fd;
+  --border:#d8e7f3;
+  --border-active:#c8dff2;
   --text:#1e293b;
-  --text-dim:#64748b;
-  --text-muted:#94a3b8;
-  --navy:#1e3a5f;
-  --navy-dark:#152d4a;
-  --navy-light:#2a4d7a;
-  --gold:#d4a853;
-  --accent:#1e3a5f;
-  --accent-dim:#1e3a5f12;
-  --success:#22c55e;
-  --warning:#f59e0b;
-  --danger:#ef4444;
-  --radius-md:8px;
-  --radius-lg:12px;
-  --shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
-  --shadow-md:0 4px 6px rgba(0,0,0,.05),0 2px 4px rgba(0,0,0,.04);
+  --text-dim:#69829a;
+  --text-muted:#8fa9c0;
+  --accent:#0f2b45;
+  --accent-dim:rgba(90,169,224,0.15);
+  --shadow-sm:0 1px 3px rgba(15,43,69,.06),0 1px 2px rgba(15,43,69,.04);
+  --shadow-md:0 4px 6px rgba(15,43,69,.05),0 2px 4px rgba(15,43,69,.04);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased}
 body{min-height:100dvh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
 .container{max-width:720px;margin:0 auto;padding:32px 16px 160px}
 .header{margin-bottom:28px;padding:28px;background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);border:1px solid var(--border)}
-.header-tag{display:inline-flex;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--navy);background:var(--accent-dim);border:1px solid rgba(30,58,95,.15);border-radius:6px;padding:4px 10px;margin-bottom:14px}
+.header-tag{display:inline-flex;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--navy);background:var(--accent-dim);border:1px solid rgba(15,43,69,.15);border-radius:6px;padding:4px 10px;margin-bottom:14px}
+.portal-brand{font-family:var(--serif);letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--navy)}
 .header h1{font-size:22px;font-weight:700;letter-spacing:-.02em;margin-bottom:8px;color:var(--navy)}
 .header p{color:var(--text-dim);font-size:13px;line-height:1.6}
 .legend{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 16px;margin:16px 0;font-size:12px;color:var(--text-dim);line-height:1.7}
 .legend b{color:var(--text)}
 .respondent{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
 .field{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-md);padding:9px 12px;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;color:var(--text);outline:none;transition:border-color .15s,box-shadow .15s}
-.field:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(30,58,95,.1)}
+.field:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(15,43,69,.1)}
 .field::placeholder{color:var(--text-muted)}
 .section{font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.07em;margin:32px 0 6px;padding:0 0 10px;border-bottom:2px solid var(--border)}
 .section-intro{font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:14px;padding:10px 14px;background:var(--surface-2);border-radius:var(--radius-md);border-left:3px solid var(--gold)}
@@ -53,10 +56,10 @@ textarea.field{resize:vertical;min-height:60px;max-height:240px}
 .prio input{display:none}
 .pill{display:inline-flex;align-items:center;padding:5px 12px;border:1.5px solid var(--border-active);border-radius:var(--radius-md);font-size:12px;font-weight:600;color:var(--text-dim);transition:all .12s;background:var(--surface)}
 .prio input:checked + .pill{border-color:var(--navy);background:var(--accent-dim);color:var(--navy)}
-.prio input:checked + .pill.must{background:#22c55e18;border-color:#22c55e;color:#15803d}
-.prio input:checked + .pill.nice{background:#1e3a5f12;border-color:var(--navy);color:var(--navy)}
-.prio input:checked + .pill.later{background:#f59e0b18;border-color:#f59e0b;color:#92400e}
-.prio input:checked + .pill.no{background:#ef444418;border-color:#ef4444;color:#b91c1c}
+.prio input:checked + .pill.must{background:var(--success-light);border-color:var(--success);color:#15803d}
+.prio input:checked + .pill.nice{background:var(--accent-dim);border-color:var(--navy);color:var(--navy)}
+.prio input:checked + .pill.later{background:var(--warning-light);border-color:var(--warning);color:#92400e}
+.prio input:checked + .pill.no{background:var(--danger-light);border-color:var(--danger);color:#b91c1c}
 .opt-row{display:flex;align-items:flex-start;gap:10px;padding:7px 8px;border-radius:var(--radius-md);cursor:pointer}
 .opt-row:hover{background:var(--surface-2)}
 .opt-row input{appearance:none;-webkit-appearance:none;width:16px;height:16px;border:2px solid var(--border-active);border-radius:50%;flex-shrink:0;margin-top:2px;transition:all .12s}
@@ -71,7 +74,7 @@ textarea.field{resize:vertical;min-height:60px;max-height:240px}
 .progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--navy);z-index:100;transition:width .3s}
 .toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);background:var(--surface);color:var(--text);border:1px solid var(--border);box-shadow:0 8px 24px rgba(0,0,0,.12);padding:12px 22px;border-radius:var(--radius-md);font-size:13px;font-weight:600;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
-.toast.error{background:#fff1f2;border-color:#fecaca;color:#b91c1c}
+.toast.error{background:#fff1f2;border-color:rgba(195,74,69,.3);color:#b91c1c}
 .hp{position:absolute;left:-9999px}
 code{font-size:.88em;background:var(--surface-2);border:1px solid var(--border);padding:1px 5px;border-radius:4px;color:var(--navy);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 </style>
@@ -81,7 +84,7 @@ code{font-size:.88em;background:var(--surface-2);border:1px solid var(--border);
 <div class="toast" id="toast"></div>
 <div class="container">
   <div class="header">
-    <div class="header-tag">HGC &amp; ARK · Requirements Intake</div>
+    <div class="header-tag"><span id="portalBrand" class="portal-brand">HARVEY GREYSTONE</span> · Requirements Intake</div>
     <h1>Deal Platform &amp; Data Room — what should it do?</h1>
     <p>Help us capture everything you want this platform to be. Answer what's relevant; skip what isn't. For feature lists, tap a priority. It only takes the answers you give — partial is fine.</p>
   </div>
@@ -266,6 +269,14 @@ window.addEventListener('scroll',()=>{ const h=document.documentElement; const p
 
 function toast(msg,err){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show'+(err?' error':''); setTimeout(()=>t.className='toast',3200); }
 
+let _brandName = 'Harvey Greystone';
+fetch('/api/brand' + location.search).then(r => r.json()).then(b => {
+  document.title = `${b.displayName} — Questionnaire`;
+  const el = document.getElementById('portalBrand');
+  if (el) el.textContent = b.wordmark;
+  _brandName = b.displayName || 'Harvey Greystone';
+}).catch(() => {});
+
 async function submitAll(){
   // gather answers per section
   const map={};
@@ -277,7 +288,7 @@ async function submitAll(){
   const btn=document.getElementById('submitBtn'); btn.disabled=true; btn.textContent='Sending…';
   try{
     const r=await fetch('/api/questionnaire-submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-      title:'HGC & ARK Deal Platform — Requirements',
+      title:_brandName + ' Deal Platform — Requirements',
       respondent:document.getElementById('r-name').value.trim(),
       email:document.getElementById('r-email').value.trim(),
       website:document.getElementById('hp').value, // honeypot
@@ -285,7 +296,7 @@ async function submitAll(){
     })});
     if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error(e.error||'submit failed'); }
     btn.textContent='Submitted ✓'; btn.classList.add('done');
-    toast('Thanks — your responses were sent to the HGC & ARK team.');
+    toast('Thanks — your responses were sent to the ' + _brandName + ' team.');
   }catch(e){ btn.disabled=false; btn.textContent='Submit responses'; toast('Error: '+e.message,true); }
 }
 </script>

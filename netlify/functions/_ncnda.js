@@ -96,6 +96,7 @@ function publicView(deal) {
     uploads: (deal.payload.clientUploads || []).map((u) => ({ filename: u.filename, uploadedAt: u.uploadedAt })),
     fundingType: deal.fundingType || deal.payload?.fundingType || null,
     clientIntake: deal.payload?.clientIntake || {},
+    brand: deal.payload.brand || 'harveygreystone',
   };
 }
 
