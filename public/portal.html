@@ -93,8 +93,8 @@
       const bEl = document.getElementById('portalBrand');
       if (bEl) bEl.textContent = BRAND_NAMES[state.brand] || BRAND_NAMES.harveygreystone;
       const bFoot = document.getElementById('portalBrandFoot');
-      if (bFoot) bFoot.textContent = (BRAND_NAMES[state.brand] || BRAND_NAMES.harveygreystone).split(' ').map(w => w[0] + w.slice(1).toLowerCase()).join(' ');
-      document.title = `${(BRAND_NAMES[state.brand] || 'HARVEY GREYSTONE').split(' ').map(w => w[0] + w.slice(1).toLowerCase()).join(' ')} — Client Portal`;
+      if (bFoot) bFoot.textContent = brandDisplay();
+      document.title = `${brandDisplay()} — Client Portal`;
       document.getElementById('subtitle').textContent = (state.company ? state.company + ' · ' : '') + 'Secure document portal · ' + (state.dealName||'');
       render();
     }catch(e){ C.innerHTML='<p class="err">Could not load the portal. Please try again.</p>'; }
