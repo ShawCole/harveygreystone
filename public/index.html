@@ -181,6 +181,8 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 
 /* Badges */
 .badge { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: var(--radius-full); font-size: 11px; font-weight: 600; letter-spacing: 0.02em; white-space: nowrap; }
+.brand-chip { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 2px 8px; border-radius: var(--radius-full); border: 1px solid var(--gray-300); color: var(--gray-600); background: var(--gray-100); vertical-align: middle; }
+.brand-serif { font-family: Georgia, 'Times New Roman', serif; letter-spacing: .14em; }
 .badge-lead { background: var(--info-light); color: var(--info); }
 .badge-proposal { background: var(--warning-light); color: #b45309; }
 .badge-negotiation { background: #fae8ff; color: #a21caf; }
@@ -429,7 +431,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 <!-- ===== NDA SCREEN ===== -->
 <div id="ndaScreen" class="auth-overlay">
   <div class="auth-card">
-    <div class="auth-logo">HGC &amp; ARK Capital Consulting</div>
+    <div class="auth-logo brand-serif" id="authBrand">Harvey Greystone</div>
     <div class="auth-subtitle">Professional deal tracking and management system</div>
     <div class="nda-text">
       <h4>Confidentiality &amp; Non-Disclosure Agreement</h4>
@@ -480,10 +482,9 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
     </div>
     <div class="sidebar-brand">
-      <div class="sidebar-brand-icon">HG</div>
       <div>
-        <div class="sidebar-brand-text">Harvey Greystone</div>
-        <div class="sidebar-brand-sub">Capital Platform</div>
+        <div class="sidebar-brand-text brand-serif" id="brandWordmark">HARVEY GREYSTONE</div>
+        <div class="sidebar-brand-sub" id="brandTagline">Deal Platform</div>
       </div>
     </div>
     <div class="sidebar-nav">
@@ -1124,6 +1125,23 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   let contacts = [];
   let investors = [];
   let nextDealId = 17;
+
+  // --- Brand (dual-brand platform) ---
+  window.BRAND = { key: 'harveygreystone', displayName: 'Harvey Greystone', wordmark: 'HARVEY GREYSTONE', tagline: 'Deal Platform' };
+  (async function initBrand() {
+    try {
+      const r = await fetch('/api/brand' + location.search);
+      if (r.ok) window.BRAND = await r.json();
+    } catch (e) { /* offline/default is fine */ }
+    document.title = `${window.BRAND.displayName} — ${window.BRAND.tagline}`;
+    const wm = document.getElementById('brandWordmark');
+    if (wm) wm.textContent = window.BRAND.wordmark;
+    const sub = document.getElementById('brandTagline');
+    if (sub) sub.textContent = window.BRAND.tagline;
+    const authLogo = document.getElementById('authBrand');
+    if (authLogo) authLogo.textContent = window.BRAND.displayName;
+  })();
+
   let nextTaskId = 1;
   let nextContactId = 1;
   let nextInvestorId = 1;
@@ -1158,6 +1176,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         investors = data.investors || investors;
         dbReady = true;
         nextDealId = (deals.reduce((m, d) => Math.max(m, d.id), 0) || 16) + 1;
+        deals.forEach(d => { if (!d.brand) d.brand = 'harveygreystone'; });
         nextTaskId = (tasks.reduce((m, t) => Math.max(m, t.id), 0) || 0) + 1;
         nextContactId = (contacts.reduce((m, c) => Math.max(m, c.id), 0) || 0) + 1;
         nextInvestorId = (investors.reduce((m, i) => Math.max(m, i.id), 0) || 0) + 1;
@@ -1322,6 +1341,12 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 
   function escHtml(s) {
     return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function brandChip(d) {
+    const b = d.brand === 'capitalstreams' ? 'CS' : 'HG';
+    const title = d.brand === 'capitalstreams' ? 'Capital Streams' : 'Harvey Greystone';
+    return `<span class="brand-chip" title="${title}">${b}</span>`;
   }
 
   function statusBadgeClass(status) {
@@ -1593,7 +1618,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         listHtml += `
           <div class="deal-list-item" draggable="true" data-deal-id="${d.id}" onclick="selectDeal(${d.id})" ondragstart="dealDragStart(event, ${d.id})" ondragover="dealDragOver(event)" ondrop="dealDrop(event, ${d.id})" ondragend="dealDragEnd(event)">
             <div>
-              <div class="deal-list-name">${escHtml(d.name)}</div>
+              <div class="deal-list-name">${escHtml(d.name)} ${brandChip(d)}</div>
               <div class="deal-list-sub">#${d.rank}${d.score ? ' · Score ' + d.score : ''} · ${formatCurrency(revenue)} est. rev${d.fundingType ? ' · <span class="badge badge-info" style="font-size:10px;padding:1px 6px;">' + escHtml(fundingTypeLabel(d.fundingType)) + '</span>' : ''}</div>
             </div>
             <div class="font-semibold">${formatCurrency(d.capital)}</div>
@@ -1621,7 +1646,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     selectedDealId = id;
     const d = deals.find(x => x.id === id);
     if (!d) return;
-    document.getElementById('dealDetailModalTitle').textContent = d.name;
+    document.getElementById('dealDetailModalTitle').innerHTML = escHtml(d.name) + ' ' + brandChip(d);
     document.getElementById('dealDetailModalSub').textContent = `${formatCurrency(d.capital)} · ${statusLabel(d.status)}${d.fundingType ? ' · ' + fundingTypeLabel(d.fundingType) : ''}`;
     document.getElementById('dealDetailModalBody').innerHTML = renderDealDetail(d);
     document.getElementById('dealDetailModal').classList.add('show');
@@ -2168,6 +2193,7 @@ ${docText}`;
     const memoText = document.getElementById('dealMemo').dataset.raw || '';
     deals.push({
       id: nextDealId++,
+      brand: (window.BRAND && window.BRAND.key) || 'harveygreystone',
       name, capital,
       status: document.getElementById('dealStatus').value,
       fee: parseFloat(document.getElementById('dealFee').value) || 5,
@@ -2435,6 +2461,7 @@ ${docText}`;
     const f = lastUwAnalysis;
     deals.push({
       id: nextDealId++,
+      brand: (window.BRAND && window.BRAND.key) || 'harveygreystone',
       name: f.name || f.company || 'Audited Deal',
       capital: parseCapital(f.capital || '0'),
       status: 'lead', fee: 5, probability: 50,
