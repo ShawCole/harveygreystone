@@ -44,3 +44,9 @@ test('brand handler honors ?b= override', async () => {
   const body = JSON.parse(res.body);
   assert.strictEqual(body.key, 'capitalstreams');
 });
+
+test('brand handler rejects POST', async () => {
+  const { handler } = require('../netlify/functions/brand');
+  const res = await handler({ httpMethod: 'POST', headers: {}, queryStringParameters: {} });
+  assert.strictEqual(res.statusCode, 405);
+});
