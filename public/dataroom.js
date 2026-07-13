@@ -60,6 +60,21 @@
   }
   const docState = (deal, id) => (deal.dataRoom && deal.dataRoom[id]) || { status: 'outstanding' };
   const isSatisfied = (st) => st && (st.status === 'received' || st.status === 'reviewed' || st.status === 'na');
+  // A slot can hold MULTIPLE files (files[]). Older records used a single
+  // `file` object — merge it in so nothing already saved is lost.
+  function docFiles(st) {
+    const arr = Array.isArray(st.files) ? st.files.slice() : [];
+    if (st.file && !arr.some((f) => f.path === st.file.path)) arr.unshift(st.file);
+    return arr;
+  }
+  function pushDocFile(deal, id, fileRec) {
+    const prev = deal.dataRoom[id] || { status: 'outstanding' };
+    const files = docFiles(prev).filter((f) => f.path !== fileRec.path);
+    files.push(fileRec);
+    const nextStatus = (prev.status === 'outstanding' || prev.status === 'requested') ? 'received' : prev.status;
+    deal.dataRoom[id] = { ...prev, status: nextStatus, files, updatedAt: new Date().toISOString() };
+    delete deal.dataRoom[id].file; // legacy single-file field superseded by files[]
+  }
 
   function completeness(deal) {
     if (!TEMPLATE) return { req: 0, reqDone: 0, pct: 0 };
@@ -198,14 +213,14 @@
   }
 
   function docRow(deal, id, doc, req, st) {
-    const file = st.file;
+    const files = docFiles(st);
     const sel = STATUSES.map((s) => `<option value="${s}" ${st.status === s ? 'selected' : ''}>${STATUS_LABEL[s]}</option>`).join('');
     const reqBadge = req
       ? '<span class="badge badge-danger">REQ</span>'
       : '<span class="badge badge-neutral">OPT</span>';
-    const fileLine = file
-      ? `<div class="text-xs mt-2"><a href="#" class="text-info" data-act="download" data-path="${esc(file.path)}">${esc(file.filename)}</a> \u00b7 <a href="#" class="text-danger" data-act="remove" data-id="${esc(id)}">remove</a></div>`
-      : '';
+    const fileLine = files.map((f) =>
+      `<div class="text-xs mt-2"><a href="#" class="text-info" data-act="download" data-path="${esc(f.path)}">${esc(f.filename)}</a> \u00b7 <a href="#" class="text-danger" data-act="remove" data-id="${esc(id)}" data-path="${esc(f.path)}">remove</a></div>`
+    ).join('');
     return `<div class="dr-doc-row">
       <div class="dr-doc-name">
         ${esc(doc.name)} ${reqBadge}
@@ -232,7 +247,7 @@
         if (!el || !body.contains(el)) return;
         const act = el.dataset.act;
         if (act === 'download') { e.preventDefault(); download(el.dataset.path); }
-        else if (act === 'remove') { e.preventDefault(); removeFile(el.dataset.id); }
+        else if (act === 'remove') { e.preventDefault(); removeFile(el.dataset.id, el.dataset.path); }
         else if (act === 'upload') { e.preventDefault(); upload(el.dataset.id); }
         else if (act === 'toggle-section') { e.preventDefault(); const idx = Number(el.dataset.sec); if (expandedSections.has(idx)) expandedSections.delete(idx); else expandedSections.add(idx); render(); }
       });
@@ -282,13 +297,7 @@
         const put = await fetch(url, { method: 'PUT', headers: { 'Content-Type': f.type || 'application/octet-stream' }, body: f });
         if (!put.ok) throw new Error('upload to storage failed');
         if (!deal.dataRoom) deal.dataRoom = {};
-        const prev = deal.dataRoom[id] || { status: 'outstanding' };
-        const nextStatus = (prev.status === 'outstanding' || prev.status === 'requested') ? 'received' : prev.status;
-        deal.dataRoom[id] = {
-          ...prev, status: nextStatus,
-          file: { path, filename: f.name, size: f.size, uploadedAt: new Date().toISOString() },
-          updatedAt: new Date().toISOString(),
-        };
+        pushDocFile(deal, id, { path, filename: f.name, size: f.size, uploadedAt: new Date().toISOString() });
         saveData();
         render();
         if (typeof showToast === 'function') showToast('File uploaded');
@@ -311,19 +320,24 @@
     }
   }
 
-  async function removeFile(id) {
+  async function removeFile(id, path) {
     const deal = deals.find((d) => d.id === currentDealId);
-    if (!deal || !deal.dataRoom || !deal.dataRoom[id] || !deal.dataRoom[id].file) return;
-    if (!confirm('Remove this file from the data room?')) return;
-    const path = deal.dataRoom[id].file.path;
+    if (!deal || !deal.dataRoom || !deal.dataRoom[id]) return;
+    const st = deal.dataRoom[id];
+    const files = docFiles(st);
+    // Path identifies WHICH file in the slot; fall back to the only file for old links
+    const target = path ? files.find((f) => f.path === path) : (files.length === 1 ? files[0] : null);
+    if (!target) return;
+    if (!confirm(`Remove "${target.filename}" from the data room?`)) return;
     try {
-      const r = await fetch('/api/file', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path }) });
+      const r = await fetch('/api/file', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: target.path }) });
       if (!r.ok) throw new Error('Server returned ' + r.status);
     } catch (e) {
       alert('Could not delete file: ' + e.message);
       return;
     }
-    delete deal.dataRoom[id].file;
+    st.files = files.filter((f) => f.path !== target.path);
+    delete st.file;
     saveData();
     render();
   }
@@ -627,11 +641,7 @@
         const put = await fetch(url, { method: 'PUT', headers: { 'Content-Type': file.type || 'application/octet-stream' }, body: file });
         if (!put.ok) throw new Error('Storage upload failed (HTTP ' + put.status + ')');
 
-        deal.dataRoom[match.docId] = {
-          status: 'received',
-          file: { path, filename: file.name, size: file.size, uploadedAt: new Date().toISOString() },
-          updatedAt: new Date().toISOString()
-        };
+        pushDocFile(deal, match.docId, { path, filename: file.name, size: file.size, uploadedAt: new Date().toISOString() });
         // Auto-expand the section that received this file so it's visible immediately
         const secIdx = TEMPLATE ? TEMPLATE.sections.findIndex(s => s.id === match.secId) : -1;
         if (secIdx >= 0) expandedSections.add(secIdx);
@@ -738,7 +748,7 @@
       const isOpen = expandedSections.has(secIdx);
       let secFiles = 0;
       sec.subfolders.forEach((sf, si) => sf.documents.forEach((doc, di) => {
-        if (docState(deal, docId(sec, si, di)).file) secFiles++;
+        secFiles += docFiles(docState(deal, docId(sec, si, di))).length;
       }));
       const fileBadge = secFiles > 0 ? `<span class="badge badge-info">${secFiles} file${secFiles > 1 ? 's' : ''}</span>` : '';
       html += `<div class="dr-section ${isOpen ? 'open' : ''}" data-sec="${secIdx}" style="${scoped ? '' : 'opacity:0.7;'}">
