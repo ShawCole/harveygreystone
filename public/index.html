@@ -2397,6 +2397,7 @@ ${docText}`;
 
   function closeAddDealModal() {
     document.getElementById('addDealModal').classList.remove('show');
+    editingDealId = null; // defensive: Cancel during edit must not leave a stale edit target
   }
 
   function readDealForm() {
