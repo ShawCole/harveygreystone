@@ -1976,7 +1976,13 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
       if (field === 'capital') deal[field] = parseCapital(value);
       else if (['fee', 'probability', 'rank'].includes(field)) deal[field] = parseFloat(value) || 0;
       else deal[field] = value;
-      if (field === 'status') deal.stage = statusToStage(value);
+      if (field === 'status') {
+        const newStage = statusToStage(value);
+        if (deal.stage !== newStage) {
+          deal.stage = newStage;
+          recordHistory(deal, `Status changed to ${value} — stage moved to ${STAGE_LABEL[newStage] || newStage}`, newStage);
+        }
+      }
       saveData();
       renderDeals();
     }
@@ -2248,14 +2254,15 @@ ${docText}`;
     const capital = parseCapital(document.getElementById('dealCapital').value);
     if (!name) { showToast('Enter deal name', 'warning'); return; }
 
+    const newStatus = document.getElementById('dealStatus').value;
     const memoText = document.getElementById('dealMemo').dataset.raw || '';
     deals.push({
       id: nextDealId++,
       brand: (window.BRAND && window.BRAND.key) || 'harveygreystone',
       name, capital,
-      status: document.getElementById('dealStatus').value,
-      stage: statusToStage(document.getElementById('dealStatus') ? document.getElementById('dealStatus').value : 'lead'),
-      history: [{ at: new Date().toISOString(), stage: 'intake', note: 'Deal created', actor: 'team' }],
+      status: newStatus,
+      stage: statusToStage(newStatus),
+      history: [{ at: new Date().toISOString(), stage: statusToStage(newStatus), note: 'Deal created', actor: 'team' }],
       fee: parseFloat(document.getElementById('dealFee').value) || 5,
       probability: parseInt(document.getElementById('dealProbability').value) || 50,
       rank: deals.length + 1,
