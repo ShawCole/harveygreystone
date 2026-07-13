@@ -76,6 +76,29 @@
     delete deal.dataRoom[id].file; // legacy single-file field superseded by files[]
   }
 
+  // Coverage of a list of docs: how many slots are satisfied vs how many are
+  // needed. Denominator = required docs when any are required; for fully
+  // optional groups (out-of-band sections) it falls back to all docs.
+  const slotHave = (deal, id) => {
+    const st = docState(deal, id);
+    return isSatisfied(st) || docFiles(st).length > 0;
+  };
+  function coverage(deal, sec, docsWithIdx) {
+    let req = 0, reqHave = 0, all = 0, allHave = 0;
+    docsWithIdx.forEach(({ doc, si, di }) => {
+      const have = slotHave(deal, docId(sec, si, di));
+      all++; if (have) allHave++;
+      if (isRequired(deal, sec, doc)) { req++; if (have) reqHave++; }
+    });
+    const total = req > 0 ? req : all;
+    const have = req > 0 ? reqHave : allHave;
+    const cls = have >= total && total > 0 ? 'badge-success' : have > 0 ? 'badge-warning' : 'badge-danger';
+    return { have, total, cls };
+  }
+  const sectionDocs = (sec) => sec.subfolders.flatMap((sf, si) => sf.documents.map((doc, di) => ({ doc, si, di })));
+  const subfolderDocs = (sf, si) => sf.documents.map((doc, di) => ({ doc, si, di }));
+  const covBadge = (c) => `<span class="badge ${c.cls}">${c.have}/${c.total}</span>`;
+
   function completeness(deal) {
     if (!TEMPLATE) return { req: 0, reqDone: 0, pct: 0 };
     let req = 0, reqDone = 0;
@@ -168,13 +191,10 @@
         </div>
       </div>`;
     TEMPLATE.sections.forEach((sec) => {
-      let sReq = 0, sDone = 0;
-      sec.subfolders.forEach((sf, si) => sf.documents.forEach((doc, di) => {
-        if (isRequired(deal, sec, doc)) { sReq++; if (isSatisfied(docState(deal, docId(sec, si, di)))) sDone++; }
-      }));
       const scoped = inScope(deal, sec.id);
       const secIdx = TEMPLATE.sections.indexOf(sec);
       const isOpen = expandedSections.has(secIdx);
+      const secCov = coverage(deal, sec, sectionDocs(sec));
 
       html += `<div class="dr-section ${isOpen ? 'open' : ''}" style="${scoped ? '' : 'opacity:0.6;'}">
         <div class="dr-section-header" data-act="toggle-section" data-sec="${secIdx}">
@@ -183,13 +203,14 @@
             ${sec.id} \u00b7 ${esc(sec.name)}
             ${scoped ? '' : '<span class="text-xs text-muted font-semibold">(optional at this deal size)</span>'}
           </div>
-          <span class="text-xs text-muted font-semibold">${sDone}/${sReq} req</span>
+          ${covBadge(secCov)}
         </div>
         <div class="dr-section-body">`;
 
       if (isOpen) {
         sec.subfolders.forEach((sf, si) => {
-          html += `<div class="dr-subfolder-label">${esc(sf.name)}</div>`;
+          const sfCov = coverage(deal, sec, subfolderDocs(sf, si));
+          html += `<div class="dr-subfolder-label" style="display:flex;justify-content:space-between;align-items:center;">${esc(sf.name)} ${covBadge(sfCov)}</div>`;
           sf.documents.forEach((doc, di) => {
             html += docRow(deal, docId(sec, si, di), doc, isRequired(deal, sec, doc), docState(deal, docId(sec, si, di)));
           });
@@ -750,16 +771,18 @@
       sec.subfolders.forEach((sf, si) => sf.documents.forEach((doc, di) => {
         secFiles += docFiles(docState(deal, docId(sec, si, di))).length;
       }));
-      const fileBadge = secFiles > 0 ? `<span class="badge badge-info">${secFiles} file${secFiles > 1 ? 's' : ''}</span>` : '';
+      const secCov = coverage(deal, sec, sectionDocs(sec));
+      const fileNote = secFiles > 0 ? `<span class="text-xs text-muted font-semibold">${secFiles} file${secFiles > 1 ? 's' : ''}</span>` : '';
       html += `<div class="dr-section ${isOpen ? 'open' : ''}" data-sec="${secIdx}" style="${scoped ? '' : 'opacity:0.7;'}">
         <div class="dr-section-header" data-act="toggle-section" data-sec="${secIdx}">
           <div class="dr-section-title"><span class="dr-section-toggle">&#9656;</span> ${sec.id}. ${esc(sec.name)}
             ${scoped ? '' : '<span class="text-xs text-muted font-semibold">(optional at this deal size)</span>'}
           </div>
-          ${fileBadge}
+          <span class="flex items-center gap-2">${fileNote} ${covBadge(secCov)}</span>
         </div><div class="dr-section-body">`;
       sec.subfolders.forEach((sf, si) => {
-        html += `<div class="text-xs font-semibold" style="padding:var(--sp-2) var(--sp-4) var(--sp-1) var(--sp-6);color:var(--gray-500);">${esc(sf.name)}</div>`;
+        const sfCov = coverage(deal, sec, subfolderDocs(sf, si));
+        html += `<div class="text-xs font-semibold" style="padding:var(--sp-2) var(--sp-4) var(--sp-1) var(--sp-6);color:var(--gray-500);display:flex;justify-content:space-between;align-items:center;">${esc(sf.name)} ${covBadge(sfCov)}</div>`;
         sf.documents.forEach((doc, di) => {
           const id = docId(sec, si, di);
           const req = isRequired(deal, sec, doc);
