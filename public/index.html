@@ -1438,7 +1438,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   function railDealHtml(d, child) {
     return `
       <div class="rail-deal ${child ? 'rail-deal-child' : ''} ${selectedDealId === d.id ? 'active' : ''}" onclick="openDeal(${d.id})">
-        <div class="rail-deal-name">&#128193; ${escHtml(d.name)} ${brandChip(d)}</div>
+        <div class="rail-deal-name">${escHtml(d.name)} ${brandChip(d)}</div>
         <div class="rail-deal-meta">
           <span>${escHtml(STAGE_LABEL[d.stage] || d.stage || '')}</span>
           <span class="owner-chip">${escHtml(d.owner || 'unassigned')}</span>
@@ -1848,7 +1848,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         <div class="card"><div class="card-header"><div class="card-header-title">Deals in this group (${children.length})</div></div>
           <div class="card-body">${children.length
             ? children.map(x => `<div class="flex items-center gap-3" style="padding:.5rem 0;border-bottom:1px solid var(--gray-100);cursor:pointer;" onclick="openDeal(${x.id})">
-                <span>&#128193;</span><span class="font-semibold text-sm">${escHtml(x.name)}</span>
+                <span class="font-semibold text-sm">${escHtml(x.name)}</span>
                 <span class="text-xs text-muted">${escHtml(STAGE_LABEL[x.stage] || x.stage || '')}</span>
               </div>`).join('')
             : '<div class="text-sm text-muted">No deals yet. Assign a deal to this group via its Edit form (Group dropdown).</div>'}</div></div>`;
