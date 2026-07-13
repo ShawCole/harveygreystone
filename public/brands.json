@@ -1,0 +1,23 @@
+{
+  "default": "harveygreystone",
+  "brands": {
+    "harveygreystone": {
+      "displayName": "Harvey Greystone",
+      "wordmark": "HARVEY GREYSTONE",
+      "tagline": "Deal Platform",
+      "legalEntity": "Harvey Greystone Capital and its authorized representatives",
+      "emailSender": "Harvey Greystone Capital",
+      "hostnames": ["app.harveygreystone.com"],
+      "logo": null
+    },
+    "capitalstreams": {
+      "displayName": "Capital Streams",
+      "wordmark": "CAPITAL STREAMS",
+      "tagline": "Deal Platform",
+      "legalEntity": "Capital Streams LLC and its authorized representatives",
+      "emailSender": "Capital Streams",
+      "hostnames": [],
+      "logo": null
+    }
+  }
+}
