@@ -105,15 +105,7 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 .sidebar-brand { padding: var(--sp-6) var(--sp-5); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: var(--sp-3); }
 .sidebar-brand-text { font-size: var(--text-sm); font-weight: 700; color: var(--navy); white-space: nowrap; overflow: hidden; }
 .sidebar-brand-sub { font-size: var(--text-xs); color: var(--gray-500); font-weight: 400; letter-spacing: .28em; text-transform: uppercase; }
-.sidebar.collapsed .sidebar-brand-text, .sidebar.collapsed .sidebar-brand-sub, .sidebar.collapsed .nav-label, .sidebar.collapsed .sidebar-footer-info, .sidebar.collapsed .nav-section-label, .sidebar.collapsed .nav-badge { display: none; }
-.sidebar-nav { flex: 1; padding: var(--sp-4) 0; overflow-y: auto; }
-.nav-section-label { font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.06em; padding: var(--sp-4) var(--sp-5) var(--sp-2); }
-.nav-item { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-5); margin: var(--sp-1) var(--sp-2); border-radius: var(--radius-md); color: var(--gray-600); cursor: pointer; transition: all var(--duration) var(--ease); font-size: var(--text-sm); font-weight: 500; white-space: nowrap; }
-.nav-item:hover { background: var(--gray-100); color: var(--navy); }
-.nav-item.active { background: var(--accent-blue-muted); color: var(--navy); }
-.nav-item svg, .nav-icon { width: 20px; height: 20px; flex-shrink: 0; opacity: 0.7; }
-.nav-item.active svg, .nav-item.active .nav-icon { opacity: 1; }
-.nav-badge { margin-left: auto; background: var(--danger); color: var(--white); font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: var(--radius-full); min-width: 20px; text-align: center; }
+.sidebar.collapsed .sidebar-brand-text, .sidebar.collapsed .sidebar-brand-sub, .sidebar.collapsed .nav-label, .sidebar.collapsed .sidebar-footer-info { display: none; }
 .sidebar-footer { padding: var(--sp-4) var(--sp-5); border-top: 1px solid var(--gray-200); display: flex; align-items: center; gap: var(--sp-3); }
 .sidebar-avatar { width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--gray-100); display: flex; align-items: center; justify-content: center; color: var(--navy); font-weight: 600; font-size: var(--text-xs); flex-shrink: 0; }
 .sidebar-footer-info { white-space: nowrap; overflow: hidden; }
@@ -150,7 +142,7 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 .breadcrumb-current { color: var(--gray-800); font-weight: 600; }
 .content-header-right { display: flex; align-items: center; gap: var(--sp-3); }
 .page-content { flex: 1; padding: var(--sp-8); max-width: 1400px; width: 100%; }
-.confidential-banner { background: var(--danger-light); color: var(--danger); font-size: var(--text-xs); font-weight: 600; text-align: center; padding: var(--sp-1) var(--sp-4); letter-spacing: 0.04em; text-transform: uppercase; }
+
 
 /* Cards */
 .card { background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); overflow: hidden; }
@@ -569,7 +561,6 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 
   <!-- Main Content -->
   <div class="main-content">
-    <div class="confidential-banner">CONFIDENTIAL: All information is strictly protected under NDA. Unauthorized access or disclosure is prohibited.</div>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileMenu()"></div>
     <div class="content-header">
       <div class="content-header-left">
@@ -1343,7 +1334,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     await loadData();
     updateNavBadges();
     renderDealRail();
-    const tab = document.querySelector('.rail-icon.active')?.dataset.tab || document.querySelector('.nav-item.active')?.dataset.tab || 'dashboard';
+    const tab = document.querySelector('.rail-icon.active')?.dataset.tab || 'dashboard';
     switchTab(tab);
     showToast('Synced from server', 'success');
   }
@@ -1364,10 +1355,6 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     // Show target
     const target = document.getElementById('view-' + tab);
     if (target) target.classList.remove('hidden');
-    // Update legacy nav active (harmless; old .nav-item elements no longer exist in HTML)
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    const navItem = document.querySelector(`.nav-item[data-tab="${tab}"]`);
-    if (navItem) navItem.classList.add('active');
     // Update rail-icon active: 'deal' has no icon, so only module tabs light up
     if (tab !== 'deal') {
       document.querySelectorAll('.rail-icon[data-tab]').forEach(el => el.classList.remove('active'));
