@@ -3,34 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Secure Document Upload — HGC & ARK Capital Consulting</title>
+  <title>Secure Document Upload — Harvey Greystone</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     * { margin:0; padding:0; box-sizing:border-box; }
     :root {
-      --navy:#1e3a5f; --navy-dark:#152d4a; --navy-light:#2a4d7a;
-      --gold:#d4a853;
-      --bg:#f8fafc; --card:#ffffff; --text:#1e293b; --muted:#64748b;
-      --success:#22c55e; --warning:#f59e0b; --danger:#ef4444;
-      --border:#e2e8f0; --input-bg:#f8fafc;
-      --radius-md:8px; --radius-lg:12px;
-      --shadow:0 4px 6px -1px rgba(0,0,0,0.07);
+      --navy:#0f2b45; --navy-dark:#0f2b45; --navy-light:#1c3a57; --charcoal:#1c3a57;
+      --gold:#5aa9e0; --gold-light:#a9d2ef; --gold-muted:rgba(90,169,224,0.15);
+      --gray-50:#f4f9fd; --gray-100:#e8f3fc; --gray-200:#d8e7f3; --gray-300:#c8dff2;
+      --gray-400:#8fa9c0; --gray-500:#69829a; --gray-600:#5e7f9b; --gray-700:#1c3a57;
+      --gray-800:#16324a; --gray-900:#0f2b45;
+      --success:#188a4e; --success-light:rgba(24,138,78,0.12);
+      --warning:#b17d12; --warning-light:rgba(177,125,18,0.12);
+      --danger:#c34a45; --danger-light:rgba(195,74,69,0.12);
+      --info:#5aa9e0; --info-light:rgba(90,169,224,0.12);
+      --radius-sm:6px; --radius-md:10px; --radius-lg:14px;
+      --serif:Georgia,'Times New Roman',serif;
+      --bg:#e8f3fc; --card:#ffffff; --text:#1e293b; --muted:#69829a;
+      --border:#d8e7f3; --input-bg:#f4f9fd;
+      --shadow:0 4px 6px -1px rgba(15,43,69,0.08);
     }
     body { font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:2rem 1rem; line-height:1.6; }
     .wrap { max-width:760px; margin:0 auto; }
     .card { background:var(--card); border-radius:var(--radius-lg); box-shadow:var(--shadow); border:1px solid var(--border); overflow:hidden; margin-bottom:1.5rem; }
-    .hdr { background:linear-gradient(135deg,var(--navy),var(--navy-dark)); color:#fff; padding:2rem; }
-    .hdr h1 { font-size:22px; font-weight:700; letter-spacing:-0.01em; }
-    .hdr p { opacity:.8; font-size:13px; margin-top:.3rem; font-weight:400; }
+    .hdr { background:var(--gray-100); border-bottom:1px solid var(--gray-200); padding:2rem; }
+    .hdr h1 { font-size:22px; font-weight:700; color:var(--navy); }
+    .hdr p { color:var(--muted); font-size:13px; margin-top:.3rem; font-weight:400; }
+    .portal-brand { font-family:var(--serif); letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:var(--navy); }
     .body { padding:2rem; }
     .step { font-size:11px; font-weight:700; color:var(--gold); text-transform:uppercase; letter-spacing:.7px; margin-bottom:.5rem; }
     h2 { font-size:18px; font-weight:700; color:var(--text); margin-bottom:1rem; }
-    .ncnda { max-height:320px; overflow-y:auto; border:1px solid var(--navy-light); border-radius:var(--radius-lg); padding:1.25rem; background:var(--input-bg); font-size:13px; white-space:pre-wrap; margin-bottom:1rem; color:var(--text); }
-    .ncnda::-webkit-scrollbar { width:6px; } .ncnda::-webkit-scrollbar-track { background:transparent; } .ncnda::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:3px; }
-    .signed-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(34,197,94,.1); color:#15803d; border:1px solid rgba(34,197,94,.3); padding:6px 12px; border-radius:var(--radius-md); font-size:12px; font-weight:600; margin-bottom:1rem; }
+    .ncnda { max-height:320px; overflow-y:auto; border:1px solid var(--gray-300); border-radius:var(--radius-lg); padding:1.25rem; background:var(--input-bg); font-size:13px; white-space:pre-wrap; margin-bottom:1rem; color:var(--text); }
+    .ncnda::-webkit-scrollbar { width:6px; } .ncnda::-webkit-scrollbar-track { background:transparent; } .ncnda::-webkit-scrollbar-thumb { background:var(--gray-300); border-radius:3px; }
+    .signed-badge { display:inline-flex; align-items:center; gap:6px; background:var(--success-light); color:#15803d; border:1px solid rgba(24,138,78,.3); padding:6px 12px; border-radius:var(--radius-md); font-size:12px; font-weight:600; margin-bottom:1rem; }
     label { display:block; font-weight:600; font-size:13px; margin-bottom:.4rem; color:var(--text); }
     input[type="text"],input[type="email"] { width:100%; padding:10px 13px; border:1px solid var(--border); border-radius:var(--radius-md); font-size:14px; font-family:inherit; margin-bottom:1rem; background:var(--card); color:var(--text); transition:border-color .15s; }
-    input[type="text"]:focus,input[type="email"]:focus { outline:none; border-color:var(--navy); box-shadow:0 0 0 3px rgba(30,58,95,.1); }
+    input[type="text"]:focus,input[type="email"]:focus { outline:none; border-color:var(--navy); box-shadow:0 0 0 3px rgba(15,43,69,.1); }
     .row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
     .chk { display:flex; gap:10px; align-items:flex-start; margin-bottom:1.25rem; }
     .chk input { width:16px; height:16px; margin-top:3px; accent-color:var(--navy); flex-shrink:0; }
@@ -39,13 +47,13 @@
     .btn-primary { background:var(--navy); color:#fff; } .btn-primary:hover { background:var(--navy-light); } .btn-primary:disabled { opacity:.5; cursor:not-allowed; }
     .btn-accent { background:var(--gold); color:#fff; }
     .drop { border:2px dashed var(--border); border-radius:var(--radius-lg); padding:2.5rem; text-align:center; background:var(--input-bg); cursor:pointer; transition:border-color .15s, background .15s; }
-    .drop:hover { border-color:var(--navy); background:#f0f4f8; }
+    .drop:hover { border-color:var(--navy); background:var(--gray-100); }
     .drop .ico { font-size:36px; } .drop .t { font-weight:600; margin:.5rem 0 .25rem; color:var(--text); } .drop .s { font-size:13px; color:var(--muted); }
     .file { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--input-bg); border-radius:var(--radius-md); font-size:13px; margin-top:8px; border:1px solid var(--border); }
     .muted { color:var(--muted); font-size:12px; }
     .hide { display:none; }
     .err { color:var(--danger); font-size:13px; margin-top:.5rem; }
-    .cert { background:rgba(34,197,94,.06); border:1px solid rgba(34,197,94,.25); border-radius:var(--radius-lg); padding:1rem; font-size:12px; margin-top:1rem; color:var(--text); }
+    .cert { background:var(--success-light); border:1px solid rgba(24,138,78,.25); border-radius:var(--radius-lg); padding:1rem; font-size:12px; margin-top:1rem; color:var(--text); }
     .foot { text-align:center; color:var(--muted); font-size:12px; margin-top:.5rem; }
   </style>
 </head>
@@ -53,12 +61,12 @@
 <div class="wrap">
   <div class="card">
     <div class="hdr">
-      <h1 id="title">HGC &amp; ARK Capital Consulting</h1>
+      <h1 id="portalBrand" class="portal-brand">HARVEY GREYSTONE</h1>
       <p id="subtitle">Secure document portal</p>
     </div>
     <div class="body" id="content"><p class="muted">Loading…</p></div>
   </div>
-  <div class="foot">🔒 Confidential. Access is governed by the NCNDA. Powered by HGC &amp; ARK Capital Consulting.</div>
+  <div class="foot">🔒 Confidential. Access is governed by the NCNDA. Powered by <span id="portalBrandFoot">Harvey Greystone</span>.</div>
 </div>
 
 <script>
@@ -66,6 +74,9 @@
   const C = document.getElementById('content');
   let state = null;
   let fundingChecklists = null;
+
+  const BRAND_NAMES = { harveygreystone: 'HARVEY GREYSTONE', capitalstreams: 'CAPITAL STREAMS' };
+  function brandDisplay(){ return (BRAND_NAMES[state && state.brand] || BRAND_NAMES.harveygreystone).split(' ').map(w=>w[0]+w.slice(1).toLowerCase()).join(' '); }
 
   function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
@@ -79,8 +90,12 @@
       if(checklistRes) fundingChecklists = checklistRes;
       if(!portalRes.ok){ const e=await portalRes.json().catch(()=>({})); C.innerHTML='<p class="err">'+esc(e.error||'This link is invalid or has expired.')+'</p>'; return; }
       state = await portalRes.json();
-      document.getElementById('title').textContent = state.company ? `${state.company}` : 'HGC & ARK Capital Consulting';
-      document.getElementById('subtitle').textContent = 'Secure document portal · ' + (state.dealName||'');
+      const bEl = document.getElementById('portalBrand');
+      if (bEl) bEl.textContent = BRAND_NAMES[state.brand] || BRAND_NAMES.harveygreystone;
+      const bFoot = document.getElementById('portalBrandFoot');
+      if (bFoot) bFoot.textContent = brandDisplay();
+      document.title = `${brandDisplay()} — Client Portal`;
+      document.getElementById('subtitle').textContent = (state.company ? state.company + ' · ' : '') + 'Secure document portal · ' + (state.dealName||'');
       render();
     }catch(e){ C.innerHTML='<p class="err">Could not load the portal. Please try again.</p>'; }
   }
@@ -93,7 +108,7 @@
   function renderSign(){
     const internal = (state.internalSigners||[]);
     const internalLine = internal.length
-      ? `<div class="signed-badge">✓ Signed by HGC &amp; ARK: ${internal.map(s=>esc(s.name)).join(', ')}</div>`
+      ? `<div class="signed-badge">✓ Signed by ${esc(brandDisplay())}: ${internal.map(s=>esc(s.name)).join(', ')}</div>`
       : `<div class="muted" style="margin-bottom:1rem;">Awaiting countersignature — sign below to proceed.</div>`;
     C.innerHTML = `
       <div class="step">Step 1 of 2 · Sign the agreement</div>
@@ -149,7 +164,7 @@
       const total = docs.length;
       checklistHtml = `
         <h2>Documents needed for your ${esc(ft.name)}</h2>
-        <p class="muted" style="margin-bottom:.75rem;">${received} of ${total} documents submitted. Your uploads are encrypted and visible only to the HGC &amp; ARK team.</p>
+        <p class="muted" style="margin-bottom:.75rem;">${received} of ${total} documents submitted. Your uploads are encrypted and visible only to the ${esc(brandDisplay())} team.</p>
         <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:1.5rem;">
           <div style="height:100%;width:${total?Math.round(received/total*100):0}%;background:${received===total?'var(--success)':'var(--gold)'};border-radius:4px;transition:width .3s;"></div>
         </div>
@@ -181,7 +196,7 @@
     } else {
       checklistHtml = `
         <h2>Upload your documents</h2>
-        <p class="muted" style="margin-bottom:1rem;">Drop files below or click to browse. Your uploads are encrypted and visible only to the HGC &amp; ARK team.</p>
+        <p class="muted" style="margin-bottom:1rem;">Drop files below or click to browse. Your uploads are encrypted and visible only to the ${esc(brandDisplay())} team.</p>
       `;
     }
 
@@ -198,7 +213,7 @@
       <div class="err hide" id="up-err"></div>`;
     const drop=document.getElementById('drop'), fi=document.getElementById('fileInput');
     drop.onclick=()=>fi.click();
-    drop.ondragover=e=>{e.preventDefault(); drop.style.borderColor='#1e3a5f';};
+    drop.ondragover=e=>{e.preventDefault(); drop.style.borderColor='var(--navy)';};
     drop.ondragleave=e=>{e.preventDefault(); drop.style.borderColor='';};
     drop.ondrop=e=>{e.preventDefault(); drop.style.borderColor=''; handle(e.dataTransfer.files);};
     fi.onchange=()=>handle(fi.files);

@@ -36,6 +36,7 @@ const ROUTES = [
   'certificate',
   'questionnaire-submit',
   'classify-docs',
+  'brand',
 ];
 
 function toEvent(req) {

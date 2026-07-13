@@ -3,46 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HGC & ARK Capital Consulting — Deal Platform</title>
+  <title>Harvey Greystone — Deal Platform</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   <style>
 /* ===== DESIGN TOKENS ===== */
 :root {
-  --navy: #1e3a5f;
-  --navy-dark: #152d4a;
-  --navy-light: #2a4d7a;
-  --charcoal: #2c3e50;
-  --gold: #d4a853;
-  --gold-light: #e8c97a;
-  --gold-muted: rgba(212, 168, 83, 0.15);
+  --navy: #0f2b45;
+  --navy-dark: #0f2b45;
+  --navy-light: #1c3a57;
+  --charcoal: #1c3a57;
+  --accent-blue: #5aa9e0;
+  --accent-blue-light: #a9d2ef;
+  --accent-blue-muted: rgba(90, 169, 224, 0.15);
   --white: #ffffff;
-  --gray-50: #f8fafc;
-  --gray-100: #f1f5f9;
-  --gray-200: #e2e8f0;
-  --gray-300: #cbd5e1;
-  --gray-400: #94a3b8;
-  --gray-500: #64748b;
-  --gray-600: #475569;
-  --gray-700: #334155;
-  --gray-800: #1e293b;
-  --gray-900: #0f172a;
-  --success: #22c55e;
-  --success-light: rgba(34, 197, 94, 0.12);
-  --warning: #f59e0b;
-  --warning-light: rgba(245, 158, 11, 0.12);
-  --danger: #ef4444;
-  --danger-light: rgba(239, 68, 68, 0.12);
-  --info: #3b82f6;
-  --info-light: rgba(59, 130, 246, 0.12);
+  --gray-50: #f4f9fd;
+  --gray-100: #e8f3fc;
+  --gray-200: #d8e7f3;
+  --gray-300: #c8dff2;
+  --gray-400: #8fa9c0;
+  --gray-500: #69829a;
+  --gray-600: #5e7f9b;
+  --gray-700: #1c3a57;
+  --gray-800: #16324a;
+  --gray-900: #0f2b45;
+  --success: #188a4e;
+  --success-light: rgba(24, 138, 78, 0.12);
+  --warning: #b17d12;
+  --warning-light: rgba(177, 125, 18, 0.12);
+  --danger: #c34a45;
+  --danger-light: rgba(195, 74, 69, 0.12);
+  --info: #5aa9e0;
+  --info-light: rgba(90, 169, 224, 0.12);
   /* Legacy compat aliases */
   --primary: var(--navy);
   --secondary: var(--gray-500);
-  --accent: var(--gold);
+  --accent: var(--accent-blue);
   --border: var(--gray-200);
   --lighter: var(--gray-50);
   --shadow-sm-legacy: 0 1px 2px rgba(0,0,0,0.05);
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --serif: Georgia, 'Times New Roman', serif;
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
@@ -64,9 +65,9 @@
   --sidebar-width: 260px;
   --sidebar-collapsed: 64px;
   --header-height: 56px;
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
   --radius-full: 9999px;
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
   --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
@@ -78,13 +79,13 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 16px; -webkit-font-smoothing: antialiased; }
-body { font-family: var(--font-sans); color: var(--gray-800); background: var(--gray-50); line-height: var(--leading-normal); }
+body { font-family: var(--font-sans); color: var(--gray-800); background: #eef5fb; line-height: var(--leading-normal); }
 a { color: var(--navy); text-decoration: none; }
 a:hover { color: var(--navy-light); }
 input, select, textarea, button { font-family: inherit; font-size: inherit; }
 
 /* Auth screens */
-.auth-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--navy-dark) 0%, var(--charcoal) 100%); }
+.auth-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; background: #eef5fb; }
 .auth-overlay.hidden { display: none; }
 .auth-card { background: var(--white); border-radius: var(--radius-lg); padding: var(--sp-10); width: 100%; max-width: 440px; box-shadow: var(--shadow-xl); }
 .auth-logo { font-size: var(--text-xl); font-weight: 700; color: var(--navy); margin-bottom: var(--sp-2); letter-spacing: -0.02em; }
@@ -99,28 +100,27 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 /* Layout */
 .app-layout { display: flex; min-height: 100vh; }
 .app-layout.hidden { display: none; }
-.sidebar { width: var(--sidebar-width); background: var(--navy-dark); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; transition: width var(--duration) var(--ease); overflow: hidden; }
+.sidebar { width: var(--sidebar-width); background: var(--white); border-right: 1px solid var(--gray-200); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; transition: width var(--duration) var(--ease); overflow: hidden; }
 .sidebar.collapsed { width: var(--sidebar-collapsed); }
-.sidebar-brand { padding: var(--sp-6) var(--sp-5); border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: var(--sp-3); }
-.sidebar-brand-icon { width: 32px; height: 32px; background: var(--gold); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--navy-dark); font-size: var(--text-sm); flex-shrink: 0; }
-.sidebar-brand-text { font-size: var(--text-sm); font-weight: 600; color: var(--white); white-space: nowrap; overflow: hidden; }
-.sidebar-brand-sub { font-size: var(--text-xs); color: var(--gray-400); font-weight: 400; }
+.sidebar-brand { padding: var(--sp-6) var(--sp-5); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: var(--sp-3); }
+.sidebar-brand-text { font-size: var(--text-sm); font-weight: 700; color: var(--navy); white-space: nowrap; overflow: hidden; }
+.sidebar-brand-sub { font-size: var(--text-xs); color: var(--gray-500); font-weight: 400; letter-spacing: .28em; text-transform: uppercase; }
 .sidebar.collapsed .sidebar-brand-text, .sidebar.collapsed .sidebar-brand-sub, .sidebar.collapsed .nav-label, .sidebar.collapsed .sidebar-footer-info, .sidebar.collapsed .nav-section-label, .sidebar.collapsed .nav-badge { display: none; }
 .sidebar-nav { flex: 1; padding: var(--sp-4) 0; overflow-y: auto; }
-.nav-section-label { font-size: 11px; font-weight: 600; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.06em; padding: var(--sp-4) var(--sp-5) var(--sp-2); }
-.nav-item { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-5); margin: var(--sp-1) var(--sp-2); border-radius: var(--radius-md); color: var(--gray-300); cursor: pointer; transition: all var(--duration) var(--ease); font-size: var(--text-sm); font-weight: 500; white-space: nowrap; }
-.nav-item:hover { background: rgba(255,255,255,0.06); color: var(--white); }
-.nav-item.active { background: rgba(212, 168, 83, 0.15); color: var(--gold); }
+.nav-section-label { font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.06em; padding: var(--sp-4) var(--sp-5) var(--sp-2); }
+.nav-item { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-5); margin: var(--sp-1) var(--sp-2); border-radius: var(--radius-md); color: var(--gray-600); cursor: pointer; transition: all var(--duration) var(--ease); font-size: var(--text-sm); font-weight: 500; white-space: nowrap; }
+.nav-item:hover { background: var(--gray-100); color: var(--navy); }
+.nav-item.active { background: var(--accent-blue-muted); color: var(--navy); }
 .nav-item svg, .nav-icon { width: 20px; height: 20px; flex-shrink: 0; opacity: 0.7; }
 .nav-item.active svg, .nav-item.active .nav-icon { opacity: 1; }
 .nav-badge { margin-left: auto; background: var(--danger); color: var(--white); font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: var(--radius-full); min-width: 20px; text-align: center; }
-.sidebar-footer { padding: var(--sp-4) var(--sp-5); border-top: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: var(--sp-3); }
-.sidebar-avatar { width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--navy-light); display: flex; align-items: center; justify-content: center; color: var(--gold); font-weight: 600; font-size: var(--text-xs); flex-shrink: 0; }
+.sidebar-footer { padding: var(--sp-4) var(--sp-5); border-top: 1px solid var(--gray-200); display: flex; align-items: center; gap: var(--sp-3); }
+.sidebar-avatar { width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--gray-100); display: flex; align-items: center; justify-content: center; color: var(--navy); font-weight: 600; font-size: var(--text-xs); flex-shrink: 0; }
 .sidebar-footer-info { white-space: nowrap; overflow: hidden; }
-.sidebar-footer-name { font-size: var(--text-sm); color: var(--white); font-weight: 500; }
-.sidebar-footer-role { font-size: var(--text-xs); color: var(--gray-400); }
-.sidebar-collapse-btn { position: absolute; top: var(--sp-5); right: var(--sp-3); width: 28px; height: 28px; border-radius: var(--radius-full); background: rgba(255,255,255,0.08); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--gray-400); font-size: 12px; z-index: 101; }
-.sidebar-collapse-btn:hover { background: rgba(255,255,255,0.15); color: var(--white); }
+.sidebar-footer-name { font-size: var(--text-sm); color: var(--navy); font-weight: 500; }
+.sidebar-footer-role { font-size: var(--text-xs); color: var(--gray-500); }
+.sidebar-collapse-btn { position: absolute; top: var(--sp-5); right: var(--sp-3); width: 28px; height: 28px; border-radius: var(--radius-full); background: var(--gray-100); border: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--gray-500); font-size: 12px; z-index: 101; }
+.sidebar-collapse-btn:hover { background: var(--gray-200); color: var(--navy); }
 .sidebar.collapsed .sidebar-collapse-btn svg { transform: rotate(180deg); }
 .main-content { flex: 1; margin-left: var(--sidebar-width); transition: margin-left var(--duration) var(--ease); display: flex; flex-direction: column; min-height: 100vh; }
 .sidebar.collapsed ~ .main-content { margin-left: var(--sidebar-collapsed); }
@@ -155,8 +155,8 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 .btn-primary:hover:not(:disabled) { background: var(--navy-light); }
 .btn-secondary { background: var(--white); color: var(--gray-700); border: 1px solid var(--gray-300); }
 .btn-secondary:hover:not(:disabled) { background: var(--gray-50); border-color: var(--gray-400); }
-.btn-gold { background: var(--gold); color: var(--navy-dark); font-weight: 600; }
-.btn-gold:hover:not(:disabled) { background: var(--gold-light); }
+.btn-gold { background: var(--accent-blue); color: var(--navy-dark); font-weight: 600; }
+.btn-gold:hover:not(:disabled) { background: var(--accent-blue-light); }
 .btn-danger { background: var(--danger-light); color: var(--danger); }
 .btn-danger:hover:not(:disabled) { background: var(--danger); color: var(--white); }
 .btn-ghost { background: transparent; color: var(--gray-600); }
@@ -181,6 +181,8 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 
 /* Badges */
 .badge { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: var(--radius-full); font-size: 11px; font-weight: 600; letter-spacing: 0.02em; white-space: nowrap; }
+.brand-chip { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 2px 8px; border-radius: var(--radius-full); border: 1px solid var(--gray-300); color: var(--gray-600); background: var(--gray-100); vertical-align: middle; }
+.brand-serif { font-family: var(--serif); letter-spacing: .14em; }
 .badge-lead { background: var(--info-light); color: var(--info); }
 .badge-proposal { background: var(--warning-light); color: #b45309; }
 .badge-negotiation { background: #fae8ff; color: #a21caf; }
@@ -200,7 +202,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 .data-table th { text-align: left; padding: var(--sp-3) var(--sp-4); font-size: var(--text-xs); font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 2px solid var(--gray-200); background: var(--gray-50); white-space: nowrap; user-select: none; }
 .data-table td { padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--gray-100); color: var(--gray-700); vertical-align: middle; }
 .data-table tr:hover td { background: var(--gray-50); }
-.data-table tr.active td { background: var(--gold-muted); }
+.data-table tr.active td { background: var(--accent-blue-muted); }
 
 /* Progress bars */
 .progress { height: 6px; background: var(--gray-200); border-radius: var(--radius-full); overflow: hidden; }
@@ -216,8 +218,8 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 .avatar { width: 36px; height: 36px; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: var(--text-xs); flex-shrink: 0; }
 .avatar-sm { width: 28px; height: 28px; font-size: 10px; }
 .avatar-lg { width: 48px; height: 48px; font-size: var(--text-sm); }
-.avatar-navy { background: var(--navy); color: var(--gold); }
-.avatar-gold { background: var(--gold-muted); color: var(--gold); }
+.avatar-navy { background: var(--navy); color: var(--accent-blue); }
+.avatar-gold { background: var(--accent-blue-muted); color: var(--navy); }
 .avatar-gray { background: var(--gray-100); color: var(--gray-500); }
 
 /* Modals */
@@ -287,7 +289,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 /* Deal list */
 .deal-list-item { display: grid; grid-template-columns: 1fr 140px 100px 80px 120px 60px; align-items: center; padding: var(--sp-4) var(--sp-5); border-bottom: 1px solid var(--gray-100); cursor: pointer; transition: background var(--duration) var(--ease); }
 .deal-list-item:hover { background: var(--gray-50); }
-.deal-list-item.active { background: var(--gold-muted); }
+.deal-list-item.active { background: var(--accent-blue-muted); }
 .deal-list-name { font-weight: 500; color: var(--gray-800); }
 .deal-list-sub { font-size: var(--text-xs); color: var(--gray-500); margin-top: 2px; }
 
@@ -429,7 +431,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 <!-- ===== NDA SCREEN ===== -->
 <div id="ndaScreen" class="auth-overlay">
   <div class="auth-card">
-    <div class="auth-logo">HGC &amp; ARK Capital Consulting</div>
+    <div class="auth-logo brand-serif" id="authBrand">Harvey Greystone</div>
     <div class="auth-subtitle">Professional deal tracking and management system</div>
     <div class="nda-text">
       <h4>Confidentiality &amp; Non-Disclosure Agreement</h4>
@@ -480,10 +482,9 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
     </div>
     <div class="sidebar-brand">
-      <div class="sidebar-brand-icon">HG</div>
       <div>
-        <div class="sidebar-brand-text">Harvey Greystone</div>
-        <div class="sidebar-brand-sub">Capital Platform</div>
+        <div class="sidebar-brand-text brand-serif" id="brandWordmark">HARVEY GREYSTONE</div>
+        <div class="sidebar-brand-sub" id="brandTagline">Deal Platform</div>
       </div>
     </div>
     <div class="sidebar-nav">
@@ -1124,6 +1125,23 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   let contacts = [];
   let investors = [];
   let nextDealId = 17;
+
+  // --- Brand (dual-brand platform) ---
+  window.BRAND = { key: 'harveygreystone', displayName: 'Harvey Greystone', wordmark: 'HARVEY GREYSTONE', tagline: 'Deal Platform' };
+  (async function initBrand() {
+    try {
+      const r = await fetch('/api/brand' + location.search);
+      if (r.ok) window.BRAND = await r.json();
+    } catch (e) { /* offline/default is fine */ }
+    document.title = `${window.BRAND.displayName} — ${window.BRAND.tagline}`;
+    const wm = document.getElementById('brandWordmark');
+    if (wm) wm.textContent = window.BRAND.wordmark;
+    const sub = document.getElementById('brandTagline');
+    if (sub) sub.textContent = window.BRAND.tagline;
+    const authLogo = document.getElementById('authBrand');
+    if (authLogo) authLogo.textContent = window.BRAND.displayName;
+  })();
+
   let nextTaskId = 1;
   let nextContactId = 1;
   let nextInvestorId = 1;
@@ -1158,6 +1176,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         investors = data.investors || investors;
         dbReady = true;
         nextDealId = (deals.reduce((m, d) => Math.max(m, d.id), 0) || 16) + 1;
+        deals.forEach(d => { if (!d.brand) d.brand = 'harveygreystone'; });
         nextTaskId = (tasks.reduce((m, t) => Math.max(m, t.id), 0) || 0) + 1;
         nextContactId = (contacts.reduce((m, c) => Math.max(m, c.id), 0) || 0) + 1;
         nextInvestorId = (investors.reduce((m, i) => Math.max(m, i.id), 0) || 0) + 1;
@@ -1322,6 +1341,12 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
 
   function escHtml(s) {
     return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function brandChip(d) {
+    const b = d.brand === 'capitalstreams' ? 'CS' : 'HG';
+    const title = d.brand === 'capitalstreams' ? 'Capital Streams' : 'Harvey Greystone';
+    return `<span class="brand-chip" title="${escHtml(title)}">${b}</span>`;
   }
 
   function statusBadgeClass(status) {
@@ -1593,7 +1618,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         listHtml += `
           <div class="deal-list-item" draggable="true" data-deal-id="${d.id}" onclick="selectDeal(${d.id})" ondragstart="dealDragStart(event, ${d.id})" ondragover="dealDragOver(event)" ondrop="dealDrop(event, ${d.id})" ondragend="dealDragEnd(event)">
             <div>
-              <div class="deal-list-name">${escHtml(d.name)}</div>
+              <div class="deal-list-name">${escHtml(d.name)} ${brandChip(d)}</div>
               <div class="deal-list-sub">#${d.rank}${d.score ? ' · Score ' + d.score : ''} · ${formatCurrency(revenue)} est. rev${d.fundingType ? ' · <span class="badge badge-info" style="font-size:10px;padding:1px 6px;">' + escHtml(fundingTypeLabel(d.fundingType)) + '</span>' : ''}</div>
             </div>
             <div class="font-semibold">${formatCurrency(d.capital)}</div>
@@ -1621,7 +1646,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     selectedDealId = id;
     const d = deals.find(x => x.id === id);
     if (!d) return;
-    document.getElementById('dealDetailModalTitle').textContent = d.name;
+    document.getElementById('dealDetailModalTitle').innerHTML = escHtml(d.name) + ' ' + brandChip(d);
     document.getElementById('dealDetailModalSub').textContent = `${formatCurrency(d.capital)} · ${statusLabel(d.status)}${d.fundingType ? ' · ' + fundingTypeLabel(d.fundingType) : ''}`;
     document.getElementById('dealDetailModalBody').innerHTML = renderDealDetail(d);
     document.getElementById('dealDetailModal').classList.add('show');
@@ -2168,6 +2193,7 @@ ${docText}`;
     const memoText = document.getElementById('dealMemo').dataset.raw || '';
     deals.push({
       id: nextDealId++,
+      brand: (window.BRAND && window.BRAND.key) || 'harveygreystone',
       name, capital,
       status: document.getElementById('dealStatus').value,
       fee: parseFloat(document.getElementById('dealFee').value) || 5,
@@ -2435,6 +2461,7 @@ ${docText}`;
     const f = lastUwAnalysis;
     deals.push({
       id: nextDealId++,
+      brand: (window.BRAND && window.BRAND.key) || 'harveygreystone',
       name: f.name || f.company || 'Audited Deal',
       capital: parseCapital(f.capital || '0'),
       status: 'lead', fee: 5, probability: 50,

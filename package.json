@@ -5,7 +5,8 @@
   "description": "HGC & ARK Capital Consulting — deal platform + data room (Cloud Run + Cloud SQL + GCS, GCP-only)",
   "engines": { "node": ">=18" },
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test tests/*.test.js"
   },
   "dependencies": {
     "@google-cloud/vertexai": "^1.9.2",
