@@ -1864,7 +1864,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
       b.innerHTML = `<div class="card"><div class="card-body text-muted">Letterheads and contracts arrive with the AI Desk (Phase 3).</div></div>`;
     } else if (currentDealTab === 'history') {
       const rows = (d.history || []).slice().reverse().map(h => `
-        <tr><td class="text-xs text-muted" style="white-space:nowrap;">${new Date(h.at).toLocaleString()}</td>
+        <tr><td class="text-xs text-muted" style="white-space:nowrap;">${h.at ? new Date(h.at).toLocaleString() : '—'}</td>
         <td><span class="badge badge-neutral">${escHtml(h.actor || '')}</span></td>
         <td class="text-sm">${escHtml(h.note || '')}</td></tr>`).join('');
       b.innerHTML = `<div class="card"><div class="card-body">${rows
@@ -1975,6 +1975,7 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     set('dealFee', d.fee);
     set('dealProbability', d.probability);
     set('dealEquity', d.equity);
+    editingDealId = dealId;
   }
 
   function renderClientIntakeHtml(deal) {
@@ -2129,6 +2130,8 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
       }
       saveData();
       renderDeals();
+      if (typeof renderDealRail === 'function') renderDealRail();
+      if (field === 'status' && typeof renderDealPane === 'function' && selectedDealId === id && currentDealTab === 'overview') renderDealPane(id);
     }
   }
 
@@ -2143,11 +2146,14 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   }
 
   // ===== DEAL MODAL =====
+  let editingDealId = null;
   let dealFiles = [];
   let dealDropReady = false;
 
   function openAddDealModal() {
+    editingDealId = null;
     document.getElementById('addDealModal').classList.add('show');
+    document.getElementById('dealModalTitle').textContent = 'New Deal';
     dealFiles = [];
     renderDealFiles();
     ['dealName','dealCompany','dealContact','dealEmail','dealPhone','dealCapital','dealRevenue','dealYears','dealDescription','dealDocText','dealNotes','dealScore'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
@@ -2393,24 +2399,14 @@ ${docText}`;
     document.getElementById('addDealModal').classList.remove('show');
   }
 
-  function addDeal() {
-    const name = document.getElementById('dealName').value.trim();
-    const capital = parseCapital(document.getElementById('dealCapital').value);
-    if (!name) { showToast('Enter deal name', 'warning'); return; }
-
-    const newStatus = document.getElementById('dealStatus').value;
+  function readDealForm() {
     const memoText = document.getElementById('dealMemo').dataset.raw || '';
-    deals.push({
-      id: nextDealId++,
-      brand: (window.BRAND && window.BRAND.key) || 'harveygreystone',
-      name, capital,
-      status: newStatus,
-      stage: statusToStage(newStatus),
-      history: [{ at: new Date().toISOString(), stage: statusToStage(newStatus), note: 'Deal created', actor: 'team' }],
+    return {
+      name: document.getElementById('dealName').value.trim(),
+      capital: parseCapital(document.getElementById('dealCapital').value),
+      status: document.getElementById('dealStatus').value,
       fee: parseFloat(document.getElementById('dealFee').value) || 5,
       probability: parseInt(document.getElementById('dealProbability').value) || 50,
-      rank: deals.length + 1,
-      reference: '',
       company: document.getElementById('dealCompany').value,
       contact: document.getElementById('dealContact').value,
       email: document.getElementById('dealEmail').value,
@@ -2422,6 +2418,80 @@ ${docText}`;
       equity: parseFloat(document.getElementById('dealEquity').value) || 0,
       fundingType: document.getElementById('dealFundingType').value,
       score: parseInt(document.getElementById('dealScore').value) || null,
+      notes: document.getElementById('dealNotes').value || '',
+      memoText: memoText
+    };
+  }
+
+  function addDeal() {
+    const f = readDealForm();
+    if (!f.name) { showToast('Enter deal name', 'warning'); return; }
+
+    // --- Upsert: edit existing deal ---
+    if (editingDealId) {
+      const deal = deals.find(x => x.id === editingDealId);
+      if (!deal) { editingDealId = null; return; }
+      deal.name = f.name;
+      deal.capital = f.capital;
+      deal.fee = f.fee;
+      deal.probability = f.probability;
+      deal.company = f.company;
+      deal.contact = f.contact;
+      deal.email = f.email;
+      deal.phone = f.phone;
+      deal.revenue = f.revenue;
+      deal.years = f.years;
+      deal.description = f.description;
+      deal.client = f.client;
+      deal.equity = f.equity;
+      deal.fundingType = f.fundingType;
+      deal.score = f.score;
+      deal.notes = f.notes;
+      deal.memo = f.memoText;
+      // Stage update if status changed
+      if (deal.status !== f.status) {
+        deal.status = f.status;
+        const newStage = statusToStage(f.status);
+        if (deal.stage !== newStage) {
+          deal.stage = newStage;
+          recordHistory(deal, `Status changed to ${f.status} — stage moved to ${STAGE_LABEL[newStage] || newStage}`, newStage);
+        }
+      }
+      recordHistory(deal, 'Deal details edited');
+      const editedId = editingDealId;
+      editingDealId = null;
+      saveData();
+      closeAddDealModal();
+      renderDealPane(selectedDealId === editedId ? editedId : selectedDealId);
+      renderDealRail();
+      showToast('Deal updated');
+      return;
+    }
+
+    // --- New deal ---
+    const memoText = f.memoText;
+    deals.push({
+      id: nextDealId++,
+      brand: (window.BRAND && window.BRAND.key) || 'harveygreystone',
+      name: f.name, capital: f.capital,
+      status: f.status,
+      stage: statusToStage(f.status),
+      history: [{ at: new Date().toISOString(), stage: statusToStage(f.status), note: 'Deal created', actor: 'team' }],
+      fee: f.fee,
+      probability: f.probability,
+      rank: deals.length + 1,
+      reference: '',
+      company: f.company,
+      contact: f.contact,
+      email: f.email,
+      phone: f.phone,
+      revenue: f.revenue,
+      years: f.years,
+      description: f.description,
+      client: f.client,
+      equity: f.equity,
+      fundingType: f.fundingType,
+      score: f.score,
       bankerFit: window._lastAnalysis?.bankerFit || null,
       investorFit: window._lastAnalysis?.investorFit || null,
       riskScore: window._lastAnalysis?.riskScore || null,
@@ -2430,9 +2500,9 @@ ${docText}`;
       roi: window._lastAnalysis?.roi || '',
       dealType: window._lastAnalysis?.dealType || '',
       execSummary: document.getElementById('dealExecSummary').textContent !== 'Auto-generated when you scan documents.' ? document.getElementById('dealExecSummary').textContent : '',
-      files: dealFiles.map(f => ({ id: f.id, name: f.name })),
+      files: dealFiles.map(fl => ({ id: fl.id, name: fl.name })),
       memo: memoText,
-      notes: (document.getElementById('dealNotes').value || '') + (memoText ? '\n\n=== UNDERWRITING MEMO ===\n' + memoText : ''),
+      notes: f.notes + (memoText ? '\n\n=== UNDERWRITING MEMO ===\n' + memoText : ''),
       createdDate: new Date().toISOString()
     });
 
