@@ -122,6 +122,24 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 .sidebar-collapse-btn { position: absolute; top: var(--sp-5); right: var(--sp-3); width: 28px; height: 28px; border-radius: var(--radius-full); background: var(--gray-100); border: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--gray-500); font-size: 12px; z-index: 101; }
 .sidebar-collapse-btn:hover { background: var(--gray-200); color: var(--navy); }
 .sidebar.collapsed .sidebar-collapse-btn svg { transform: rotate(180deg); }
+/* Deal Rail (Task 2) */
+.rail-modules { display: flex; gap: 4px; padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--gray-200); flex-wrap: wrap; }
+.rail-icon { width: 34px; height: 34px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--gray-500); cursor: pointer; font-size: 15px; position: relative; }
+.rail-icon:hover { background: var(--gray-100); color: var(--navy); }
+.rail-icon.active { background: var(--accent-blue-muted); color: var(--navy); }
+.rail-icon svg { width: 18px; height: 18px; }
+.rail-badge { position: absolute; top: 2px; right: 2px; background: var(--danger); color: var(--white); font-size: 9px; font-weight: 700; padding: 1px 4px; border-radius: var(--radius-full); min-width: 14px; text-align: center; line-height: 14px; }
+.rail-label { font-size: 11px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: .08em; padding: var(--sp-4) var(--sp-4) var(--sp-2); }
+.intake-box { padding: 0 var(--sp-4) var(--sp-3); border-bottom: 1px solid var(--gray-200); }
+.intake-row { display: flex; gap: 6px; }
+.intake-row input { flex: 1; min-width: 0; font-size: 12px; font-family: var(--font-mono); background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: 6px 8px; color: var(--gray-600); }
+.deal-rail { flex: 1; overflow-y: auto; padding: 0 var(--sp-2) var(--sp-4); }
+.rail-deal { border: 1px solid transparent; border-radius: var(--radius-md); padding: 9px 10px; margin: 2px var(--sp-2); cursor: pointer; }
+.rail-deal:hover { background: var(--gray-50); border-color: var(--gray-200); }
+.rail-deal.active { background: var(--accent-blue-muted); border-color: var(--accent-blue-light); }
+.rail-deal-name { font-family: var(--serif); font-size: 14px; font-weight: 700; color: var(--navy); display: flex; align-items: center; gap: 6px; }
+.rail-deal-meta { font-size: 11.5px; color: var(--gray-500); margin-top: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.owner-chip { font-size: 10px; font-weight: 700; background: var(--info-light); color: var(--navy); border-radius: var(--radius-full); padding: 1px 7px; }
 .main-content { flex: 1; margin-left: var(--sidebar-width); transition: margin-left var(--duration) var(--ease); display: flex; flex-direction: column; min-height: 100vh; }
 .sidebar.collapsed ~ .main-content { margin-left: var(--sidebar-collapsed); }
 .content-header { height: var(--header-height); background: var(--white); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; padding: 0 var(--sp-8); position: sticky; top: 0; z-index: 50; }
@@ -495,46 +513,39 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
         <div class="sidebar-brand-sub" id="brandTagline">Deal Platform</div>
       </div>
     </div>
-    <div class="sidebar-nav">
-      <!-- Overview -->
-      <div class="nav-section-label">Overview</div>
-      <div class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard')">
+    <div class="rail-modules" id="railModules">
+      <!-- module icons — SVGs reused from old nav items -->
+      <div class="rail-icon active" data-tab="dashboard" title="Dashboard" onclick="switchTab('dashboard')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        <span class="nav-label">Dashboard</span>
       </div>
-      <!-- Deal Flow -->
-      <div class="nav-section-label">Deal Flow</div>
-      <div class="nav-item" data-tab="deals" onclick="switchTab('deals')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        <span class="nav-label">Deals</span>
-        <span class="nav-badge" id="navDealsCount">0</span>
-      </div>
-      <div class="nav-item" data-tab="dataroom" onclick="switchTab('dataroom')">
+      <div class="rail-icon" data-tab="dataroom" title="Data Room" onclick="switchTab('dataroom')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-        <span class="nav-label">Data Room</span>
       </div>
-      <div class="nav-item" data-tab="underwriting" onclick="switchTab('underwriting')">
+      <div class="rail-icon" data-tab="underwriting" title="Underwriting" onclick="switchTab('underwriting')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>
-        <span class="nav-label">Underwriting</span>
       </div>
-      <!-- Relationships -->
-      <div class="nav-section-label">Relationships</div>
-      <div class="nav-item" data-tab="investors" onclick="switchTab('investors')">
+      <div class="rail-icon" data-tab="investors" title="Investors" onclick="switchTab('investors')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <span class="nav-label">Investors</span>
       </div>
-      <div class="nav-item" data-tab="contacts" onclick="switchTab('contacts')">
+      <div class="rail-icon" data-tab="contacts" title="Contacts" onclick="switchTab('contacts')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-        <span class="nav-label">Contacts</span>
       </div>
-      <!-- Operations -->
-      <div class="nav-section-label">Operations</div>
-      <div class="nav-item" data-tab="tasks" onclick="switchTab('tasks')">
+      <div class="rail-icon" data-tab="tasks" title="Tasks" onclick="switchTab('tasks')" style="position:relative;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-        <span class="nav-label">Tasks</span>
-        <span class="nav-badge" id="navTasksCount" class="hidden">0</span>
+        <span class="rail-badge hidden" id="navTasksCount"></span>
       </div>
     </div>
+    <div class="intake-box">
+      <div class="rail-label">Client Intake Link</div>
+      <div class="intake-row">
+        <input id="intakeLink" readonly value="">
+        <button class="btn btn-primary btn-sm" onclick="copyIntakeLink()">Copy</button>
+      </div>
+    </div>
+    <div class="rail-label" style="display:flex;justify-content:space-between;align-items:center;">Deals
+      <button class="btn btn-ghost btn-sm" onclick="openAddDealModal()" title="New deal">＋</button>
+    </div>
+    <div class="deal-rail" id="dealRail"></div>
     <div class="sidebar-footer">
       <div class="sidebar-avatar">HG</div>
       <div class="sidebar-footer-info">
@@ -1316,13 +1327,23 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     document.getElementById('mainApp').classList.remove('hidden');
     await loadData();
     updateNavBadges();
-    renderDashboard();
+    renderDealRail();
+    // Default view: open newest deal if any, else show dashboard
+    const newestDeal = deals.length
+      ? [...deals].sort((a, b) => (b.createdDate || '').localeCompare(a.createdDate || '') || b.id - a.id)[0]
+      : null;
+    if (newestDeal) {
+      openDeal(newestDeal.id);
+    } else {
+      renderDashboard();
+    }
   }
 
   async function refreshFromDB() {
     await loadData();
     updateNavBadges();
-    const tab = document.querySelector('.nav-item.active')?.dataset.tab || 'dashboard';
+    renderDealRail();
+    const tab = document.querySelector('.rail-icon.active')?.dataset.tab || document.querySelector('.nav-item.active')?.dataset.tab || 'dashboard';
     switchTab(tab);
     showToast('Synced from server', 'success');
   }
@@ -1343,10 +1364,14 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     // Show target
     const target = document.getElementById('view-' + tab);
     if (target) target.classList.remove('hidden');
-    // Update nav active
+    // Update legacy nav active (harmless; old .nav-item elements no longer exist in HTML)
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
     const navItem = document.querySelector(`.nav-item[data-tab="${tab}"]`);
     if (navItem) navItem.classList.add('active');
+    // Update rail-icon active state
+    document.querySelectorAll('.rail-icon[data-tab]').forEach(el => el.classList.remove('active'));
+    const railIcon = document.querySelector(`.rail-icon[data-tab="${tab}"]`);
+    if (railIcon) railIcon.classList.add('active');
     // Update breadcrumb
     const titles = { dashboard: 'Dashboard', deals: 'Deals', dataroom: 'Data Room', underwriting: 'Underwriting', investors: 'Investors', contacts: 'Contacts', tasks: 'Tasks' };
     document.getElementById('breadcrumbTitle').textContent = titles[tab] || tab;
@@ -1358,6 +1383,8 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     else if (tab === 'investors') { if (window.HGCInvestors) HGCInvestors.render(); }
     else if (tab === 'contacts') renderContacts();
     else if (tab === 'tasks') renderTasks();
+    // Refresh deal rail on every tab switch
+    renderDealRail();
   }
 
   function toggleSidebar() {
@@ -1376,7 +1403,34 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
     const dc = document.getElementById('navDealsCount');
     if (dc) dc.textContent = deals.length;
     const tc = document.getElementById('navTasksCount');
-    if (tc) { tc.textContent = tasks.filter(t => !t.completed).length; tc.classList.toggle('hidden', tasks.length === 0); }
+    if (tc) {
+      const open = tasks.filter(t => !t.completed).length;
+      tc.textContent = open;
+      tc.classList.toggle('hidden', open === 0);
+    }
+  }
+
+  // ===== DEAL RAIL (Task 2) =====
+  function renderDealRail() {
+    const rail = document.getElementById('dealRail');
+    if (!rail) return;
+    const sorted = [...deals].sort((a, b) => (b.createdDate || '').localeCompare(a.createdDate || '') || b.id - a.id);
+    rail.innerHTML = sorted.map(d => `
+      <div class="rail-deal ${selectedDealId === d.id ? 'active' : ''}" onclick="openDeal(${d.id})">
+        <div class="rail-deal-name">&#128193; ${escHtml(d.name)} ${brandChip(d)}</div>
+        <div class="rail-deal-meta">
+          <span>${escHtml(STAGE_LABEL[d.stage] || d.stage || '')}</span>
+          <span class="owner-chip">${escHtml(d.owner || 'unassigned')}</span>
+        </div>
+      </div>`).join('');
+    const link = document.getElementById('intakeLink');
+    if (link && !link.value) link.value = location.origin + '/apply';
+  }
+
+  function copyIntakeLink() {
+    const link = document.getElementById('intakeLink');
+    if (!link) return;
+    navigator.clipboard.writeText(link.value).then(() => showToast('Intake link copied'));
   }
 
   // ===== UTILITIES =====
@@ -1712,6 +1766,15 @@ select.form-input { appearance: none; background-image: url("data:image/svg+xml,
   function closeDealDetailModal() {
     document.getElementById('dealDetailModal').classList.remove('show');
     selectedDealId = null;
+  }
+
+  // interim bridge — Task 3 replaces with the real openDeal
+  if (typeof openDeal !== 'function') {
+    window.openDeal = function(id) {
+      selectedDealId = id;
+      renderDealRail(); // update active highlight
+      selectDeal(id);
+    };
   }
 
   function renderDealDetail(d) {
