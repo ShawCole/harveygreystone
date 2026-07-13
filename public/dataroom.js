@@ -236,8 +236,11 @@
   function docRow(deal, id, doc, req, st) {
     const files = docFiles(st);
     const sel = STATUSES.map((s) => `<option value="${s}" ${st.status === s ? 'selected' : ''}>${STATUS_LABEL[s]}</option>`).join('');
+    // REQ turns green once the requirement is satisfied (file present or
+    // status received/reviewed/na); red while still outstanding.
+    const satisfied = isSatisfied(st) || files.length > 0;
     const reqBadge = req
-      ? '<span class="badge badge-danger">REQ</span>'
+      ? (satisfied ? '<span class="badge badge-success">REQ \u2713</span>' : '<span class="badge badge-danger">REQ</span>')
       : '<span class="badge badge-neutral">OPT</span>';
     const fileLine = files.map((f) =>
       `<div class="text-xs mt-2"><a href="#" class="text-info" data-act="download" data-path="${esc(f.path)}">${esc(f.filename)}</a> \u00b7 <a href="#" class="text-danger" data-act="remove" data-id="${esc(id)}" data-path="${esc(f.path)}">remove</a></div>`
